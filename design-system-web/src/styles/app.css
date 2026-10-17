@@ -1,0 +1,32 @@
+/* Global styles for the standalone MVP app (mirrors the essentials Storybook
+ * provided: margin reset, inherited control fonts, token-driven page surface).
+ * The design-system component CSS carries its own per-class box-sizing, so no
+ * global box-sizing reset here — keeps layout identical to the Storybook view. */
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-block-size: 100vh;
+  background: var(--yw-sys-color-surface-paper);
+  font-family: var(--yw-sys-font-ui), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  min-block-size: 100vh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
