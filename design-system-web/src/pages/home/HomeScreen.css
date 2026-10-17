@@ -1,0 +1,257 @@
+.yw-home {
+  position: relative;
+  /* Contain the floating nav's z-index so it can't escape above an app-level
+     overlay (e.g. the record-outfit sheet). */
+  isolation: isolate;
+  inline-size: 360px;
+  max-inline-size: 100%;
+  block-size: 760px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--yw-sys-color-surface-warm);
+  border-radius: 28px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  font-family: var(--yw-sys-font-ui);
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-home__top {
+  padding: 16px 16px 8px;
+}
+
+.yw-home__scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Keep every section at its natural height — a scrolling flex column would
+   otherwise shrink items (e.g. the promo banner) to fit instead of scrolling. */
+.yw-home__scroll > * {
+  flex-shrink: 0;
+}
+
+/* Raised paper card on the warm ground */
+.yw-home__card {
+  background: var(--yw-sys-color-surface-paper);
+  border-radius: var(--yw-sys-radius-xl);
+  padding: 12px 16px;
+}
+
+/* ---- Hero: mascot + 現在體感 + headline, then the metrics row ---- */
+.yw-home__hero {
+  background: var(--yw-sys-color-surface-paper);
+  border-radius: var(--yw-sys-radius-xl);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.yw-home__hero-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.yw-home__mascot {
+  flex: none;
+  inline-size: 100px;
+}
+.yw-home__mascot .yw-mascot {
+  inline-size: 100px;
+}
+.yw-home__hero-info {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* 現在體感: DM Sans 11px, warm muted */
+.yw-home__now-label {
+  font-size: 11px;
+  color: var(--yw-sys-color-text-muted-warm);
+}
+/* 16°C: DM Sans Regular 44px, ink */
+.yw-home__now-temp {
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--yw-sys-color-text-primary);
+}
+/* 晴天: icon + DM Sans Medium 14px ink */
+.yw-home__now-cond {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--yw-sys-color-text-primary);
+}
+/* 比昨天涼一些: DM Sans Bold 24px ink */
+.yw-home__headline {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* ---- Hero metrics: 實際氣溫 / 濕度 rows (label + value) + 較昨日 delta pill ---- */
+.yw-home__hero-divider {
+  block-size: var(--yw-sys-border-hairline);
+  border: none;
+  margin: 0;
+  background: var(--yw-sys-color-line);
+}
+.yw-home__hero-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.yw-home__hm-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* label: DM Sans Regular 10.5px, muted label */
+.yw-home__hm-label {
+  flex: none;
+  inline-size: 52px;
+  font-size: 10.5px;
+  color: var(--yw-sys-color-text-label);
+}
+/* value: DM Sans SemiBold 16px ink */
+.yw-home__hm-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--yw-sys-color-text-primary);
+}
+/* 較昨日 delta pill: full-radius, bg = delta direction color, white text */
+.yw-home__hm-pill {
+  margin-inline-start: auto;
+  padding: 5px 10px;
+  border-radius: var(--yw-sys-radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--yw-sys-color-text-on-dark);
+  white-space: nowrap;
+}
+
+/* 當地昨日補充列 — secondary reference, lower visual level than the pill */
+.yw-home__crosshint {
+  margin: 8px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--yw-sys-color-text-hint);
+}
+/* 昨日穿搭 · 📍城市 (cross-location section label) */
+.yw-home__sec-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.yw-home__block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* section label with bullet: DM Sans Medium 13px muted */
+.yw-home__seclabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--yw-sys-color-text-muted);
+}
+.yw-home__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--yw-sys-color-text-primary);
+}
+
+.yw-home__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.yw-home__empty {
+  font-size: 13px;
+  color: var(--yw-sys-color-text-label);
+}
+
+.yw-home__suggestion {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--yw-sys-color-text-muted-warm);
+}
+
+/* commute */
+.yw-home__commute {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.yw-home__vrule {
+  inline-size: 1px;
+  block-size: 40px;
+  background: var(--yw-sys-color-line);
+}
+.yw-home__rain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-home__rain-label {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+}
+.yw-home__rain-note {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.yw-home__h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Forecast rows sit edge-to-edge inside their card */
+.yw-home__forecast {
+  padding: 2px 16px;
+}
+
+/* Reserve clearance for the floating nav (≈65px tall + 16px bottom inset) so the
+   last card can always scroll clear of it instead of sitting underneath. */
+.yw-home__nav-spacer {
+  block-size: 96px;
+}
+
+/* floating nav — always above the scrolling cards */
+.yw-home__nav {
+  position: absolute;
+  inset-block-end: 16px;
+  inset-inline: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.yw-home__nav > * {
+  pointer-events: auto;
+}

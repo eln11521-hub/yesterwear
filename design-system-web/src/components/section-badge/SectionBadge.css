@@ -1,0 +1,22 @@
+.yw-section-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-family: var(--yw-sys-font-ui);
+  font-size: 11px;
+  font-weight: 500; /* DM Sans Medium */
+  line-height: 1.2;
+}
+
+/* Figma 226:3160 必選 */
+.yw-section-badge[data-tone="required"] {
+  background: var(--yw-sys-color-badge-required-bg);
+  color: var(--yw-sys-color-badge-required-text);
+}
+
+/* Figma 226:3191 可選 */
+.yw-section-badge[data-tone="optional"] {
+  background: var(--yw-sys-color-badge-optional-bg);
+  color: var(--yw-sys-color-badge-optional-text);
+}

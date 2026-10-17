@@ -1,0 +1,77 @@
+.yw-forecast-row {
+  display: grid;
+  grid-template-columns: 40px 30px 28px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+  padding-block: 11px;
+  border-block-end: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  font-family: var(--yw-sys-font-ui);
+}
+
+.yw-forecast-row:last-child {
+  border-block-end: none;
+}
+
+/* Figma-exact grays (174:87) */
+.yw-forecast-row__day {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555553;
+}
+
+.yw-forecast-row__icon {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+.yw-forecast-row__icon img {
+  display: block;
+}
+.yw-forecast-row__pop {
+  margin-block-start: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--yw-sys-color-delta-cold);
+}
+
+.yw-forecast-row__low {
+  font-size: 14px;
+  font-weight: 500;
+  color: #8e8e8c;
+  text-align: end;
+}
+
+.yw-forecast-row__high {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--yw-sys-color-text-primary);
+  text-align: end;
+}
+
+/* bar: track = ink 8%, solid warm fill (#e8a44a), white knob for today */
+.yw-forecast-row__bar {
+  position: relative;
+  inline-size: auto;
+  block-size: 6px;
+  border-radius: 3px;
+  background: rgb(17 17 17 / 8%);
+}
+.yw-forecast-row__fill {
+  position: absolute;
+  inset-block: 0;
+  min-inline-size: 8px;
+  border-radius: 3px;
+  background: var(--yw-sys-color-delta-warm);
+}
+.yw-forecast-row__knob {
+  position: absolute;
+  inset-block-start: 50%;
+  inline-size: 9px;
+  block-size: 9px;
+  margin-inline-start: -4.5px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgb(17 17 17 / 15%);
+}

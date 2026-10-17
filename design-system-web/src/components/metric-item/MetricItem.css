@@ -1,0 +1,21 @@
+.yw-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: var(--yw-sys-font-ui);
+}
+
+/* label: IBM Plex Mono 10px #8c8680 (Figma 176:12) */
+.yw-metric-item__label {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--yw-sys-color-text-label);
+}
+
+/* value: DM Sans Medium 13px #111 (Figma 176:13) */
+.yw-metric-item__value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--yw-sys-color-text-primary);
+}

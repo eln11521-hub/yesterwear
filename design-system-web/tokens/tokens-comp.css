@@ -1,0 +1,29 @@
+/* Component tokens hold per-component slots. References the sys layer only. */
+
+:root {
+  /* ---- OutfitChip ---- */
+  --yw-comp-chip-radius: var(--yw-sys-radius-full);
+  --yw-comp-chip-padding-y: var(--yw-sys-spacing-sm);
+  --yw-comp-chip-padding-x: var(--yw-sys-spacing-md);
+  --yw-comp-chip-gap: var(--yw-sys-spacing-sm);
+  --yw-comp-chip-border-color: var(--yw-sys-color-line);
+  --yw-comp-chip-bg: var(--yw-sys-color-surface-white);
+  --yw-comp-chip-label-color: var(--yw-sys-color-text-primary);
+  --yw-comp-chip-label-size: var(--yw-sys-type-body-size);
+  --yw-comp-chip-icon-size: var(--yw-sys-icon-size-sm);
+  --yw-comp-chip-selected-bg: var(--yw-sys-color-text-primary);
+  --yw-comp-chip-selected-border-color: var(--yw-sys-color-text-primary);
+  --yw-comp-chip-selected-label-color: var(--yw-sys-color-text-on-dark);
+
+  /* ---- PrimaryButton ---- */
+  --yw-comp-button-bg: var(--yw-sys-color-text-primary);
+  --yw-comp-button-label-color: var(--yw-sys-color-text-on-dark);
+  --yw-comp-button-label-size: var(--yw-sys-type-body-size);
+  --yw-comp-button-label-weight: var(--yw-sys-type-body-weight);
+  --yw-comp-button-radius: var(--yw-sys-radius-md);
+  --yw-comp-button-padding-y: var(--yw-sys-spacing-md);
+  --yw-comp-button-padding-x: var(--yw-sys-spacing-2xl);
+  --yw-comp-button-disabled-opacity: var(--yw-sys-opacity-disabled);
+  --yw-comp-button-pressed-scale: var(--yw-sys-motion-scale-pressed);
+  --yw-comp-button-tap-duration: var(--yw-sys-motion-tap-duration);
+}

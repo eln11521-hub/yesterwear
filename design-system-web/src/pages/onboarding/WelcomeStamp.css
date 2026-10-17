@@ -1,0 +1,150 @@
+/* WelcomeStamp — illustrated postage-stamp hero for onboarding Step 1.
+   Warm muted ground + perforated paper stamp; all type uses the design-system
+   fonts/tokens, art colors (tape/sun/ground) are illustration paint. */
+
+.yw-wstamp-ground {
+  inline-size: 100%;
+  box-sizing: border-box;
+  margin-block-start: 6px;
+  display: flex;
+  justify-content: center;
+  padding: 20px 16px;
+  border-radius: 24px;
+  background: #ece3d5;
+}
+
+.yw-wstamp {
+  position: relative;
+  inline-size: 256px;
+  block-size: 366px;
+  filter: drop-shadow(0 6px 16px rgba(60, 48, 26, 0.16));
+}
+
+.yw-wstamp__paper {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.yw-wstamp__content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 34px 26px 26px;
+  text-align: center;
+}
+
+/* Date pill (echoes the image-1 date chip) */
+.yw-wstamp__date {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #f0ebe4;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  color: var(--yw-sys-color-text-muted);
+}
+
+.yw-wstamp__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--yw-sys-font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* Hero: mascot bunny standing beside the 現在體感 number */
+.yw-wstamp__hero {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-block-start: 2px;
+}
+.yw-wstamp__bunny {
+  display: block;
+  height: auto;
+}
+.yw-wstamp__bigcol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+.yw-wstamp__biglabel {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-wstamp__big {
+  font-family: var(--yw-sys-font-ui);
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* Signature signal — the black "stamp" badge (image-1 wordmark echo) */
+.yw-wstamp__delta {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.yw-wstamp__metrics {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 11px;
+  color: var(--yw-sys-color-text-muted);
+}
+
+.yw-wstamp__rule {
+  inline-size: 120px;
+  block-size: 0;
+  border-block-start: 1px dashed var(--yw-sys-color-line);
+  margin-block: 1px;
+}
+
+.yw-wstamp__outfit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.yw-wstamp__olabel {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-wstamp__chips {
+  display: flex;
+  gap: 6px;
+}
+.yw-wstamp__chip {
+  padding: 3px 10px;
+  border: 1px solid var(--yw-sys-color-line);
+  border-radius: 999px;
+  background: #fff;
+  font-family: var(--yw-sys-font-ui);
+  font-size: 11.5px;
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-wstamp__commute {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  color: var(--yw-sys-color-text-muted);
+}

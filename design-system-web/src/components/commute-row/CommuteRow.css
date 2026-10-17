@@ -1,0 +1,35 @@
+.yw-commute-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--yw-sys-font-ui);
+  white-space: nowrap;
+}
+
+/* slot: IBM Plex Mono 10.5px #8c8680 (Figma 174:54) */
+.yw-commute-row__slot {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--yw-sys-color-text-label);
+}
+
+/* temp: DM Sans Bold 24px #111, tracking -0.24 (Figma 174:55) */
+.yw-commute-row__temp {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.24px;
+  line-height: 1;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* delta: 較昨日 (#8c8680, 10px) + arrow (semibold, state color) */
+.yw-commute-row__delta {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-commute-row__delta-val {
+  font-weight: 600;
+}

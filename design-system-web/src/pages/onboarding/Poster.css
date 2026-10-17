@@ -1,0 +1,380 @@
+/* Style B poster onboarding — full-bleed photo, warm dark scrim, grotesque
+   headline + mono body, loose felt-marker stickers. Serif/grotesque + mono are
+   scoped here (loaded in preview-head), not part of the design-system tokens. */
+
+.yw-poster {
+  position: relative;
+  inline-size: 340px;
+  max-inline-size: 100%;
+  block-size: 720px;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 40px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  color: #f3ead9;
+}
+
+.yw-poster__bg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Warm dark scrim — keeps the photo vivid (no white wash) while cream text reads. */
+.yw-poster__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 17, 7, 0.36) 0%,
+    rgba(28, 17, 7, 0.22) 30%,
+    rgba(24, 14, 5, 0.42) 60%,
+    rgba(18, 10, 3, 0.82) 100%
+  );
+}
+
+/* Back control (steps 2+) */
+.yw-poster__back {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  inline-size: 34px;
+  block-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: rgba(243, 234, 217, 0.16);
+  color: #f3ead9;
+  cursor: pointer;
+}
+.yw-poster__back:active {
+  transform: scale(var(--yw-sys-motion-scale-pressed));
+}
+
+.yw-poster__content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 58px 30px 0;
+}
+
+/* Mono kicker (image-2 typewriter label) */
+.yw-poster__kicker {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: rgba(243, 234, 217, 0.9);
+}
+
+/* Big grotesque headline (image-1 "Hayes Valley" heavy sans) */
+.yw-poster__headline {
+  margin: 12px 0 0;
+  font-family: "Archivo Black", "DM Sans", sans-serif;
+  font-weight: 400;
+  font-size: 46px;
+  line-height: 0.98;
+  letter-spacing: -1px;
+  color: #f5ecdb;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.42);
+}
+
+/* Illustration area — holds one sticker or a small collage. No shadow. */
+.yw-poster__art {
+  margin-block-start: 22px;
+  min-block-size: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.yw-sticker {
+  inline-size: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Single stickers — casual tilts, per-motif sizing */
+.yw-poster__solo {
+  display: block;
+}
+.yw-poster__solo--pin {
+  inline-size: 116px;
+  transform: rotate(-6deg);
+}
+.yw-poster__solo--bell {
+  inline-size: 118px;
+  transform: rotate(7deg);
+}
+.yw-poster__solo--widget {
+  inline-size: 150px;
+  transform: rotate(-5deg);
+}
+.yw-poster__solo--check {
+  inline-size: 118px;
+  transform: rotate(-6deg);
+}
+
+/* Step 1 collage — sweater + big orange wool sock dropped casually */
+.yw-poster__collage {
+  position: relative;
+  inline-size: 246px;
+  block-size: 200px;
+}
+.yw-poster__collage .yw-poster__s-sweater {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  inline-size: 182px;
+  transform: rotate(-7deg);
+}
+.yw-poster__collage .yw-poster__s-sock {
+  position: absolute;
+  right: 2px;
+  top: 22px;
+  inline-size: 126px;
+  transform: rotate(15deg);
+}
+
+/* Mono body caption, letter-spaced & justified (image-2 paragraph) */
+.yw-poster__caption {
+  margin: 26px 0 0;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.95;
+  letter-spacing: 0.4px;
+  text-align: justify;
+  color: rgba(243, 234, 217, 0.92);
+  max-inline-size: 250px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+}
+
+.yw-poster__footer {
+  position: relative;
+  z-index: 2;
+  padding: 14px 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.yw-poster__dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+.yw-poster__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: rgba(243, 234, 217, 0.4);
+}
+.yw-poster__dot[data-active="true"] {
+  inline-size: 18px;
+  background: #f3ead9;
+}
+.yw-poster__btn {
+  inline-size: 100%;
+  padding-block: 13px;
+  border: none;
+  border-radius: var(--yw-sys-radius-md);
+  background: #f1e7d2;
+  color: #241206;
+  font-family: var(--yw-sys-font-ui);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.yw-poster__btn:active {
+  transform: scale(var(--yw-sys-motion-scale-pressed));
+}
+
+/* ---- Light card variant (Step 2): cream ground, dark text, framed photo ---- */
+.yw-poster--light {
+  background: #f5f5f5;
+  color: #111;
+}
+.yw-poster--light .yw-poster__kicker {
+  color: rgba(17, 17, 17, 0.7);
+}
+.yw-poster--light .yw-poster__headline {
+  color: #111;
+  text-shadow: none;
+}
+.yw-poster--light .yw-poster__caption {
+  color: #111;
+  text-shadow: none;
+}
+.yw-poster--light .yw-poster__dot {
+  background: rgba(17, 17, 17, 0.28);
+}
+.yw-poster--light .yw-poster__dot[data-active="true"] {
+  background: #111;
+}
+.yw-poster--light .yw-poster__back {
+  background: rgba(17, 17, 17, 0.08);
+  color: #111;
+}
+
+/* Rounded photo card holding a small sticker (Figma: 260×200, radius 80) */
+.yw-poster__photocard {
+  position: relative;
+  margin-block-start: 22px;
+  inline-size: 260px;
+  block-size: 200px;
+  border-radius: 80px;
+  overflow: hidden;
+}
+.yw-poster__photocard > img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.yw-poster__cardart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.yw-poster__cardpin {
+  inline-size: 58px;
+}
+
+/* ---- Cream variant (Step 1): warm paper ground, dark text, quadrant chart ---- */
+.yw-poster--cream {
+  background: #f4efe3;
+  color: #241206;
+}
+.yw-poster--cream .yw-poster__kicker {
+  color: rgba(36, 18, 6, 0.66);
+}
+.yw-poster--cream .yw-poster__headline {
+  color: #241206;
+  text-shadow: none;
+}
+.yw-poster--cream .yw-poster__caption {
+  color: rgba(36, 18, 6, 0.9);
+  text-shadow: none;
+}
+.yw-poster--cream .yw-poster__dot {
+  background: rgba(36, 18, 6, 0.26);
+}
+.yw-poster--cream .yw-poster__dot[data-active="true"] {
+  background: #241206;
+}
+.yw-poster--cream .yw-poster__back {
+  background: rgba(36, 18, 6, 0.08);
+  color: #241206;
+}
+/* Ink CTA — a cream pill would vanish on the cream ground */
+.yw-poster--cream .yw-poster__btn {
+  background: #241206;
+  color: #f1e7d2;
+}
+
+/* Art area holding the full quadrant chart (a touch taller than the sticker slot) */
+.yw-poster__art--chart {
+  margin-block-start: 20px;
+  min-block-size: 246px;
+  overflow: visible;
+}
+
+/* 2×2 chart: temperature (warm↑ / cold↓) × humidity (dry← / humid→) */
+.yw-poster__quad {
+  position: relative;
+  inline-size: 284px;
+  block-size: 224px;
+}
+.yw-poster__quad-line {
+  position: absolute;
+  background: none;
+}
+.yw-poster__quad-line--v {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px dashed rgba(36, 18, 6, 0.4);
+}
+.yw-poster__quad-line--h {
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed rgba(36, 18, 6, 0.4);
+}
+
+.yw-poster__quad-lbl {
+  position: absolute;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(36, 18, 6, 0.62);
+  background: #f4efe3;
+  padding: 1px 4px;
+}
+.yw-poster__quad-lbl--top {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.yw-poster__quad-lbl--bottom {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.yw-poster__quad-lbl--left {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.yw-poster__quad-lbl--right {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.yw-poster__quad-item {
+  position: absolute;
+}
+.yw-poster__quad-item--tl {
+  left: 10px;
+  top: 6px;
+  inline-size: 88px;
+  transform: rotate(-6deg);
+}
+.yw-poster__quad-item--tr {
+  right: 12px;
+  top: 4px;
+  inline-size: 74px;
+  transform: rotate(6deg);
+}
+.yw-poster__quad-item--bl {
+  left: 4px;
+  bottom: 2px;
+  inline-size: 100px;
+  transform: rotate(-5deg);
+}
+.yw-poster__quad-item--br {
+  right: 14px;
+  bottom: 2px;
+  inline-size: 72px;
+  transform: rotate(7deg);
+}

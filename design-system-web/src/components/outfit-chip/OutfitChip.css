@@ -1,0 +1,45 @@
+.yw-outfit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px 9px 12px; /* py9 pl12 pr14 (Figma 226:3163) */
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  border-radius: 999px;
+  background: var(--yw-sys-color-surface-white);
+  color: var(--yw-sys-color-text-primary);
+  font-family: var(--yw-sys-font-ui);
+  cursor: pointer;
+  transition:
+    background var(--yw-sys-motion-state-duration) var(--yw-sys-motion-ease-out),
+    border-color var(--yw-sys-motion-state-duration)
+      var(--yw-sys-motion-ease-out),
+    color var(--yw-sys-motion-state-duration) var(--yw-sys-motion-ease-out);
+}
+
+.yw-outfit-chip__label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: inherit;
+  white-space: nowrap;
+}
+
+/* compact = home display (Figma 173:2919): smaller, muted label */
+.yw-outfit-chip[data-compact="true"] {
+  padding: 6px 12px 6px 10px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-outfit-chip[data-compact="true"] .yw-outfit-chip__label {
+  font-size: 13px;
+}
+
+.yw-outfit-chip[data-selected="true"] {
+  background: var(--yw-sys-color-text-primary);
+  border-color: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+}
+
+.yw-outfit-chip:focus-visible {
+  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
+  outline-offset: 2px;
+}

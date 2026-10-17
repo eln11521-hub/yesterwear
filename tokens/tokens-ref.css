@@ -1,0 +1,147 @@
+/**
+ * Reference Tokens（引用代碼）
+ *
+ * Raw, authored values extracted from Figma, design direction, and implemented code.
+ * These are the source of truth for all design values.
+ *
+ * Names use palette/scale terms only (no semantic or component names).
+ * On-grid length values intentionally coincide across axes (radius/spacing/type);
+ * those coincidences are marked `token-review: keep-distinct` — a 4pt grid reuses
+ * the same pixel value for different, independently-scaling roles.
+ *
+ * See TOKEN_ARCHITECTURE.md for semantic layer (sys-*) and component layer (comp-*)
+ */
+
+:root {
+  /* ============================================
+     COLOR REFERENCES（顏色引用）
+     ============================================ */
+
+  /* Delta States（溫度差狀態） */
+  --ref-color-delta-cold: #5A7A94;              /* dusty slate, cool/降溫 state */
+  --ref-color-delta-cold-light: #6C8AA4;        /* lighter variant for gradient */
+  --ref-color-delta-cold-dark: #435D76;         /* darker variant for gradient end */
+  --ref-color-delta-neutral: #9E9E9E;           /* neutral gray, 持平 state */
+  --ref-color-delta-warm: #E8A44A;              /* editorial orange, 升溫 state */
+
+  /* Base Palette（基礎色板） — raw palette names only */
+  --ref-color-cream: #FAF7F2;                   /* warm cream */
+  --ref-color-beige: #F0EBE4;                   /* beige */
+  --ref-color-ink: #111;                        /* near-black */
+  --ref-color-gray-mid: #666;                   /* medium gray */
+  --ref-color-gray-light: #999;                 /* light gray */
+  --ref-color-white: #FFFFFF;                   /* white */
+
+  /* ============================================
+     RADIUS REFERENCES（半徑引用）
+     4pt grid: 12, 16, 20, 24, 28, 48
+     ============================================ */
+
+  --ref-radius-sm: 12px;    /* token-review: keep-distinct — grid coincidence */
+  --ref-radius-md: 16px;    /* token-review: keep-distinct — grid coincidence */
+  --ref-radius-lg: 20px;    /* token-review: keep-distinct — grid coincidence */
+  --ref-radius-xl: 24px;    /* token-review: keep-distinct — grid coincidence */
+  --ref-radius-2xl: 28px;   /* token-review: keep-distinct — grid coincidence */
+  --ref-radius-full: 48px;  /* full round, floating nav */
+
+  /* ============================================
+     SPACING REFERENCES（間距引用）
+     4pt grid: 4, 8, 12, 16, 20, 24
+     ============================================ */
+
+  --ref-space-xs: 4px;      /* token-review: keep-distinct — grid coincidence */
+  --ref-space-sm: 8px;      /* token-review: keep-distinct — grid coincidence */
+  --ref-space-md: 12px;     /* token-review: keep-distinct — grid coincidence */
+  --ref-space-lg: 16px;     /* token-review: keep-distinct — grid coincidence */
+  --ref-space-xl: 20px;     /* token-review: keep-distinct — grid coincidence */
+  --ref-space-2xl: 24px;    /* token-review: keep-distinct — grid coincidence */
+
+  /* ============================================
+     TYPOGRAPHY REFERENCES（排版引用）
+     Type scale: 10, 12, 16, 22, 44
+     ============================================ */
+
+  --ref-type-micro-size: 10px;    /* token-review: keep-distinct — type scale */
+  --ref-type-caption-size: 12px;  /* token-review: keep-distinct — type scale */
+  --ref-type-body-size: 16px;     /* token-review: keep-distinct — type scale */
+  --ref-type-title-size: 22px;    /* token-review: keep-distinct — type scale */
+  --ref-type-hero-size: 44px;
+
+  --ref-type-weight-medium: 500;
+  --ref-type-weight-semibold: 600;
+
+  --ref-type-line-height-tight: 1.1;
+  --ref-type-line-height-normal: 1.2;
+  --ref-type-line-height-body: 1.5;
+  --ref-type-line-height-caption: 1.4;
+  --ref-type-line-height-micro: 1.3;
+
+  --ref-type-tracking-normal: 0;
+  --ref-type-tracking-label: 1.2px;  /* token-review: keep-distinct — uppercase label tracking */
+
+  /* ============================================
+     OPACITY REFERENCES（透明度引用）
+     Non-numeric names so downstream var() refs read as references
+     ============================================ */
+
+  --ref-opacity-solid: 1;
+  --ref-opacity-gradient-mid: 0.55;             /* gradient layer 1 */
+  --ref-opacity-gradient-light: 0.18;           /* gradient layer 2 */
+  --ref-opacity-strong: 0.72;                   /* translucent overlay on gradient */
+  --ref-opacity-faint: 0.22;                    /* large blurred circle */
+  --ref-opacity-soft: 0.35;                     /* small blurred circle, subtle borders */
+  --ref-opacity-half: 0.5;                      /* muted / inactive UI */
+  --ref-opacity-sheer: 0.15;                    /* very subtle backgrounds */
+
+  /* ============================================
+     BLUR REFERENCES（模糊引用）
+     ============================================ */
+
+  --ref-blur-sm: 30px;                          /* small blurred circle */
+  --ref-blur-lg: 40px;                          /* large blurred circle */
+
+  /* ============================================
+     ICON REFERENCES（圖示引用）
+     Line icons (lucide-style), consistent stroke
+     ============================================ */
+
+  --ref-icon-size-sm: 16px;      /* token-review: keep-distinct — icon scale */
+  --ref-icon-size-md: 20px;      /* token-review: keep-distinct — icon scale */
+  --ref-icon-size-lg: 24px;      /* token-review: keep-distinct — icon scale */
+  --ref-icon-stroke-thin: 1.5px; /* token-review: keep-distinct — icon stroke */
+  --ref-icon-stroke-base: 2px;   /* token-review: keep-distinct — icon stroke */
+
+  /* ============================================
+     BORDER REFERENCES（邊框引用）
+     ============================================ */
+
+  --ref-border-hairline: 1px;    /* token-review: keep-distinct — card borders */
+
+  /* ============================================
+     MOTION REFERENCES（動畫引用）
+     ============================================ */
+
+  --ref-motion-duration-tap: 0.08s;             /* button press feedback */
+  --ref-motion-duration-state: 0.2s;            /* delta state color change */
+  --ref-motion-duration-transition: 0.3s;       /* page/atmosphere transition */
+  --ref-motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ref-motion-scale-down: 0.95;                /* button press scale */
+
+  /* ============================================
+     FONT FAMILY REFERENCES（字體族引用）
+     See DESIGN_PRINCIPLES.md for font integration notes
+     ============================================ */
+
+  --ref-font-ui: "DM Sans", system-ui, -apple-system, sans-serif;
+  --ref-font-mono: "IBM Plex Mono", "Monaco", monospace;
+
+  /* Note: Font files not yet integrated into project.
+     Currently using system fonts; these tokens prepare
+     for future integration of DM Sans + IBM Plex Mono. */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode placeholder - future enhancement */
+  }
+}

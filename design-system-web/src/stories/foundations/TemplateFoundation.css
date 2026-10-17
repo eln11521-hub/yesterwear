@@ -1,0 +1,86 @@
+.yw-foundation {
+  display: grid;
+  gap: var(--yw-sys-spacing-2xl);
+  min-block-size: 100vh;
+  padding: var(--yw-sys-spacing-2xl);
+  color: var(--yw-sys-color-text-primary);
+  background: var(--yw-sys-color-surface-paper);
+  font-family: var(--yw-sys-font-ui);
+}
+
+.yw-foundation__header {
+  display: grid;
+  gap: var(--yw-sys-spacing-xs);
+}
+
+.yw-foundation__header p,
+.yw-foundation__header h2 {
+  margin: 0;
+}
+
+.yw-foundation__header p {
+  color: var(--yw-sys-color-delta-warm);
+  font-size: var(--yw-sys-type-caption-size);
+  font-weight: var(--yw-sys-type-micro-weight);
+  letter-spacing: var(--yw-sys-type-label-tracking);
+  text-transform: uppercase;
+}
+
+.yw-foundation__header h2 {
+  color: var(--yw-sys-color-text-primary);
+  font-size: var(--yw-sys-type-hero-size);
+  font-weight: var(--yw-sys-type-hero-weight);
+}
+
+.yw-foundation__section {
+  display: grid;
+  gap: var(--yw-sys-spacing-md);
+}
+
+.yw-foundation__h3 {
+  margin: 0;
+  font-size: var(--yw-sys-type-body-size);
+  font-weight: var(--yw-sys-type-title-weight);
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-foundation__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--yw-sys-spacing-md);
+  max-inline-size: 768px;
+}
+
+.yw-foundation__swatch {
+  display: flex;
+  gap: var(--yw-sys-spacing-md);
+  align-items: center;
+  padding: var(--yw-sys-spacing-lg);
+  background: var(--yw-sys-color-surface-white);
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  border-radius: var(--yw-sys-radius-md);
+}
+
+.yw-foundation__color {
+  flex: none;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--yw-sys-radius-sm);
+}
+
+.yw-foundation__swatch div {
+  display: grid;
+  gap: var(--yw-sys-spacing-xs);
+}
+
+.yw-foundation__swatch strong {
+  color: var(--yw-sys-color-text-primary);
+  font-size: var(--yw-sys-type-body-size);
+}
+
+.yw-foundation__swatch code,
+.yw-foundation code {
+  color: var(--yw-sys-color-text-secondary);
+  font-family: var(--yw-sys-font-mono);
+  font-size: var(--yw-sys-type-caption-size);
+}

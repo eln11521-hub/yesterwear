@@ -1,0 +1,81 @@
+/**
+ * Component Tokens（組件代碼）
+ *
+ * Component-specific token slots. Each component's token contract.
+ *
+ * RULE: Component tokens reference ONLY sys-* tokens, never ref-* or raw values.
+ * See design-system/components/*.md for each component's full spec.
+ */
+
+:root {
+  /* ============================================
+     METRIC BLOCK（指標區塊）
+     components/metric-block.md
+     ============================================ */
+
+  --comp-metric-label-size: var(--sys-type-caption-size);
+  --comp-metric-label-weight: var(--sys-type-caption-weight);
+  --comp-metric-label-color: var(--sys-text-secondary);
+  --comp-metric-label-tracking: var(--sys-type-label-tracking);   /* uppercase */
+  --comp-metric-value-size: var(--sys-type-title-size);
+  --comp-metric-value-weight: var(--sys-type-title-weight);
+  --comp-metric-value-color: var(--sys-text-primary);
+  --comp-metric-subtitle-size: var(--sys-type-caption-size);
+  --comp-metric-subtitle-color: var(--sys-text-secondary);
+  --comp-metric-gap-tight: var(--sys-spacing-xs);                 /* 4pt */
+
+  /* ============================================
+     COMMUTE DELTA CARD（通勤溫差卡）
+     components/commute-delta-card.md
+     Delta color driven at runtime by TempDeltaState:
+       cooler  -> var(--sys-delta-cold)
+       neutral -> var(--sys-delta-neutral)
+       warmer  -> var(--sys-delta-warm)
+     ============================================ */
+
+  --comp-delta-card-bg: var(--sys-surface-white);
+  --comp-delta-card-bg-opacity: var(--sys-opacity-overlay);       /* 0.72 */
+  --comp-delta-card-border-opacity: var(--sys-opacity-subtle);    /* 0.35 */
+  --comp-delta-card-border-width: var(--sys-border-hairline);     /* 1px */
+  --comp-delta-card-radius: var(--sys-radius-lg);                 /* 20pt */
+  --comp-delta-card-padding: var(--sys-spacing-lg);              /* 16pt */
+  --comp-delta-card-gap: var(--sys-spacing-sm);                  /* 8pt */
+  --comp-delta-card-title-size: var(--sys-type-body-size);
+  --comp-delta-card-title-color: var(--sys-text-primary);
+  --comp-delta-card-delta-size: var(--sys-type-title-size);
+  --comp-delta-card-delta-color: var(--sys-text-primary);
+  --comp-delta-card-icon-size: var(--sys-icon-size-md);          /* 20pt, colored by state */
+  --comp-delta-card-comparison-size: var(--sys-type-caption-size);
+  --comp-delta-card-comparison-color: var(--sys-text-secondary);
+  --comp-delta-card-hint-size: var(--sys-type-caption-size);
+  --comp-delta-card-hint-color: var(--sys-text-secondary);
+
+  /* ============================================
+     DELTA ATMOSPHERE（溫差背景）
+     components/delta-atmosphere.md
+     Gradient primary color driven at runtime by TempDeltaState.
+     ============================================ */
+
+  --comp-atmosphere-gradient-stop1-opacity: var(--sys-opacity-gradient-mid);    /* 0.55 */
+  --comp-atmosphere-gradient-stop2-opacity: var(--sys-opacity-gradient-light);  /* 0.18 */
+  --comp-atmosphere-gradient-end: var(--sys-surface-paper);
+  --comp-atmosphere-circle-primary-opacity: var(--sys-opacity-atmosphere-circle-primary);  /* 0.22 */
+  --comp-atmosphere-circle-primary-blur: var(--sys-blur-lg);      /* 40pt */
+  --comp-atmosphere-circle-accent-color: var(--sys-surface-white);
+  --comp-atmosphere-circle-accent-opacity: var(--sys-opacity-atmosphere-circle-accent);    /* 0.35 */
+  --comp-atmosphere-circle-accent-blur: var(--sys-blur-sm);      /* 30pt */
+
+  /* ============================================
+     PRIMARY BUTTON（主要按鈕）
+     components/primary-button.md
+     ============================================ */
+
+  --comp-button-primary-text-size: var(--sys-type-body-size);
+  --comp-button-primary-text-color: var(--sys-text-on-dark);     /* white */
+  --comp-button-primary-bg: var(--sys-text-primary);             /* #111 ink */
+  --comp-button-primary-radius: var(--sys-radius-md);            /* 16pt (was 14 off-grid) */
+  --comp-button-primary-padding-vertical: var(--sys-spacing-md); /* 12pt */
+  --comp-button-primary-scale-pressed: var(--sys-motion-scale-pressed);  /* 0.95 */
+  --comp-button-primary-opacity-disabled: var(--sys-opacity-disabled);   /* 0.5 */
+  --comp-button-primary-tap-duration: var(--sys-motion-tap-duration);    /* 0.08s */
+}

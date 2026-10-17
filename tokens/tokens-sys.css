@@ -1,0 +1,133 @@
+/**
+ * System Tokens（系統代碼）
+ *
+ * Semantic roles that map reference tokens to design intent.
+ * System tokens are product-wide and reusable.
+ *
+ * RULE: System tokens reference ONLY ref-* tokens, never raw values.
+ * See TOKEN_ARCHITECTURE.md for the full semantic model.
+ */
+
+:root {
+  /* ============================================
+     COLOR SYSTEM（色彩系統）
+     ============================================ */
+
+  /* Delta States — the app's signature temperature-comparison signal */
+  --sys-delta-cold: var(--ref-color-delta-cold);
+  --sys-delta-cold-light: var(--ref-color-delta-cold-light);
+  --sys-delta-cold-dark: var(--ref-color-delta-cold-dark);
+  --sys-delta-neutral: var(--ref-color-delta-neutral);
+  --sys-delta-warm: var(--ref-color-delta-warm);
+
+  /* Text Colors */
+  --sys-text-primary: var(--ref-color-ink);
+  --sys-text-secondary: var(--ref-color-gray-mid);
+  --sys-text-tertiary: var(--ref-color-gray-light);
+  --sys-text-on-dark: var(--ref-color-white);        /* text on dark button/badge */
+
+  /* Surface Colors */
+  --sys-surface-paper: var(--ref-color-cream);       /* screen background */
+  --sys-surface-raised: var(--ref-color-beige);      /* raised container (was surface-card) */
+  --sys-surface-white: var(--ref-color-white);       /* modal, translucent fill */
+
+  /* ============================================
+     OPACITY SYSTEM（透明度系統）
+     ============================================ */
+
+  --sys-opacity-solid: var(--ref-opacity-solid);
+  --sys-opacity-overlay: var(--ref-opacity-strong);             /* translucent surface on gradient */
+  --sys-opacity-gradient-mid: var(--ref-opacity-gradient-mid);
+  --sys-opacity-gradient-light: var(--ref-opacity-gradient-light);
+  --sys-opacity-subtle: var(--ref-opacity-soft);                /* borders */
+  --sys-opacity-disabled: var(--ref-opacity-half);
+  --sys-opacity-faint: var(--ref-opacity-sheer);
+
+  /* ============================================
+     TYPOGRAPHY SYSTEM（排版系統）
+     ============================================ */
+
+  /* Font families */
+  --sys-font-ui: var(--ref-font-ui);
+  --sys-font-mono: var(--ref-font-mono);              /* numbers, temps, percentages */
+
+  /* Type roles — each pairs size + weight + line-height */
+  --sys-type-hero-size: var(--ref-type-hero-size);
+  --sys-type-hero-weight: var(--ref-type-weight-semibold);
+  --sys-type-hero-line-height: var(--ref-type-line-height-tight);
+
+  --sys-type-title-size: var(--ref-type-title-size);
+  --sys-type-title-weight: var(--ref-type-weight-semibold);
+  --sys-type-title-line-height: var(--ref-type-line-height-normal);
+
+  --sys-type-body-size: var(--ref-type-body-size);
+  --sys-type-body-weight: var(--ref-type-weight-medium);
+  --sys-type-body-line-height: var(--ref-type-line-height-body);
+
+  --sys-type-caption-size: var(--ref-type-caption-size);
+  --sys-type-caption-weight: var(--ref-type-weight-medium);
+  --sys-type-caption-line-height: var(--ref-type-line-height-caption);
+
+  --sys-type-micro-size: var(--ref-type-micro-size);
+  --sys-type-micro-weight: var(--ref-type-weight-semibold);
+  --sys-type-micro-line-height: var(--ref-type-line-height-micro);
+
+  /* Label tracking (uppercase micro/caption labels) */
+  --sys-type-label-tracking: var(--ref-type-tracking-label);
+
+  /* ============================================
+     SPACING SYSTEM（間距系統）
+     4pt grid enforced
+     ============================================ */
+
+  --sys-spacing-xs: var(--ref-space-xs);             /* 4pt */
+  --sys-spacing-sm: var(--ref-space-sm);             /* 8pt */
+  --sys-spacing-md: var(--ref-space-md);             /* 12pt */
+  --sys-spacing-lg: var(--ref-space-lg);             /* 16pt */
+  --sys-spacing-xl: var(--ref-space-xl);             /* 20pt */
+  --sys-spacing-2xl: var(--ref-space-2xl);           /* 24pt */
+
+  /* ============================================
+     RADIUS SYSTEM（圓角系統）
+     ============================================ */
+
+  --sys-radius-sm: var(--ref-radius-sm);             /* 12pt — small accents */
+  --sys-radius-md: var(--ref-radius-md);             /* 16pt — buttons */
+  --sys-radius-lg: var(--ref-radius-lg);             /* 20pt — cards */
+  --sys-radius-xl: var(--ref-radius-xl);             /* 24pt — overlays */
+  --sys-radius-full: var(--ref-radius-full);         /* 48pt — pills, floating nav */
+
+  /* ============================================
+     ICON SYSTEM（圖示系統）
+     Line icons (lucide-style), consistent stroke
+     ============================================ */
+
+  --sys-icon-size-sm: var(--ref-icon-size-sm);       /* 16pt */
+  --sys-icon-size-md: var(--ref-icon-size-md);       /* 20pt — default */
+  --sys-icon-size-lg: var(--ref-icon-size-lg);       /* 24pt — nav, large */
+  --sys-icon-stroke-thin: var(--ref-icon-stroke-thin);
+  --sys-icon-stroke: var(--ref-icon-stroke-base);
+
+  /* ============================================
+     ATMOSPHERE / BLUR SYSTEM（背景/模糊系統）
+     For DeltaAtmosphere background
+     ============================================ */
+
+  --sys-blur-sm: var(--ref-blur-sm);                 /* 30pt small circle */
+  --sys-blur-lg: var(--ref-blur-lg);                 /* 40pt large circle */
+  --sys-opacity-atmosphere-circle-primary: var(--ref-opacity-faint);   /* 0.22 */
+  --sys-opacity-atmosphere-circle-accent: var(--ref-opacity-soft);     /* 0.35 */
+
+  /* ============================================
+     MOTION SYSTEM（動畫系統）
+     ============================================ */
+
+  --sys-motion-tap-duration: var(--ref-motion-duration-tap);         /* button press feedback */
+  --sys-motion-state-duration: var(--ref-motion-duration-state);     /* delta state color change */
+  --sys-motion-transition-duration: var(--ref-motion-duration-transition); /* page/atmosphere transition */
+  --sys-motion-ease-out: var(--ref-motion-ease-out);
+  --sys-motion-scale-pressed: var(--ref-motion-scale-down);          /* button press scale */
+
+  /* Border widths */
+  --sys-border-hairline: var(--ref-border-hairline);                 /* 1px card borders */
+}

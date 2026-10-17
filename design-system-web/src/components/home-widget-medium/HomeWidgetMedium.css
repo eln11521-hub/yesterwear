@@ -1,0 +1,179 @@
+.yw-home-widget {
+  --tint-a: #efe7d9;
+  --tint-b: #e4d8c4;
+  --delta-color: var(--yw-sys-color-delta-neutral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 28px;
+  background: linear-gradient(150deg, var(--tint-a) 0%, var(--tint-b) 71%);
+  font-family: var(--yw-sys-font-ui);
+}
+
+/* background + accent shift with the delta state (PRD) */
+.yw-home-widget[data-state="cold"] {
+  --delta-color: var(--yw-sys-color-delta-cold);
+  --tint-a: color-mix(in srgb, #efe7d9 80%, #5a7a94);
+  --tint-b: color-mix(in srgb, #e4d8c4 74%, #5a7a94);
+}
+.yw-home-widget[data-state="warm"] {
+  --delta-color: var(--yw-sys-color-delta-warm);
+  --tint-a: color-mix(in srgb, #efe7d9 80%, #e8a44a);
+  --tint-b: color-mix(in srgb, #e4d8c4 74%, #e8a44a);
+}
+
+.yw-home-widget__card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  inline-size: 329px;
+  max-inline-size: 100%;
+  padding: 16px 18px;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(58 46 28 / 14%);
+}
+
+.yw-home-widget__top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.yw-home-widget__mascot {
+  flex: none;
+  inline-size: 58px;
+  display: flex;
+  justify-content: center;
+}
+
+.yw-home-widget__info {
+  flex: 1 0 0;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yw-home-widget__locrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.yw-home-widget__loc {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  color: #8c8680;
+}
+.yw-home-widget__rain {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--yw-sys-color-delta-cold);
+}
+
+.yw-home-widget__temp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.yw-home-widget__bigcol {
+  display: flex;
+  flex-direction: column;
+}
+.yw-home-widget__biglabel {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  color: #8c8680;
+}
+.yw-home-widget__big {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: #111;
+}
+.yw-home-widget__delta {
+  padding: 5px 11px 5px 10px;
+  border-radius: 999px;
+  background: var(--delta-color);
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.yw-home-widget__outfit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.yw-home-widget__olabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  color: #8c8680;
+}
+/* 昨日 city (cross-location) — pin + truncated name */
+.yw-home-widget__ocity {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-inline-size: 60px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.yw-home-widget__chips {
+  display: flex;
+  gap: 6px;
+}
+.yw-home-widget__chip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #f0ebe4;
+  font-size: 12px;
+  font-weight: 500;
+  color: #111;
+  white-space: nowrap;
+}
+
+.yw-home-widget__divider {
+  block-size: 1px;
+  background: var(--yw-sys-color-separator);
+}
+
+/* commute: 出門 / 下班 times + temp + state-colored delta */
+.yw-home-widget__commute {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.yw-home-widget__commute-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.yw-home-widget__commute-slot {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10px;
+  color: #8c8680;
+}
+.yw-home-widget__commute-felt {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 9px;
+  color: #8c8680;
+}
+.yw-home-widget__commute-temp {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
+.yw-home-widget__commute-delta {
+  font-size: 10px;
+  font-weight: 600;
+}

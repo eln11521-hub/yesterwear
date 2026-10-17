@@ -1,0 +1,58 @@
+.yw-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--yw-sys-font-ui);
+}
+
+.yw-top-bar__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-top-bar__place {
+  font-size: 15px;
+  font-weight: 600; /* DM Sans SemiBold */
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-top-bar__date {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--yw-sys-color-text-label);
+}
+
+.yw-top-bar__actions {
+  display: inline-flex;
+  gap: 12px;
+  color: var(--yw-sys-color-text-label);
+}
+
+.yw-top-bar__action {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.yw-top-bar__action:disabled {
+  cursor: default;
+}
+.yw-top-bar__action[data-spinning] {
+  animation: yw-top-bar-spin 0.8s linear infinite;
+}
+@keyframes yw-top-bar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yw-top-bar__action[data-spinning] {
+    animation: none;
+  }
+}

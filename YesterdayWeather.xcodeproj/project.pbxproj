@@ -1,0 +1,481 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BF7263F1FA9645D785C04D60 /* DeltaBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA03CD3BB734FCB8D4797A2 /* DeltaBackground.swift */; };
+		9C5F9BC1C02341E0A77EADB9 /* MetricBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E355B176E149FE8B59882B /* MetricBlock.swift */; };
+		B2D7CF35C51F46D48FA3BF9D /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AFF0911190462F85DA31FA /* DashboardView.swift */; };
+		DCCBC81F1FD746A0ABDF80E4 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C127B6E119544FAA83085937 /* OnboardingFlowView.swift */; };
+		A5A8E704C9D44635A511A4CF /* OutfitLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58530403D66A42DBA70A2B35 /* OutfitLogView.swift */; };
+		7B12B30541B041D3837606B3 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A38467FE62454834A22C0A8C /* RootTabView.swift */; };
+		884329BA314D40F988829D49 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F94E2E82E049A8885727C9 /* SettingsView.swift */; };
+		F330D182B0CD4E6197E42F5C /* YesterdayWeatherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B1B6E3869B43D0AE7EF6D1 /* YesterdayWeatherApp.swift */; };
+		9A736416657B4AA0A773CFC4 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C75A9BA2F448D5B82E5258 /* AppGroup.swift */; };
+		0790AA7F650943D9B4C1F00A /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C75A9BA2F448D5B82E5258 /* AppGroup.swift */; };
+		D0FA23F019B14606A7A60E79 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3B24D7DF4B1460FA19A0DF1 /* AppSettings.swift */; };
+		07110530AA9A4328BF58E249 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3B24D7DF4B1460FA19A0DF1 /* AppSettings.swift */; };
+		BB728916890A4FE79C79DA88 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A8E29BA11C4ABB9A0B2C79 /* DesignTokens.swift */; };
+		F3169BAEB5714115A4906FD4 /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77A8E29BA11C4ABB9A0B2C79 /* DesignTokens.swift */; };
+		3E19F321E0FB45BCA6BC9F11 /* OutfitModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855386D83F4D42CF9C5B6ED6 /* OutfitModels.swift */; };
+		E8C91C78DB02442A9712DFD1 /* OutfitModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 855386D83F4D42CF9C5B6ED6 /* OutfitModels.swift */; };
+		DB4122C0D94F4F08B5E34573 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079E1F8B530B43D988F29C42 /* WeatherModels.swift */; };
+		DEECE72AC39F4B61AE1F031B /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079E1F8B530B43D988F29C42 /* WeatherModels.swift */; };
+		C108744A3A124AD1BA4FA8F9 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C372A6BAB5BC4F0EAA83C656 /* WeatherService.swift */; };
+		3F535884F9E64A70B0A73327 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C372A6BAB5BC4F0EAA83C656 /* WeatherService.swift */; };
+		355935AA578E4DE089A30AA6 /* WeatherSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6091E93EE74D3A8F775D16 /* WeatherSnapshotStore.swift */; };
+		B3AEC50ED7CD44429CEC6F57 /* WeatherSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6091E93EE74D3A8F775D16 /* WeatherSnapshotStore.swift */; };
+		2C4A46E5E0F34F4D9006646C /* HomeScreenCompareWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E0ED9DCF4348E79F3D32DD /* HomeScreenCompareWidget.swift */; };
+		61DFD868BA174879AAA8E040 /* LockScreenCompareWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C717E9DBB543E4BE432AAC /* LockScreenCompareWidget.swift */; };
+		B6AE2D83CE4745399618F476 /* WidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A22D0D2F7634E95AC98E2B7 /* WidgetTimeline.swift */; };
+		3E129CC1C1374DF390910EDE /* YesterdayWeatherWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDE597D7B3C4292B0005D7C /* YesterdayWeatherWidgetBundle.swift */; };
+		8679D792424C4D34BC459A67 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E22B8D0CD2424D6CA25F23B2 /* Assets.xcassets */; };
+		F60BA236184C4BF7A97A655C /* YesterdayWeatherWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7B2120539FEB47BAAC0CA634 /* YesterdayWeatherWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B1C2BDCF31004782923B92F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D4DBA8BEB6DA43C4B8B2C613;
+			remoteInfo = YesterdayWeatherWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4DBA8BEB6DA43C4B8B2C613 /* YesterdayWeatherWidget */;
+			targetProxy = A10000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2E57D06609444C09836EA714 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F60BA236184C4BF7A97A655C /* YesterdayWeatherWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		CFA03CD3BB734FCB8D4797A2 /* DeltaBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme/DeltaBackground.swift"; sourceTree = "<group>"; };
+		54E355B176E149FE8B59882B /* MetricBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Components/MetricBlock.swift"; sourceTree = "<group>"; };
+		47AFF0911190462F85DA31FA /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Dashboard/DashboardView.swift"; sourceTree = "<group>"; };
+		C127B6E119544FAA83085937 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Onboarding/OnboardingFlowView.swift"; sourceTree = "<group>"; };
+		58530403D66A42DBA70A2B35 /* OutfitLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Outfit/OutfitLogView.swift"; sourceTree = "<group>"; };
+		A38467FE62454834A22C0A8C /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/RootTabView.swift"; sourceTree = "<group>"; };
+		B4F94E2E82E049A8885727C9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/Settings/SettingsView.swift"; sourceTree = "<group>"; };
+		84B1B6E3869B43D0AE7EF6D1 /* YesterdayWeatherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YesterdayWeatherApp.swift"; sourceTree = "<group>"; };
+		38C75A9BA2F448D5B82E5258 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		E3B24D7DF4B1460FA19A0DF1 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		77A8E29BA11C4ABB9A0B2C79 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		855386D83F4D42CF9C5B6ED6 /* OutfitModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitModels.swift; sourceTree = "<group>"; };
+		079E1F8B530B43D988F29C42 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
+		C372A6BAB5BC4F0EAA83C656 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		6B6091E93EE74D3A8F775D16 /* WeatherSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherSnapshotStore.swift; sourceTree = "<group>"; };
+		D9E0ED9DCF4348E79F3D32DD /* HomeScreenCompareWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreenCompareWidget.swift; sourceTree = "<group>"; };
+		41C717E9DBB543E4BE432AAC /* LockScreenCompareWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenCompareWidget.swift; sourceTree = "<group>"; };
+		9A22D0D2F7634E95AC98E2B7 /* WidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTimeline.swift; sourceTree = "<group>"; };
+		5BDE597D7B3C4292B0005D7C /* YesterdayWeatherWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YesterdayWeatherWidgetBundle.swift; sourceTree = "<group>"; };
+		E22B8D0CD2424D6CA25F23B2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C9A784594F0F4B398BC94E9E /* YesterdayWeather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YesterdayWeather.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B2120539FEB47BAAC0CA634 /* YesterdayWeatherWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = YesterdayWeatherWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7E5BD1F997C4F5DAF426559 /* YesterdayWeather.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YesterdayWeather.entitlements; sourceTree = "<group>"; };
+		5AAD7F38976E4F949C772ED1 /* YesterdayWeatherWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YesterdayWeatherWidget.entitlements; sourceTree = "<group>"; };
+		17C0ED64138E4867BEDDF3BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AEC81AE93F6F44958EAE4ACD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C910E1463344380B146D222 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6762A17545D34D5483B0BC4B = {
+			isa = PBXGroup;
+			children = (
+				DC3B43F593314DCE98EF3F71 /* YesterdayWeather */,
+				2EE64DD4202C417B9E7867D0 /* Shared */,
+				0663C7F8B2A34AEFBB06F591 /* YesterdayWeatherWidget */,
+				86865E7789DF4F75A5ACB7A1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DC3B43F593314DCE98EF3F71 /* YesterdayWeather */ = {
+			isa = PBXGroup;
+			children = (
+				CFA03CD3BB734FCB8D4797A2 /* DeltaBackground.swift */,
+				54E355B176E149FE8B59882B /* MetricBlock.swift */,
+				47AFF0911190462F85DA31FA /* DashboardView.swift */,
+				C127B6E119544FAA83085937 /* OnboardingFlowView.swift */,
+				58530403D66A42DBA70A2B35 /* OutfitLogView.swift */,
+				A38467FE62454834A22C0A8C /* RootTabView.swift */,
+				B4F94E2E82E049A8885727C9 /* SettingsView.swift */,
+				84B1B6E3869B43D0AE7EF6D1 /* YesterdayWeatherApp.swift */,
+				E22B8D0CD2424D6CA25F23B2 /* Assets.xcassets */,
+				C7E5BD1F997C4F5DAF426559 /* YesterdayWeather.entitlements */,
+			);
+			path = YesterdayWeather;
+			sourceTree = "<group>";
+		};
+		2EE64DD4202C417B9E7867D0 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				38C75A9BA2F448D5B82E5258 /* AppGroup.swift */,
+				E3B24D7DF4B1460FA19A0DF1 /* AppSettings.swift */,
+				77A8E29BA11C4ABB9A0B2C79 /* DesignTokens.swift */,
+				855386D83F4D42CF9C5B6ED6 /* OutfitModels.swift */,
+				079E1F8B530B43D988F29C42 /* WeatherModels.swift */,
+				C372A6BAB5BC4F0EAA83C656 /* WeatherService.swift */,
+				6B6091E93EE74D3A8F775D16 /* WeatherSnapshotStore.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		0663C7F8B2A34AEFBB06F591 /* YesterdayWeatherWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D9E0ED9DCF4348E79F3D32DD /* HomeScreenCompareWidget.swift */,
+				41C717E9DBB543E4BE432AAC /* LockScreenCompareWidget.swift */,
+				9A22D0D2F7634E95AC98E2B7 /* WidgetTimeline.swift */,
+				5BDE597D7B3C4292B0005D7C /* YesterdayWeatherWidgetBundle.swift */,
+				5AAD7F38976E4F949C772ED1 /* YesterdayWeatherWidget.entitlements */,
+				17C0ED64138E4867BEDDF3BF /* Info.plist */,
+			);
+			path = YesterdayWeatherWidget;
+			sourceTree = "<group>";
+		};
+		86865E7789DF4F75A5ACB7A1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C9A784594F0F4B398BC94E9E /* YesterdayWeather.app */,
+				7B2120539FEB47BAAC0CA634 /* YesterdayWeatherWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		64BEAE21320346DEB173DC08 /* YesterdayWeather */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85AC6CC9BC60440E9F0D3F2B /* Build configuration list for PBXNativeTarget "YesterdayWeather" */;
+			buildPhases = (
+				B9448C2C425146279F82FF31 /* Sources */,
+				AEC81AE93F6F44958EAE4ACD /* Frameworks */,
+				E971992D2B8D48048A065C5F /* Resources */,
+				2E57D06609444C09836EA714 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = YesterdayWeather;
+			productName = YesterdayWeather;
+			productReference = C9A784594F0F4B398BC94E9E /* YesterdayWeather.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D4DBA8BEB6DA43C4B8B2C613 /* YesterdayWeatherWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8F8CDF7D01440AB8DE7B7D8 /* Build configuration list for PBXNativeTarget "YesterdayWeatherWidget" */;
+			buildPhases = (
+				AE70A5A562234F619DCEAFCA /* Sources */,
+				4C910E1463344380B146D222 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = YesterdayWeatherWidget;
+			productName = YesterdayWeatherWidget;
+			productReference = 7B2120539FEB47BAAC0CA634 /* YesterdayWeatherWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B1C2BDCF31004782923B92F1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 0F7EC1FD0A6A4F5DB6A4BDCF /* Build configuration list for PBXProject "YesterdayWeather" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hant",
+			);
+			mainGroup = 6762A17545D34D5483B0BC4B;
+			productRefGroup = 86865E7789DF4F75A5ACB7A1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				64BEAE21320346DEB173DC08 /* YesterdayWeather */,
+				D4DBA8BEB6DA43C4B8B2C613 /* YesterdayWeatherWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E971992D2B8D48048A065C5F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8679D792424C4D34BC459A67 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B9448C2C425146279F82FF31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF7263F1FA9645D785C04D60 /* DeltaBackground.swift in Sources */,
+				9C5F9BC1C02341E0A77EADB9 /* MetricBlock.swift in Sources */,
+				B2D7CF35C51F46D48FA3BF9D /* DashboardView.swift in Sources */,
+				DCCBC81F1FD746A0ABDF80E4 /* OnboardingFlowView.swift in Sources */,
+				A5A8E704C9D44635A511A4CF /* OutfitLogView.swift in Sources */,
+				7B12B30541B041D3837606B3 /* RootTabView.swift in Sources */,
+				884329BA314D40F988829D49 /* SettingsView.swift in Sources */,
+				F330D182B0CD4E6197E42F5C /* YesterdayWeatherApp.swift in Sources */,
+				9A736416657B4AA0A773CFC4 /* AppGroup.swift in Sources */,
+				D0FA23F019B14606A7A60E79 /* AppSettings.swift in Sources */,
+				BB728916890A4FE79C79DA88 /* DesignTokens.swift in Sources */,
+				3E19F321E0FB45BCA6BC9F11 /* OutfitModels.swift in Sources */,
+				DB4122C0D94F4F08B5E34573 /* WeatherModels.swift in Sources */,
+				C108744A3A124AD1BA4FA8F9 /* WeatherService.swift in Sources */,
+				355935AA578E4DE089A30AA6 /* WeatherSnapshotStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE70A5A562234F619DCEAFCA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C4A46E5E0F34F4D9006646C /* HomeScreenCompareWidget.swift in Sources */,
+				61DFD868BA174879AAA8E040 /* LockScreenCompareWidget.swift in Sources */,
+				B6AE2D83CE4745399618F476 /* WidgetTimeline.swift in Sources */,
+				3E129CC1C1374DF390910EDE /* YesterdayWeatherWidgetBundle.swift in Sources */,
+				0790AA7F650943D9B4C1F00A /* AppGroup.swift in Sources */,
+				07110530AA9A4328BF58E249 /* AppSettings.swift in Sources */,
+				F3169BAEB5714115A4906FD4 /* DesignTokens.swift in Sources */,
+				E8C91C78DB02442A9712DFD1 /* OutfitModels.swift in Sources */,
+				DEECE72AC39F4B61AE1F031B /* WeatherModels.swift in Sources */,
+				3F535884F9E64A70B0A73327 /* WeatherService.swift in Sources */,
+				B3AEC50ED7CD44429CEC6F57 /* WeatherSnapshotStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9EC715F6CF2F42DFB6D516C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_DYNAMIC_NO_PIC = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		453E124F2CF84DA8BDFDBDE6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DD67337761F442C5B6502A4D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = YesterdayWeather/YesterdayWeather.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yesterday Weather";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要位置以取得今日與昨日氣溫、體感對比。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yesterdayweather.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		42FFB952E83B4A2C9254FD31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = YesterdayWeather/YesterdayWeather.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yesterday Weather";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "需要位置以取得今日與昨日氣溫、體感對比。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yesterdayweather.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F3AA49C12C684F6B9D5723E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YesterdayWeatherWidget/YesterdayWeatherWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = YesterdayWeatherWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yesterday Weather";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yesterdayweather.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		51803A8B90E747F689D5FA0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YesterdayWeatherWidget/YesterdayWeatherWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = YesterdayWeatherWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yesterday Weather";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yesterdayweather.app.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0F7EC1FD0A6A4F5DB6A4BDCF /* Build configuration list for PBXProject "YesterdayWeather" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EC715F6CF2F42DFB6D516C0 /* Debug */,
+				453E124F2CF84DA8BDFDBDE6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85AC6CC9BC60440E9F0D3F2B /* Build configuration list for PBXNativeTarget "YesterdayWeather" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DD67337761F442C5B6502A4D /* Debug */,
+				42FFB952E83B4A2C9254FD31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8F8CDF7D01440AB8DE7B7D8 /* Build configuration list for PBXNativeTarget "YesterdayWeatherWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F3AA49C12C684F6B9D5723E9 /* Debug */,
+				51803A8B90E747F689D5FA0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B1C2BDCF31004782923B92F1 /* Project object */;
+}

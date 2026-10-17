@@ -1,0 +1,35 @@
+.yw-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding-block: 15px;
+  padding-inline: 24px;
+  border: none;
+  border-radius: var(--yw-comp-button-radius); /* 16 */
+  background: var(--yw-comp-button-bg);
+  color: var(--yw-comp-button-label-color);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 15px;
+  font-weight: 600; /* DM Sans SemiBold */
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform var(--yw-comp-button-tap-duration)
+    var(--yw-sys-motion-ease-out);
+}
+
+.yw-primary-button:active:not(:disabled) {
+  transform: scale(var(--yw-comp-button-pressed-scale));
+}
+
+.yw-primary-button:focus-visible {
+  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
+  outline-offset: 2px;
+}
+
+.yw-primary-button:disabled {
+  opacity: var(--yw-comp-button-disabled-opacity);
+  cursor: not-allowed;
+}

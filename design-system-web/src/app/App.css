@@ -1,0 +1,95 @@
+.yw-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--yw-sys-font-ui);
+}
+
+.yw-app__phone {
+  position: relative;
+  inline-size: 360px;
+  max-inline-size: 100%;
+}
+
+.yw-app__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 0;
+  border: none;
+  border-radius: 28px;
+  background: rgb(0 0 0 / 40%);
+  cursor: pointer;
+}
+
+.yw-app__sheet {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 6;
+}
+
+.yw-app__dev {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--yw-sys-color-text-muted);
+}
+.yw-app__dev-title {
+  font-weight: 600;
+}
+.yw-app__dev button {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--yw-sys-color-line);
+  border-radius: 8px;
+  background: var(--yw-sys-color-surface-white);
+  cursor: pointer;
+}
+.yw-app__dev button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.yw-app__note {
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-app__status {
+  font-weight: 600;
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-app__widgets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-inline-size: 100%;
+}
+.yw-app__widgets-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--yw-sys-color-text-muted);
+}
+.yw-app__widget-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+.yw-app__widget-label {
+  display: block;
+  margin-block-end: 6px;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 11px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-app__lockbg {
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #c9a75c 0%, #b8873f 100%);
+}

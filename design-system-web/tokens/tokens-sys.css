@@ -1,0 +1,106 @@
+/* System tokens map raw reference values to semantic roles.
+   References the ref layer only. */
+
+:root {
+  /* ---- Delta state colors ---- */
+  --yw-sys-color-delta-cold: var(--yw-ref-color-delta-cold);
+  --yw-sys-color-delta-cold-light: var(--yw-ref-color-delta-cold-light);
+  --yw-sys-color-delta-cold-dark: var(--yw-ref-color-delta-cold-dark);
+  --yw-sys-color-delta-neutral: var(--yw-ref-color-delta-neutral);
+  --yw-sys-color-delta-warm: var(--yw-ref-color-delta-warm);
+
+  /* ---- Text ---- */
+  --yw-sys-color-text-primary: var(--yw-ref-color-ink);
+  --yw-sys-color-text-secondary: var(--yw-ref-color-gray-mid);
+  --yw-sys-color-text-tertiary: var(--yw-ref-color-gray-light);
+  --yw-sys-color-text-on-dark: var(--yw-ref-color-white);
+  --yw-sys-color-text-label: var(--yw-ref-color-label);      /* mono labels */
+  --yw-sys-color-text-muted: var(--yw-ref-color-gray-8a);    /* section labels */
+  --yw-sys-color-text-muted-warm: var(--yw-ref-color-muted);  /* warm secondary text (Figma: muted) */
+  --yw-sys-color-text-hint: var(--yw-ref-color-muted2);       /* warm tertiary / hint (Figma: muted2) */
+  --yw-sys-color-separator: var(--yw-ref-color-sep);
+
+  /* Badges + promo */
+  --yw-sys-color-badge-required-bg: var(--yw-ref-color-badge-warm-bg);
+  --yw-sys-color-badge-required-text: var(--yw-ref-color-badge-warm-text);
+  --yw-sys-color-badge-optional-bg: var(--yw-ref-color-badge-neutral-bg);
+  --yw-sys-color-badge-optional-text: var(--yw-ref-color-gray-8a);
+  --yw-sys-color-promo-bg: var(--yw-ref-color-promo-bg);
+
+  /* ---- Surfaces ---- */
+  --yw-sys-color-surface-paper: var(--yw-ref-color-paper);
+  --yw-sys-color-surface-raised: var(--yw-ref-color-card);
+  --yw-sys-color-surface-warm: var(--yw-ref-color-card-warm);
+  --yw-sys-color-surface-white: var(--yw-ref-color-white);
+  --yw-sys-color-line: var(--yw-ref-color-line);
+
+  /* ---- Opacity roles ---- */
+  --yw-sys-opacity-solid: var(--yw-ref-opacity-solid);
+  --yw-sys-opacity-overlay: var(--yw-ref-opacity-strong);
+  --yw-sys-opacity-gradient-mid: var(--yw-ref-opacity-gradient-mid);
+  --yw-sys-opacity-gradient-light: var(--yw-ref-opacity-gradient-light);
+  --yw-sys-opacity-subtle: var(--yw-ref-opacity-soft);
+  --yw-sys-opacity-disabled: var(--yw-ref-opacity-half);
+  --yw-sys-opacity-faint: var(--yw-ref-opacity-sheer);
+  --yw-sys-opacity-atmosphere-circle-primary: var(--yw-ref-opacity-faint);
+  --yw-sys-opacity-atmosphere-circle-accent: var(--yw-ref-opacity-soft);
+
+  /* ---- Fonts ---- */
+  --yw-sys-font-ui: var(--yw-ref-font-ui);
+  --yw-sys-font-mono: var(--yw-ref-font-mono);
+
+  /* ---- Typography roles ---- */
+  --yw-sys-type-hero-size: var(--yw-ref-type-hero-size);
+  --yw-sys-type-hero-weight: var(--yw-ref-type-weight-semibold);
+  --yw-sys-type-hero-line-height: var(--yw-ref-type-line-height-tight);
+  --yw-sys-type-title-size: var(--yw-ref-type-title-size);
+  --yw-sys-type-title-weight: var(--yw-ref-type-weight-semibold);
+  --yw-sys-type-title-line-height: var(--yw-ref-type-line-height-normal);
+  --yw-sys-type-body-size: var(--yw-ref-type-body-size);
+  --yw-sys-type-body-weight: var(--yw-ref-type-weight-medium);
+  --yw-sys-type-body-line-height: var(--yw-ref-type-line-height-body);
+  --yw-sys-type-caption-size: var(--yw-ref-type-caption-size);
+  --yw-sys-type-caption-weight: var(--yw-ref-type-weight-medium);
+  --yw-sys-type-caption-line-height: var(--yw-ref-type-line-height-caption);
+  --yw-sys-type-micro-size: var(--yw-ref-type-micro-size);
+  --yw-sys-type-micro-weight: var(--yw-ref-type-weight-semibold);
+  --yw-sys-type-micro-line-height: var(--yw-ref-type-line-height-micro);
+  --yw-sys-type-label-tracking: var(--yw-ref-type-tracking-label);
+
+  /* ---- Spacing ---- */
+  --yw-sys-spacing-xs: var(--yw-ref-space-xs);
+  --yw-sys-spacing-sm: var(--yw-ref-space-sm);
+  --yw-sys-spacing-md: var(--yw-ref-space-md);
+  --yw-sys-spacing-lg: var(--yw-ref-space-lg);
+  --yw-sys-spacing-xl: var(--yw-ref-space-xl);
+  --yw-sys-spacing-2xl: var(--yw-ref-space-2xl);
+
+  /* ---- Radius ---- */
+  --yw-sys-radius-sm: var(--yw-ref-radius-sm);
+  --yw-sys-radius-md: var(--yw-ref-radius-md);
+  --yw-sys-radius-lg: var(--yw-ref-radius-lg);
+  --yw-sys-radius-xl: var(--yw-ref-radius-xl);
+  --yw-sys-radius-2xl: var(--yw-ref-radius-2xl);
+  --yw-sys-radius-full: var(--yw-ref-radius-full);
+
+  /* ---- Icon ---- */
+  --yw-sys-icon-size-sm: var(--yw-ref-icon-size-sm);
+  --yw-sys-icon-size-md: var(--yw-ref-icon-size-md);
+  --yw-sys-icon-size-lg: var(--yw-ref-icon-size-lg);
+  --yw-sys-icon-stroke-thin: var(--yw-ref-icon-stroke-thin);
+  --yw-sys-icon-stroke: var(--yw-ref-icon-stroke-base);
+
+  /* ---- Blur ---- */
+  --yw-sys-blur-sm: var(--yw-ref-blur-sm);
+  --yw-sys-blur-lg: var(--yw-ref-blur-lg);
+
+  /* ---- Motion ---- */
+  --yw-sys-motion-tap-duration: var(--yw-ref-motion-duration-tap);
+  --yw-sys-motion-state-duration: var(--yw-ref-motion-duration-state);
+  --yw-sys-motion-transition-duration: var(--yw-ref-motion-duration-transition);
+  --yw-sys-motion-ease-out: var(--yw-ref-motion-ease-out);
+  --yw-sys-motion-scale-pressed: var(--yw-ref-motion-scale-down);
+
+  /* ---- Border ---- */
+  --yw-sys-border-hairline: var(--yw-ref-border-hairline);
+}

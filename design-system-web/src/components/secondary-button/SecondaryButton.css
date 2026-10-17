@@ -1,0 +1,39 @@
+.yw-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding-block: 15px;
+  padding-inline: 24px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-text-primary); /* ink border */
+  border-radius: var(--yw-sys-radius-md); /* 16 */
+  background: transparent;
+  color: var(--yw-sys-color-text-primary);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 15px;
+  font-weight: 600; /* DM Sans SemiBold */
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform var(--yw-sys-motion-tap-duration)
+    var(--yw-sys-motion-ease-out);
+}
+
+.yw-secondary-button:active:not(:disabled) {
+  transform: scale(var(--yw-sys-motion-scale-pressed));
+}
+
+.yw-secondary-button:focus-visible {
+  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
+  outline-offset: 2px;
+}
+
+.yw-secondary-button:disabled {
+  opacity: var(--yw-sys-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.yw-secondary-button__icon {
+  display: inline-flex;
+}

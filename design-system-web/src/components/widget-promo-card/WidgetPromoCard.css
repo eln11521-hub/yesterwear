@@ -1,0 +1,62 @@
+.yw-widget-promo-card {
+  position: relative;
+  overflow: hidden;
+  /* Contain the deco / text z-indexes so they can't paint above a floating nav. */
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 16px;
+  border-radius: 24px;
+  background: var(--yw-sys-color-promo-bg); /* #f5c88a */
+  font-family: var(--yw-sys-font-ui);
+}
+
+/* Decorative looping stroke (Figma 173:2932): white 43%, 20px, clipped by card */
+.yw-widget-promo-card__deco {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-end: 8px;
+  inline-size: 128px;
+  block-size: 124px;
+  pointer-events: none;
+}
+
+.yw-widget-promo-card__text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.yw-widget-promo-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700; /* DM Sans Bold */
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-widget-promo-card__subtitle {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgb(17 17 17 / 70%);
+}
+
+.yw-widget-promo-card__action {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 38px;
+  block-size: 38px;
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  background: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+  cursor: pointer;
+}

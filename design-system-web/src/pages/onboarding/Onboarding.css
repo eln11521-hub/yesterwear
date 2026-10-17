@@ -1,0 +1,246 @@
+.yw-ob {
+  position: relative;
+  inline-size: 340px;
+  max-inline-size: 100%;
+  block-size: 720px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--yw-sys-color-surface-white);
+  border-radius: 40px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  font-family: var(--yw-sys-font-ui);
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-ob__scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 60px 24px 24px;
+}
+
+.yw-ob__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* Step label (Figma 3:5): DM Sans SemiBold 10.5px #8c8680, tracking 1.05 */
+.yw-ob__step {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.05px;
+  color: var(--yw-sys-color-text-label);
+}
+
+/* Headline (3:6): DM Sans Bold 22px #111, tracking -0.44, line 1.3 */
+.yw-ob__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.44px;
+  line-height: 1.3;
+}
+
+/* Subtext (3:7): DM Sans Regular 13px #8c8680, line 1.7 */
+.yw-ob__subtext {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--yw-sys-color-text-label);
+}
+
+/* Illustration card (3:8): #f0ebe4, 140px tall, radius 24 */
+.yw-ob__illus {
+  inline-size: 100%;
+  box-sizing: border-box;
+  block-size: 140px;
+  margin-block-start: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: #f0ebe4;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* Widget-preview variant: real Lock Widget on the lock-wallpaper tint */
+.yw-ob__illus--widget {
+  overflow: hidden;
+  background: linear-gradient(160deg, #c9a75c 0%, #b8873f 100%);
+}
+.yw-ob__preview {
+  transform: scale(0.58);
+  transform-origin: center;
+}
+
+/* Permission-preview card (4:10 / 4:36): tan, radius 24, pad 16, gap 4.
+   Mimics the OS permission dialog copy so users know what they'll be asked. */
+.yw-ob__perm {
+  inline-size: 100%;
+  box-sizing: border-box;
+  margin-block-start: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 24px;
+  background: #f0ebe4;
+  text-align: start;
+  border: none;
+  font-family: var(--yw-sys-font-ui);
+  cursor: pointer;
+}
+.yw-ob__perm:active {
+  transform: scale(var(--yw-sys-motion-scale-pressed));
+}
+.yw-ob__perm-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-ob__perm-body {
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--yw-sys-color-text-label);
+}
+
+/* Delta-color swatch row (46:11): three cards showing the widget's dynamic
+   temperature-delta colors, so users learn the color language during onboarding.
+   Colors come from the delta design-system tokens the real widget uses. */
+.yw-ob__swatches {
+  inline-size: 100%;
+  display: flex;
+  gap: 8px;
+  margin-block-start: 6px;
+}
+.yw-ob__swatch {
+  flex: 1 0 0;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border-radius: var(--yw-sys-radius-md);
+  color: var(--yw-sys-color-text-on-dark);
+}
+.yw-ob__swatch--cold {
+  background: var(--yw-sys-color-delta-cold);
+}
+.yw-ob__swatch--neutral {
+  background: var(--yw-sys-color-delta-neutral);
+}
+.yw-ob__swatch--warm {
+  background: var(--yw-sys-color-delta-warm);
+}
+.yw-ob__swatch-label {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* Recovery links (4:13): DM Sans SemiBold 11.5px #111, gap 4, arrow prefix.
+   A muted mono caption frames them so "重新開啟" reads as a fallback, not a
+   pre-emptive instruction. */
+.yw-ob__reclinks {
+  inline-size: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.yw-ob__reclabel {
+  margin-block-end: 2px;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  color: var(--yw-sys-color-text-muted);
+}
+.yw-ob__reclink {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--yw-sys-font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--yw-sys-color-text-primary);
+  text-align: start;
+  cursor: pointer;
+}
+.yw-ob__reclink:active {
+  opacity: 0.6;
+}
+
+/* Reassurance note (Step 5): a lighter line that pays off the Widget-first
+   promise — once added, the App can stay in the background. */
+.yw-ob__note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--yw-sys-color-text-muted);
+}
+
+/* Footer (3:10): border-top, dots + button */
+.yw-ob__footer {
+  border-block-start: var(--yw-sys-border-hairline) solid
+    var(--yw-sys-color-line);
+  padding: 16px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.yw-ob__dots {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+.yw-ob__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: var(--yw-sys-color-line);
+  transition: inline-size var(--yw-sys-motion-state-duration)
+    var(--yw-sys-motion-ease-out);
+}
+.yw-ob__dot[data-active="true"] {
+  inline-size: 18px;
+  background: var(--yw-sys-color-text-primary);
+}
+
+/* Button (3:18): ink pill, py 12, radius 16, DM Sans SemiBold 13.5px.
+   Stretches full-width when alone in the footer (align-items: stretch). */
+.yw-ob__btn {
+  padding-block: 12px;
+  border: none;
+  border-radius: var(--yw-sys-radius-md);
+  background: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.yw-ob__btn:active {
+  transform: scale(var(--yw-sys-motion-scale-pressed));
+}
+
+/* Secondary (back) button (4:24): tan fill, ink text. */
+.yw-ob__btn--secondary {
+  background: #f0ebe4;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* Two-button row (4:23): 上一步 + 下一步, gap 8, each fills half. */
+.yw-ob__btns {
+  display: flex;
+  gap: 8px;
+}
+.yw-ob__btns .yw-ob__btn {
+  flex: 1 0 0;
+  min-inline-size: 0;
+}
