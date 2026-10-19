@@ -8,6 +8,10 @@ struct YesterdayWeatherApp: App {
     @AppStorage(AppGroup.Key.onboardingDone, store: AppGroup.defaults)
     private var onboardingDone = false
 
+    init() {
+        BrandFonts.register()
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {

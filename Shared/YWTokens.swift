@@ -116,13 +116,27 @@ enum YWTokens {
     }
 
     // MARK: - Typography（排版）
-    // Font family: design specifies DM Sans (UI) + IBM Plex Mono (numbers).
-    // Currently system rounded until font files are bundled. See DESIGN_PRINCIPLES.md.
+    // Bundled brand fonts, registered at launch by BrandFonts.register():
+    //   DM Sans (UI, variable) · IBM Plex Mono (numerals/dates) · Archivo Black (display).
+    // Mirrors the web tokens --yw-sys-font-ui / --yw-sys-font-mono + the Archivo Black wordmark.
     enum Type {
-        static let hero    = Font.system(size: Ref.typeHero,    weight: .semibold, design: .rounded)
-        static let title   = Font.system(size: Ref.typeTitle,   weight: .semibold, design: .rounded)
-        static let body    = Font.system(size: Ref.typeBody,    weight: .medium,   design: .rounded)
-        static let caption = Font.system(size: Ref.typeCaption, weight: .medium,   design: .rounded)
-        static let micro   = Font.system(size: Ref.typeMicro,   weight: .semibold, design: .rounded)
+        private static let ui = "DMSans-9ptRegular"        // variable; weight via .weight()
+        private static let monoMedium = "IBMPlexMono-Medium"
+        private static let monoSemibold = "IBMPlexMono-SemiBold"
+        private static let displayFace = "ArchivoBlack-Regular"
+
+        // UI text — DM Sans
+        static let hero    = Font.custom(ui, size: Ref.typeHero).weight(.semibold)
+        static let title   = Font.custom(ui, size: Ref.typeTitle).weight(.semibold)
+        static let body    = Font.custom(ui, size: Ref.typeBody).weight(.medium)
+        static let caption = Font.custom(ui, size: Ref.typeCaption).weight(.medium)
+        static let micro   = Font.custom(ui, size: Ref.typeMicro).weight(.semibold)
+
+        // Display — Archivo Black (brand wordmark / onboarding title)
+        static let display = Font.custom(displayFace, size: Ref.typeHero)
+
+        // Numerals / dates — IBM Plex Mono
+        static let mono       = Font.custom(monoMedium, size: Ref.typeCaption)
+        static let monoStrong = Font.custom(monoSemibold, size: Ref.typeCaption)
     }
 }
