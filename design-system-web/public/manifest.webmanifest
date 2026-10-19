@@ -1,0 +1,15 @@
+{
+  "name": "Yesterwear 昨日天氣對比",
+  "short_name": "Yesterwear",
+  "description": "用昨天的體感與穿搭,決定今天怎麼穿。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e8a44a",
+  "theme_color": "#e8a44a",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
