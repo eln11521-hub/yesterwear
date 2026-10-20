@@ -119,7 +119,7 @@ struct DashboardView: View {
                 OutfitLogView()
             } label: {
                 Text(outfit.today == nil ? "記錄今日穿搭" : "更新今日穿搭")
-                    .font(YWTokens.Type.body)
+                    .font(YWTokens.Typography.body)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, YWTokens.Sys.spacingMd)        // 12pt
                     .background(YWTokens.Sys.textPrimary)              // #111 (was 0x1A1A1A)

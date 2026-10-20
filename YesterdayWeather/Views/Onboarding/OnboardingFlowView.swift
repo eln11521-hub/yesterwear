@@ -37,7 +37,7 @@ struct OnboardingFlowView: View {
                 .padding(.horizontal, 28)
             VStack(spacing: 10) {
                 Text("Yesterday Weather")
-                    .font(.system(size: 34, weight: .bold, design: .serif))
+                    .font(YWTokens.Typography.display(34))
                 Text("用昨天的體感，決定今天怎麼穿")
                     .font(YWTypography.body)
                     .foregroundStyle(.secondary)
@@ -53,7 +53,7 @@ struct OnboardingFlowView: View {
         VStack(alignment: .leading, spacing: 20) {
             Spacer()
             Text("需要你的位置")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(YWTokens.Typography.display(28))
             Text("用來取得今日與昨日的實際氣溫與體感。僅供天氣對比，不會用於其他用途。")
                 .font(YWTypography.body)
                 .foregroundStyle(.secondary)
@@ -113,7 +113,7 @@ struct OnboardingFlowView: View {
         VStack(alignment: .leading, spacing: 20) {
             Spacer()
             Text("通勤前提醒")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(YWTokens.Typography.display(28))
             Text("開啟通知，才能在出門／下班前提醒溫差與降雨變化。預設 08:00 / 18:00，之後可在設定調整。")
                 .font(YWTypography.body)
                 .foregroundStyle(.secondary)
@@ -136,7 +136,7 @@ struct OnboardingFlowView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Widget 才是舞台")
-                    .font(.system(size: 28, weight: .bold, design: .serif))
+                    .font(YWTokens.Typography.display(28))
                     .padding(.top, 24)
 
                 Text("鎖定畫面 2×1")
@@ -167,7 +167,7 @@ struct OnboardingFlowView: View {
         VStack(alignment: .leading, spacing: 18) {
             Spacer()
             Text("把小工具加到桌面")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(YWTokens.Typography.display(28))
             stepRow(1, "長按桌面空白處")
             stepRow(2, "點右上角「+」")
             stepRow(3, "搜尋 Yesterday Weather")
@@ -189,7 +189,7 @@ struct OnboardingFlowView: View {
                 .foregroundStyle(Color(hex: 0x4A90E2))
                 .symbolEffect(.bounce, value: step == 5)
             Text("準備完成")
-                .font(.system(size: 28, weight: .bold, design: .serif))
+                .font(YWTokens.Typography.display(28))
             Text("首頁會展開 Widget 的完整對比。日常就看鎖定畫面／桌面小工具即可。")
                 .font(YWTypography.body)
                 .foregroundStyle(.secondary)

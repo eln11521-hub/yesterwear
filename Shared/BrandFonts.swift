@@ -10,7 +10,7 @@ import Foundation
 /// `Bundle.main` resolves to whichever bundle is running (app or widget
 /// extension); both embed the `.ttf` files from `Shared/Fonts`, so the same
 /// call works in each process. Registration must run before any `Font.custom`
-/// is first evaluated — the `YWTokens.Type` fonts are lazy `static let`s, so
+/// is first evaluated — the `YWTokens.Typography` fonts are lazy `static let`s, so
 /// registering in `init()` is early enough.
 enum BrandFonts {
     private static var didRegister = false

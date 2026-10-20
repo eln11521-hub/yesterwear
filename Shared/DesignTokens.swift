@@ -39,15 +39,15 @@ enum TempDeltaState: Equatable {
     }
 }
 
-/// Typography scale. Delegates to the token layer (YWTokens.Type) so the
+/// Typography scale. Delegates to the token layer (YWTokens.Typography) so the
 /// type scale has a single source of truth. Retained as `YWTypography` for
-/// backwards compatibility with existing views; new code may use YWTokens.Type.
+/// backwards compatibility with existing views; new code may use YWTokens.Typography.
 enum YWTypography {
-    static let hero = YWTokens.Type.hero
-    static let title = YWTokens.Type.title
-    static let body = YWTokens.Type.body
-    static let caption = YWTokens.Type.caption
-    static let micro = YWTokens.Type.micro
+    static let hero = YWTokens.Typography.hero
+    static let title = YWTokens.Typography.title
+    static let body = YWTokens.Typography.body
+    static let caption = YWTokens.Typography.caption
+    static let micro = YWTokens.Typography.micro
 }
 
 extension Color {

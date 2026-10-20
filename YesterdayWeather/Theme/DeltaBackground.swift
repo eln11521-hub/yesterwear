@@ -38,8 +38,8 @@ private func atmospherePreview(_ state: TempDeltaState, _ label: String) -> some
     ZStack {
         DeltaAtmosphere(state: state)
         VStack(spacing: 4) {
-            Text(label).font(YWTokens.Type.title)
-            Text(state.label).font(YWTokens.Type.body).foregroundStyle(state.primary)
+            Text(label).font(YWTokens.Typography.title)
+            Text(state.label).font(YWTokens.Typography.body).foregroundStyle(state.primary)
         }
         .padding(20)
         .background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: YWTokens.Sys.radiusLg))

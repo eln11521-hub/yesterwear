@@ -9,5 +9,8 @@ DerivedData/
 xcuserdata/
 *.xcworkspace/xcuserdata/
 
+# xcodegen generates the project from project.yml — don't track it
+YesterdayWeather.xcodeproj/
+
 # Node (prototype has its own .gitignore too)
 node_modules/

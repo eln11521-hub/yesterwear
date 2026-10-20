@@ -91,7 +91,7 @@ struct ComponentCatalogView: View {
     private func section<Content: View>(_ title: String, @ViewBuilder _ content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: YWTokens.Sys.spacingMd) {
             Text(title.uppercased())
-                .font(YWTokens.Type.micro)
+                .font(YWTokens.Typography.micro)
                 .tracking(1.2)
                 .foregroundStyle(YWTokens.Sys.textSecondary)
             content()
@@ -105,7 +105,7 @@ struct ComponentCatalogView: View {
                 .frame(width: 56, height: 40)
                 .overlay(RoundedRectangle(cornerRadius: YWTokens.Sys.radiusSm)
                     .strokeBorder(.black.opacity(0.08)))
-            Text(name).font(YWTokens.Type.micro).foregroundStyle(YWTokens.Sys.textSecondary)
+            Text(name).font(YWTokens.Typography.micro).foregroundStyle(YWTokens.Sys.textSecondary)
         }
     }
 
@@ -113,7 +113,7 @@ struct ComponentCatalogView: View {
         DeltaAtmosphere(state: state)
             .frame(height: 96)
             .clipShape(RoundedRectangle(cornerRadius: YWTokens.Sys.radiusLg))
-            .overlay(Text(label).font(YWTokens.Type.body).foregroundStyle(state.primary))
+            .overlay(Text(label).font(YWTokens.Typography.body).foregroundStyle(state.primary))
     }
 }
 
