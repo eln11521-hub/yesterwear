@@ -11,13 +11,13 @@ final class WeatherSnapshotStore: ObservableObject {
         snapshot = Self.loadCached()
     }
 
-    static func loadCached() -> WeatherSnapshot? {
+    nonisolated static func loadCached() -> WeatherSnapshot? {
         guard let data = AppGroup.defaults.data(forKey: AppGroup.Key.weatherSnapshot),
               let decoded = try? JSONDecoder().decode(WeatherSnapshot.self, from: data) else { return nil }
         return decoded
     }
 
-    static func saveCached(_ snapshot: WeatherSnapshot) {
+    nonisolated static func saveCached(_ snapshot: WeatherSnapshot) {
         if let data = try? JSONEncoder().encode(snapshot) {
             AppGroup.defaults.set(data, forKey: AppGroup.Key.weatherSnapshot)
         }

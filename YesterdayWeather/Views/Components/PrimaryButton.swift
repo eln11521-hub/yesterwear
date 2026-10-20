@@ -5,7 +5,7 @@ import SwiftUI
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(YWTokens.Type.body)
+            .font(YWTokens.Typography.body)
             .frame(maxWidth: .infinity)
             .padding(.vertical, YWTokens.Sys.spacingMd)          // 12pt
             .background(YWTokens.Sys.textPrimary)                // #111 ink

@@ -29,6 +29,9 @@ targets:
       - target: YesterdayWeatherWidget
     entitlements:
       path: YesterdayWeather/YesterdayWeather.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.yesterdayweather.shared
   YesterdayWeatherWidget:
     type: app-extension
     platform: iOS
@@ -38,12 +41,15 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.yesterdayweather.app.widget
       CODE_SIGN_ENTITLEMENTS: YesterdayWeatherWidget/YesterdayWeatherWidget.entitlements
-      GENERATE_INFOPLIST_FILE: YES
+      GENERATE_INFOPLIST_FILE: NO
       INFOPLIST_FILE: YesterdayWeatherWidget/Info.plist
       INFOPLIST_KEY_CFBundleDisplayName: Yesterday Weather
       LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
     entitlements:
       path: YesterdayWeatherWidget/YesterdayWeatherWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.yesterdayweather.shared
 schemes:
   YesterdayWeather:
     build:

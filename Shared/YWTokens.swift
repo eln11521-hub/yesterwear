@@ -119,7 +119,7 @@ enum YWTokens {
     // Bundled brand fonts, registered at launch by BrandFonts.register():
     //   DM Sans (UI, variable) · IBM Plex Mono (numerals/dates) · Archivo Black (display).
     // Mirrors the web tokens --yw-sys-font-ui / --yw-sys-font-mono + the Archivo Black wordmark.
-    enum Type {
+    enum Typography {
         private static let ui = "DMSans-9ptRegular"        // variable; weight via .weight()
         private static let monoMedium = "IBMPlexMono-Medium"
         private static let monoSemibold = "IBMPlexMono-SemiBold"
@@ -133,7 +133,9 @@ enum YWTokens {
         static let micro   = Font.custom(ui, size: Ref.typeMicro).weight(.semibold)
 
         // Display — Archivo Black (brand wordmark / onboarding title)
-        static let display = Font.custom(displayFace, size: Ref.typeHero)
+        static func display(_ size: CGFloat = Ref.typeHero) -> Font {
+            Font.custom(displayFace, size: size)
+        }
 
         // Numerals / dates — IBM Plex Mono
         static let mono       = Font.custom(monoMedium, size: Ref.typeCaption)
