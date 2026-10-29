@@ -22,6 +22,7 @@ targets:
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: 需要位置以取得今日與昨日氣溫、體感對比。
+      INFOPLIST_KEY_NSCameraUsageDescription: 拍下今天的穿搭，明天就能對照昨天穿了什麼。
       CODE_SIGN_ENTITLEMENTS: YesterdayWeather/YesterdayWeather.entitlements
       DEVELOPMENT_TEAM: ""
       GENERATE_INFOPLIST_FILE: YES
