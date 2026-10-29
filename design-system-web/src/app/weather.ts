@@ -18,6 +18,8 @@ export type WeatherVM = {
   conditionLabel: string;
   metrics: { label: string; value: string }[];
   commute: { slot: string; time: string; temp: string; delta: string }[];
+  /** Today 00–23, feels-like temperature per hour (今天各時段溫度). */
+  hourly: HourlyPoint[];
   forecast: {
     day: string;
     condition: Condition;
@@ -36,6 +38,36 @@ export type WeatherVM = {
   /** PRD 4.3: epoch ms of the successful fetch (for staleness display). */
   updatedAt?: number;
 };
+
+export type HourlyPoint = {
+  /** Hour of day 0–23. */
+  hour: number;
+  /** Feels-like temperature in the display unit. */
+  temp: number;
+  condition: Condition;
+  /** Precipitation probability, only when wet weather is likely (≥ 40%). */
+  pop?: number;
+  /** The current hour. */
+  now?: boolean;
+  /** Commute marker for this hour. */
+  slot?: "出門" | "下班";
+};
+
+/** Mock day: feels-like curve with a 15:00 peak, now = 09:00. */
+function mockHourly(): HourlyPoint[] {
+  return Array.from({ length: 24 }, (_, hour) => {
+    const temp = Math.round(12 + 6 * Math.sin(((hour - 9) / 24) * 2 * Math.PI));
+    const condition: Condition = hour < 6 || hour > 19 ? "partly" : hour >= 16 ? "overcast" : "sun";
+    return {
+      hour,
+      temp,
+      condition,
+      ...(hour === 9 ? { now: true } : {}),
+      ...(hour === 8 ? { slot: "出門" as const } : {}),
+      ...(hour === 18 ? { slot: "下班" as const } : {}),
+    };
+  });
+}
 
 /** "更新於 X 前" — human staleness label for cached data (PRD 4.3). */
 export function agoText(ts?: number): string {
@@ -66,6 +98,7 @@ export const MOCK_WEATHER: WeatherVM = {
     { slot: "出門", time: "08:00", temp: "16°", delta: "↓2°" },
     { slot: "下班", time: "18:00", temp: "14°", delta: "↓4°" },
   ],
+  hourly: mockHourly(),
   forecast: [
     { day: "今天", condition: "partly", low: 11, high: 18, current: 16 },
     { day: "週五", condition: "sun", low: 13, high: 20 },

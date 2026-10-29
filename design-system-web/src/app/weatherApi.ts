@@ -51,6 +51,7 @@ type OMResponse = {
     temperature_2m: number[];
     apparent_temperature: number[];
     precipitation_probability: number[];
+    weather_code: number[];
   };
   daily: {
     time: string[];
@@ -73,7 +74,7 @@ export async function fetchWeather(
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
     `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code` +
-    `&hourly=temperature_2m,apparent_temperature,precipitation_probability` +
+    `&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
     `&past_days=1&forecast_days=7&timezone=auto`;
 
@@ -141,6 +142,24 @@ export async function fetchWeather(
     };
   });
 
+  // 今天各時段: hourly[24..47] is today (past_days=1), feels-like per hour.
+  const leaveHH = Number(commute.leaveTime.slice(0, 2));
+  const returnHH = Number(commute.returnTime.slice(0, 2));
+  const hourlyToday = Array.from({ length: 24 }, (_, hour) => {
+    const idx = 24 + hour;
+    const { condition } = decode(hourly.weather_code[idx] ?? 0);
+    const pop = hourly.precipitation_probability[idx] ?? 0;
+    return {
+      hour,
+      temp: toDisp(hourly.apparent_temperature[idx]),
+      condition,
+      ...(/rain|snow|thunder/.test(condition) && pop >= 40 ? { pop } : {}),
+      ...(idx === nowIdx ? { now: true } : {}),
+      ...(hour === leaveHH ? { slot: "出門" as const } : {}),
+      ...(hour === returnHH && hour !== leaveHH ? { slot: "下班" as const } : {}),
+    };
+  });
+
   const cond = decode(current.weather_code);
   // PRD 4.2: rain hint when today's precipitation probability > 50%.
   const rain = (daily.precipitation_probability_max[1] ?? 0) > 50;
@@ -164,6 +183,7 @@ export async function fetchWeather(
       commuteAt("出門", commute.leaveTime),
       commuteAt("下班", commute.returnTime),
     ],
+    hourly: hourlyToday,
     forecast,
     overallDelta,
     unit,

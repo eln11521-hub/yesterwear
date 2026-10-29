@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Home — the Dashboard, ported from design-system-web/src/pages/home/HomeScreen.tsx
 /// (Figma 174:2 v4d). Paper ground with #f5f5f5 cards: hero → commute → outfit
-/// → CTA → week forecast → widget promo.
+/// → CTA (the first screen ends here) → 今天各時段溫度 → widget promo.
 struct HomeView: View {
     var onRecord: () -> Void = {}
 
@@ -41,8 +41,9 @@ struct HomeView: View {
                             pill: true,
                             action: onRecord
                         )
-                        if let days = snap.forecast, !days.isEmpty {
-                            forecast(days)
+                        // The first screen ends at the CTA; 今天各時段溫度 sits below.
+                        if let hours = snap.hourly, !hours.isEmpty {
+                            hourlyCard(hours, nowHour: snap.nowHour)
                         }
                     } else {
                         placeholder
@@ -195,32 +196,25 @@ struct HomeView: View {
         Rectangle().fill(S.line).frame(width: 1, height: 40)
     }
 
-    // MARK: Forecast
+    // MARK: Hourly
 
-    private func forecast(_ days: [DailyForecast]) -> some View {
-        let lows = days.map { deg($0.low) }, highs = days.map { deg($0.high) }
-        let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
-        return VStack(alignment: .leading, spacing: 12) {
-            Text("未來一週天氣")
-                .font(T.ui(15, .semibold))
-                .foregroundStyle(S.textPrimary)
-            VStack(spacing: 0) {
-                ForEach(Array(days.enumerated()), id: \.offset) { i, d in
-                    ForecastRow(
-                        day: i == 0 ? "今天" : Self.weekday(d.dateISO),
-                        condition: d.condition,
-                        low: lows[i],
-                        high: highs[i],
-                        weekMin: weekMin,
-                        weekMax: weekMax,
-                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil
-                    )
-                    // Full-bleed 6% ink separators (Figma 174:102).
-                    if i < days.count - 1 { Rectangle().fill(S.textPrimary.opacity(0.06)).frame(height: 1) }
-                }
-            }
-            .ywCard(padding: EdgeInsets())
+    private func hourlyCard(_ hours: [HourPoint], nowHour: Int?) -> some View {
+        let leave = settings.settings.leaveHour, ret = settings.settings.returnHour
+        let items = hours.map { h in
+            HourlyStrip.Item(
+                hour: h.hour,
+                temp: deg(h.apparent),
+                condition: h.condition,
+                pop: h.condition.isWet && h.pop >= 40 ? h.pop : nil,
+                now: h.hour == nowHour,
+                slot: h.hour == leave ? "出門" : h.hour == ret ? "下班" : nil
+            )
         }
+        return VStack(alignment: .leading, spacing: 12) {
+            SectionLabel("今天各時段溫度")
+            HourlyStrip(items: items)
+        }
+        .ywCard()
     }
 
     // MARK: Placeholder
@@ -257,16 +251,5 @@ struct HomeView: View {
         if let tz = weather.snapshot.flatMap({ TimeZone(identifier: $0.timezone) }) { cal.timeZone = tz }
         let c = cal.dateComponents([.weekday, .month, .day], from: .now)
         return "· 今天 \(Self.weekdays[(c.weekday ?? 1) - 1]) \(c.month ?? 0)/\(c.day ?? 0)"
-    }
-
-    private static func weekday(_ iso: String) -> String {
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "en_US_POSIX")
-        f.dateFormat = "yyyy-MM-dd"
-        f.timeZone = TimeZone(identifier: "UTC")
-        guard let d = f.date(from: iso) else { return "" }
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "UTC")!
-        return weekdays[cal.component(.weekday, from: d) - 1]
     }
 }

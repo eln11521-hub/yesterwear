@@ -26,7 +26,7 @@ actor WeatherService {
             .init(name: "latitude", value: String(settings.latitude)),
             .init(name: "longitude", value: String(settings.longitude)),
             .init(name: "current", value: "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code"),
-            .init(name: "hourly", value: "temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability"),
+            .init(name: "hourly", value: "temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,weather_code"),
             .init(name: "daily", value: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"),
             .init(name: "past_days", value: "1"),
             .init(name: "forecast_days", value: "7"),
@@ -81,8 +81,24 @@ actor WeatherService {
             suggestion: OutfitAdvice.text(delta: overallDelta, rain: leave.compare.rainHint || ret.compare.rainHint, yesterday: outfitYesterday),
             conditionCode: current?.weatherCode,
             rainNow: rainNow,
-            forecast: forecast(response.daily)
+            forecast: forecast(response.daily),
+            hourly: today(hourly),
+            nowHour: nowIdx >= Self.dayHours ? nowIdx - Self.dayHours : nil
         )
+    }
+
+    /// hourly[24..<48] is today (past_days=1).
+    private func today(_ hourly: HourlyWeather) -> [HourPoint]? {
+        let range = Self.dayHours..<(Self.dayHours * 2)
+        guard range.upperBound <= hourly.apparentTemperature.count else { return nil }
+        return range.map { i in
+            HourPoint(
+                hour: i - Self.dayHours,
+                apparent: hourly.apparentTemperature[i],
+                conditionCode: hourly.weatherCode?[i] ?? 0,
+                pop: hourly.precipitationProbability[i] ?? 0
+            )
+        }
     }
 
     /// daily[0] = yesterday (past_days=1), so today onward starts at index 1.
