@@ -2,16 +2,21 @@ import SwiftUI
 
 /// Home — the Dashboard, ported from design-system-web/src/pages/home/HomeScreen.tsx
 /// (Figma 174:2 v4d). Paper ground with #f5f5f5 cards: hero → commute → outfit
-/// → CTA (the first screen ends here) → 今天各時段溫度 → widget promo.
+/// → CTA (the first screen ends here, right above the floating nav) →
+/// 今天各時段溫度 → week forecast → widget promo.
 struct HomeView: View {
     var onRecord: () -> Void = {}
 
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var outfit: OutfitStore
     @EnvironmentObject private var weather: WeatherSnapshotStore
+    @State private var switchingPlace = false
 
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
+
+    /// Floating nav (≈65pt) + its 8pt bottom inset + a 16pt gap above it.
+    private static let navClearance: CGFloat = 65 + 8 + 16
 
     private var unit: TempUnit { settings.settings.unit }
     private var suffix: String { unit == .f ? "°F" : "°C" }
@@ -23,27 +28,37 @@ struct HomeView: View {
                 location: settings.settings.cityName,
                 date: dateLabel,
                 refreshing: weather.isLoading,
-                onRefresh: refresh
+                onRefresh: refresh,
+                onLocationTap: { switchingPlace = true }
             )
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 8)
 
+            GeometryReader { viewport in
             ScrollView {
                 VStack(spacing: 16) {
                     if let snap = weather.snapshot {
-                        hero(snap)
-                        commuteCard(snap)
-                        outfitCard(snap)
-                        YWPrimaryButton(
-                            label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
-                            icon: "icon-tag",
-                            pill: true,
-                            action: onRecord
-                        )
-                        // The first screen ends at the CTA; 今天各時段溫度 sits below.
+                        // First screen: hero → commute → outfit → CTA, sized so the
+                        // CTA lands right above the floating nav; the outfit card
+                        // absorbs the slack (fixed height for a given screen).
+                        VStack(spacing: 16) {
+                            hero(snap)
+                            commuteCard(snap)
+                            outfitCard(snap)
+                            YWPrimaryButton(
+                                label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
+                                icon: "icon-tag",
+                                pill: true,
+                                action: onRecord
+                            )
+                        }
+                        .frame(minHeight: max(0, viewport.size.height - Self.navClearance))
                         if let hours = snap.hourly, !hours.isEmpty {
                             hourlyCard(hours, nowHour: snap.nowHour)
+                        }
+                        if let days = snap.forecast, !days.isEmpty {
+                            forecast(days, currentApparent: snap.currentApparent)
                         }
                     } else {
                         placeholder
@@ -56,8 +71,10 @@ struct HomeView: View {
             }
             .scrollIndicators(.hidden)
             .refreshable { await reload() }
+            }
         }
         .background(S.surfacePaper.ignoresSafeArea())
+        .sheet(isPresented: $switchingPlace) { LocationSheet() }
     }
 
     // MARK: Hero
@@ -155,7 +172,7 @@ struct HomeView: View {
                 .font(T.ui(12))
                 .lineSpacing(12 * 0.3)   // web line-height 1.6
         }
-        .ywCard()
+        .ywCard(fillHeight: true)
     }
 
     /// 「建議：」 bold ink + the rest in the label gray (Figma 173:2914).
@@ -217,6 +234,35 @@ struct HomeView: View {
         .ywCard()
     }
 
+    // MARK: Forecast
+
+    private func forecast(_ days: [DailyForecast], currentApparent: Double) -> some View {
+        let lows = days.map { deg($0.low) }, highs = days.map { deg($0.high) }
+        let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
+        return VStack(alignment: .leading, spacing: 12) {
+            Text("未來一週天氣")
+                .font(T.ui(15, .semibold))
+                .foregroundStyle(S.textPrimary)
+            VStack(spacing: 0) {
+                ForEach(Array(days.enumerated()), id: \.offset) { i, d in
+                    ForecastRow(
+                        day: i == 0 ? "今天" : Self.weekday(d.dateISO),
+                        condition: d.condition,
+                        low: lows[i],
+                        high: highs[i],
+                        weekMin: weekMin,
+                        weekMax: weekMax,
+                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil,
+                        current: i == 0 ? deg(currentApparent) : nil   // today's feels-like knob
+                    )
+                    // Full-bleed 6% ink separators (Figma 174:102).
+                    if i < days.count - 1 { Rectangle().fill(S.textPrimary.opacity(0.06)).frame(height: 1) }
+                }
+            }
+            .ywCard(padding: EdgeInsets())
+        }
+    }
+
     // MARK: Placeholder
 
     private var placeholder: some View {
@@ -251,5 +297,16 @@ struct HomeView: View {
         if let tz = weather.snapshot.flatMap({ TimeZone(identifier: $0.timezone) }) { cal.timeZone = tz }
         let c = cal.dateComponents([.weekday, .month, .day], from: .now)
         return "· 今天 \(Self.weekdays[(c.weekday ?? 1) - 1]) \(c.month ?? 0)/\(c.day ?? 0)"
+    }
+
+    private static func weekday(_ iso: String) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        f.timeZone = TimeZone(identifier: "UTC")
+        guard let d = f.date(from: iso) else { return "" }
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "UTC")!
+        return weekdays[cal.component(.weekday, from: d) - 1]
     }
 }

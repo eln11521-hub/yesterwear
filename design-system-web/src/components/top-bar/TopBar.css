@@ -13,6 +13,22 @@
   color: var(--yw-sys-color-text-primary);
 }
 
+/* pin + place — tappable to switch places; keeps the plain text look */
+.yw-top-bar__place-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.yw-top-bar__place-btn:disabled {
+  cursor: default;
+}
+
 .yw-top-bar__place {
   font-size: 15px;
   font-weight: 600; /* DM Sans SemiBold */

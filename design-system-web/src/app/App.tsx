@@ -4,6 +4,7 @@ import { HomeWidgetMedium } from "../components/home-widget-medium/HomeWidgetMed
 import { LockWidget } from "../components/lock-widget/LockWidget";
 import { HomeScreen } from "../pages/home/HomeScreen";
 import { Welcome } from "../pages/onboarding/Welcome";
+import { LocationSheet } from "../pages/location-sheet/LocationSheet";
 import { RecordOutfitSheet } from "../pages/record-outfit/RecordOutfitSheet";
 import { SettingsScreen } from "../pages/settings/SettingsScreen";
 import "./App.css";
@@ -34,6 +35,7 @@ export function App() {
     setReturnTime,
     setLocationMode,
     setLocation,
+    selectLocation,
     setUnit,
     setNotifCommute,
     setLeaveAlert,
@@ -50,6 +52,26 @@ export function App() {
   const { yesterday, today, saveToday, simulateNextDay, reset } =
     useOutfitStore();
   const [open, setOpen] = useState(false);
+  const [locOpen, setLocOpen] = useState(false);
+
+  /** 使用目前位置: resolve the device location and show its weather (GPS mode). */
+  function locateMe(): Promise<boolean> {
+    return new Promise((resolve) => {
+      if (!("geolocation" in navigator)) return resolve(false);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          selectLocation(
+            { name: "目前位置", lat: pos.coords.latitude, lon: pos.coords.longitude },
+            "gps",
+          );
+          setLocOpen(false);
+          resolve(true);
+        },
+        () => resolve(false),
+        { timeout: 10000 },
+      );
+    });
+  }
   const [tab, setTab] = useState<Tab>("weather");
   // First-launch onboarding: show the Welcome screen until it's been completed once.
   const [onboarded, setOnboarded] = useState(() => {
@@ -108,9 +130,33 @@ export function App() {
               onRecord={() => setOpen(true)}
               onRefresh={refresh}
               refreshing={status === "loading"}
+              onLocationPress={() => setLocOpen(true)}
               navActiveId="weather"
               onNavSelect={selectTab}
             />
+
+            {locOpen ? (
+              <>
+                <button
+                  type="button"
+                  className="yw-app__scrim"
+                  aria-label="關閉"
+                  onClick={() => setLocOpen(false)}
+                />
+                <div className="yw-app__sheet">
+                  <LocationSheet
+                    location={settings.location}
+                    mode={settings.locationMode}
+                    recents={settings.recentLocations ?? []}
+                    onSelect={(loc) => {
+                      selectLocation(loc, "manual");
+                      setLocOpen(false);
+                    }}
+                    onUseGps={locateMe}
+                  />
+                </div>
+              </>
+            ) : null}
 
             {open ? (
               <>
