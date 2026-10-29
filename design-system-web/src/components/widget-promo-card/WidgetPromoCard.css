@@ -13,14 +13,24 @@
   font-family: var(--yw-sys-font-ui);
 }
 
-/* Decorative looping stroke (Figma 173:2932): white 43%, 20px, clipped by card */
+/* Decorative looping stroke (Figma 504:234): white 43%, 20px, rotated −89.81°
+   inside a 123.5×127.8 box at right 15.5 / top −16, clipped by the card. */
 .yw-widget-promo-card__deco {
   position: absolute;
-  inset-block-start: 2px;
-  inset-inline-end: 8px;
-  inline-size: 128px;
-  block-size: 124px;
+  inset-block-start: -16px;
+  inset-inline-end: 15.51px;
+  inline-size: 123.486px;
+  block-size: 127.764px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
+}
+.yw-widget-promo-card__curve {
+  flex: none;
+  inline-size: 127.347px;
+  block-size: 123.054px;
+  transform: rotate(-89.81deg);
 }
 
 .yw-widget-promo-card__text {

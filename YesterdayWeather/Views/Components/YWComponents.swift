@@ -99,8 +99,8 @@ struct TopBar: View {
                     .foregroundStyle(S.textPrimary)
                     .lineLimit(1)
                 Text(date)
-                    .font(T.mono(11))
-                    .foregroundStyle(S.textLabel)
+                    .font(T.mono(11, .bold))
+                    .foregroundStyle(S.textMutedWarm)
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
@@ -130,7 +130,7 @@ struct SectionLabel<Content: View>: View {
     @ViewBuilder var content: Content
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             Circle().fill(S.textPrimary).frame(width: 6, height: 6)
             content
                 .font(T.ui(13, .medium))
@@ -209,8 +209,8 @@ struct ChipFlow: Layout {
 
 // MARK: - Commute column
 
-/// Slot · temp · note column (web CommuteRow, Figma 174:54–55). `note` is the
-/// plain label line; `delta` (when set) renders as 「較昨日 ↓3°」 with the value tinted.
+/// Slot · temp · note column (web CommuteRow, Figma Commute Row 504:231). The
+/// last line is 「較昨日 ↓3°」 when `delta` is set, otherwise `note` — both muted.
 struct CommuteColumn: View {
     let slot: String
     let temp: String
@@ -226,18 +226,15 @@ struct CommuteColumn: View {
                 .font(T.ui(24, .bold))
                 .tracking(-0.24)
                 .foregroundStyle(S.textPrimary)
-            if let delta {
-                (Text("較昨日 ").foregroundStyle(S.textLabel)
-                 + Text(delta).fontWeight(.semibold).foregroundStyle(DeltaTint.color(for: delta)))
+            if let line = delta.map({ "較昨日 \($0)" }) ?? note {
+                Text(line)
                     .font(T.ui(10, .medium))
-            } else if let note {
-                Text(note)
-                    .font(T.ui(10, .medium))
-                    .foregroundStyle(S.textLabel)
+                    .foregroundStyle(S.textMutedWarm)
             }
         }
         .lineLimit(1)
         .fixedSize()
+        .padding(.horizontal, 8)
     }
 }
 
@@ -260,12 +257,12 @@ struct ForecastRow: View {
             Text(day)
                 .font(T.ui(12, .semibold))
                 .foregroundStyle(Color(hex: 0x555553))
-                .frame(width: 40, alignment: .leading)
-            VStack(spacing: 2) {
+                .frame(width: 38, alignment: .leading)
+            VStack(spacing: 1) {
                 WeatherGlyph(condition: condition, size: 22)
                 if let pop {
                     Text("\(pop)%")
-                        .font(T.ui(10, .medium))
+                        .font(T.ui(9, .medium))
                         .foregroundStyle(S.deltaCold)
                 }
             }
@@ -273,14 +270,15 @@ struct ForecastRow: View {
             Text("\(low)°")
                 .font(T.ui(14, .medium))
                 .foregroundStyle(Color(hex: 0x8E8E8C))
-                .frame(width: 28, alignment: .trailing)
+                .frame(width: 26, alignment: .trailing)
             bar
             Text("\(high)°")
                 .font(T.ui(14, .bold))
                 .foregroundStyle(S.textPrimary)
-                .frame(width: 28, alignment: .trailing)
+                .frame(width: 26, alignment: .trailing)
         }
         .padding(.vertical, 11)
+        .padding(.horizontal, 16)
     }
 
     private var bar: some View {
@@ -320,19 +318,21 @@ struct YWPrimaryButton: View {
     let label: String
     var icon: String? = nil
     var isDisabled: Bool = false
+    /// Fully rounded, 14pt label — the Home 記錄今天穿搭 CTA (Figma 515:901).
+    var pill: Bool = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
                 if let icon { AssetIcon(name: icon, size: 18) }
-                Text(label).font(T.ui(15, .semibold))
+                Text(label).font(T.ui(pill ? 14 : 15, .semibold))
             }
             .foregroundStyle(S.textOnDark)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 15)
             .padding(.horizontal, 24)
-            .background(S.textPrimary, in: RoundedRectangle(cornerRadius: S.radiusMd))
+            .background(S.textPrimary, in: RoundedRectangle(cornerRadius: pill ? 100 : S.radiusMd))
         }
         .buttonStyle(PressScaleStyle())
         .disabled(isDisabled)
@@ -362,22 +362,22 @@ struct FloatingNav: View {
                     VStack(spacing: 3) {
                         AssetIcon(name: item.icon, size: 20)
                         Text(item.label)
-                            .font(T.ui(10.5, active ? .bold : .medium))
+                            .font(T.ui(11, .medium))
                     }
-                    .foregroundStyle(active ? S.textOnDark : S.textLabel)
-                    .padding(.vertical, 9)
-                    .padding(.horizontal, 20)
-                    .background(active ? S.textPrimary : .clear, in: RoundedRectangle(cornerRadius: 20))
-                    .contentShape(RoundedRectangle(cornerRadius: 20))
+                    .foregroundStyle(active ? S.textOnDark : S.textHint)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .background(active ? S.textPrimary : .clear, in: RoundedRectangle(cornerRadius: 16))
+                    .contentShape(RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(.plain)
                 .animation(.easeOut(duration: S.motionStateDuration), value: active)
             }
         }
         .padding(6)
-        .background(S.surfaceWhite, in: RoundedRectangle(cornerRadius: 28))
-        .overlay(RoundedRectangle(cornerRadius: 28).strokeBorder(S.line, lineWidth: 1))
-        .shadow(color: .black.opacity(0.08), radius: 12, y: 8)
+        .background(S.surfaceWhite, in: RoundedRectangle(cornerRadius: 22))
+        .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(S.line, lineWidth: 1))
+        .shadow(color: Color(hex: 0x291F0A).opacity(0.16), radius: 4, y: 6)
     }
 }
 
@@ -413,10 +413,11 @@ struct WidgetPromoCard: View {
         .padding(.horizontal, 16)
         .background(alignment: .topTrailing) {
             PromoSwoosh()
-                .stroke(.white.opacity(0.43), style: StrokeStyle(lineWidth: 20, lineCap: .round))
-                .frame(width: 128, height: 124)
-                .padding(.top, 2)
-                .padding(.trailing, 8)
+                .stroke(.white.opacity(0.43), style: StrokeStyle(lineWidth: 20, lineCap: .round, lineJoin: .round))
+                .frame(width: 127.347, height: 123.054)
+                .rotationEffect(.degrees(-89.81))
+                .frame(width: 123.486, height: 127.764)
+                .offset(x: -15.51, y: -16)
         }
         .background(S.promoBg)
         .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -449,12 +450,12 @@ private struct PromoSwoosh: Shape {
 // MARK: - Card container
 
 extension View {
-    /// Raised paper card on the warm ground (web .yw-home__card).
+    /// Raised card on the paper ground (web .yw-home__card, Figma var card #f5f5f5).
     func ywCard(padding: EdgeInsets = EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)) -> some View {
         self
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(S.surfacePaper, in: RoundedRectangle(cornerRadius: S.radiusXl))
+            .background(S.surfaceRaised, in: RoundedRectangle(cornerRadius: S.radiusXl))
     }
 }
 

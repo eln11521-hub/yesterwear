@@ -1,19 +1,13 @@
 import { Fragment } from "react";
 
 import tagUrl from "../../assets/icon/tag.svg?url";
-import {
-  deltaState,
-  MOCK_WEATHER,
-  suggestOutfit,
-  type WeatherVM,
-} from "../../app/weather";
+import { MOCK_WEATHER, suggestOutfit, type WeatherVM } from "../../app/weather";
 import { WeatherIcon } from "../../components/weather-icon/WeatherIcon";
 import { Icon } from "../../components/_ui/Icon";
 import { CommuteRow } from "../../components/commute-row/CommuteRow";
 import { FloatingNav } from "../../components/floating-nav/FloatingNav";
 import { GearIcon, ThermometerIcon } from "../../components/floating-nav/NavIcons";
 import { ForecastRow } from "../../components/forecast-row/ForecastRow";
-import { Mascot } from "../../components/mascot/Mascot";
 import { garmentIcon } from "../../components/outfit-chip/garments";
 import { OutfitChip } from "../../components/outfit-chip/OutfitChip";
 import { PrimaryButton } from "../../components/primary-button/PrimaryButton";
@@ -88,10 +82,10 @@ function deltaColor(d: string): string {
 const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 
 /**
- * HomeScreen — the 174:2 Dashboard (v4d). Warm (card-warm) ground with raised
- * paper cards: a hero card pairing the 兔子與太陽 mascot with 現在體感 + the
- * comparison headline, a single-row metrics card, and the outfit / commute /
- * forecast cards. Presentational: pass props for real data.
+ * HomeScreen — the 174:2 Dashboard (v4d). Paper ground with #f5f5f5 cards: a
+ * hero (現在體感 + condition + comparison headline, 實際氣溫/濕度 + 較昨日 pill),
+ * then commute → outfit → CTA → week forecast → widget promo. Presentational:
+ * pass props for real data.
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
@@ -127,17 +121,16 @@ export function HomeScreen({
       </div>
 
       <div className="yw-home__scroll">
-        {/* Hero: mascot + 現在體感 + comparison headline, then the metrics row */}
+        {/* Hero: 現在體感 + condition/headline, then the metrics rows (Figma 173:2893) */}
         <section className="yw-home__hero">
           <div className="yw-home__hero-top">
-            <div className="yw-home__mascot">
-              <Mascot size={100} state={deltaState(weather.overallDelta)} />
-            </div>
-            <div className="yw-home__hero-info">
+            <div className="yw-home__now">
               <span className="yw-home__now-label">現在體感</span>
               <span className="yw-home__now-temp">{weather.nowTemp}</span>
+            </div>
+            <div className="yw-home__hero-info">
               <span className="yw-home__now-cond">
-                <WeatherIcon condition={weather.condition} size={24} />{" "}
+                <WeatherIcon condition={weather.condition} size={20} />{" "}
                 {weather.conditionLabel}
               </span>
               <h1 className="yw-home__headline">{weather.headline}</h1>
@@ -173,6 +166,27 @@ export function HomeScreen({
         </section>
 
         <section className="yw-home__card yw-home__block">
+          <SecLabel>通勤時段溫度</SecLabel>
+          <div className="yw-home__commute">
+            {weather.commute.map((c, i) => (
+              <Fragment key={c.slot}>
+                {i > 0 ? <span className="yw-home__vrule" /> : null}
+                <CommuteRow {...c} />
+              </Fragment>
+            ))}
+            <span className="yw-home__vrule" />
+            {/* 降雨 reuses the commute column visual (value + optional note) */}
+            <div className="yw-commute-row">
+              <span className="yw-commute-row__slot">降雨</span>
+              <span className="yw-commute-row__temp">{rain}</span>
+              {rainPossible ? (
+                <span className="yw-commute-row__delta">攜帶雨具</span>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
+        <section className="yw-home__card yw-home__block">
           <SecLabel>
             {crossLocation ? (
               <span className="yw-home__sec-city">
@@ -199,41 +213,29 @@ export function HomeScreen({
           </div>
           <SecLabel>今日建議穿搭</SecLabel>
           <div className="yw-home__chips">
-            {suggestedChips.map((label, i) => (
+            {suggestedChips.map((label) => (
               <OutfitChip
                 key={label}
                 compact
-                selected={i === 0}
                 label={label}
                 iconSrc={garmentIcon[label]}
               />
             ))}
           </div>
-          <p className="yw-home__suggestion">{advice}</p>
-        </section>
-
-        <section className="yw-home__card yw-home__block">
-          <SecLabel>通勤時段溫度</SecLabel>
-          <div className="yw-home__commute">
-            {weather.commute.map((c, i) => (
-              <Fragment key={c.slot}>
-                {i > 0 ? <span className="yw-home__vrule" /> : null}
-                <CommuteRow {...c} />
-              </Fragment>
-            ))}
-            <span className="yw-home__vrule" />
-            {/* 降雨 reuses the commute column visual (value + optional note) */}
-            <div className="yw-commute-row">
-              <span className="yw-commute-row__slot">降雨</span>
-              <span className="yw-commute-row__temp">{rain}</span>
-              {rainPossible ? (
-                <span className="yw-commute-row__delta">攜帶雨具</span>
-              ) : null}
-            </div>
-          </div>
+          <p className="yw-home__suggestion">
+            {advice.startsWith("建議：") ? (
+              <>
+                <strong>建議：</strong>
+                {advice.slice("建議：".length)}
+              </>
+            ) : (
+              advice
+            )}
+          </p>
         </section>
 
         <PrimaryButton
+          shape="pill"
           label={ctaLabel}
           icon={<Icon src={tagUrl} size={18} />}
           onClick={onRecord}
@@ -252,7 +254,6 @@ export function HomeScreen({
                 weekMin={weekMin}
                 weekMax={weekMax}
                 pop={"pop" in d ? d.pop : undefined}
-                current={"current" in d ? d.current : undefined}
               />
             ))}
           </div>

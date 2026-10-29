@@ -7,6 +7,8 @@ export type PrimaryButtonProps = {
   /** Optional leading line icon. */
   icon?: ReactNode;
   disabled?: boolean;
+  /** "pill" = fully rounded, 14px label (Home 記錄今天穿搭 CTA, Figma 515:901). */
+  shape?: "rounded" | "pill";
   onClick?: () => void;
 };
 
@@ -18,12 +20,14 @@ export function PrimaryButton({
   label,
   icon,
   disabled = false,
+  shape = "rounded",
   onClick,
 }: PrimaryButtonProps) {
   return (
     <button
       type="button"
       className="yw-primary-button"
+      data-shape={shape}
       disabled={disabled}
       onClick={onClick}
     >

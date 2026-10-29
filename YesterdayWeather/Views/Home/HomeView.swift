@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Home — the Dashboard, ported from design-system-web/src/pages/home/HomeScreen.tsx
-/// (Figma 174:2 v4d). Warm ground with raised paper cards.
+/// (Figma 174:2 v4d). Paper ground with #f5f5f5 cards: hero → commute → outfit
+/// → CTA → week forecast → widget promo.
 struct HomeView: View {
     var onRecord: () -> Void = {}
 
@@ -32,15 +33,16 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     if let snap = weather.snapshot {
                         hero(snap)
-                        outfitCard(snap)
                         commuteCard(snap)
+                        outfitCard(snap)
                         YWPrimaryButton(
                             label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
                             icon: "icon-tag",
+                            pill: true,
                             action: onRecord
                         )
                         if let days = snap.forecast, !days.isEmpty {
-                            forecast(days, currentApparent: snap.currentApparent)
+                            forecast(days)
                         }
                     } else {
                         placeholder
@@ -54,35 +56,41 @@ struct HomeView: View {
             .scrollIndicators(.hidden)
             .refreshable { await reload() }
         }
-        .background(S.surfaceWarm.ignoresSafeArea())
+        .background(S.surfacePaper.ignoresSafeArea())
     }
 
     // MARK: Hero
 
     private func hero(_ snap: WeatherSnapshot) -> some View {
         let delta = DeltaFormat.text(snap.overallDelta, unit)
+        // Figma 173:2893 v4d: 現在體感 column (96pt) + condition/headline,
+        // bottom-aligned, gap 16 — no mascot.
         return VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                MascotView(size: 100, state: snap.state)
-                VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .bottom, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("現在體感")
-                        .font(T.ui(11))
+                        .font(T.mono(11))
                         .foregroundStyle(S.textMutedWarm)
                     Text("\(deg(snap.currentApparent))\(suffix)")
-                        .font(T.ui(44))
+                        .font(T.ui(44, .bold))
                         .foregroundStyle(S.textPrimary)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+                .frame(minWidth: 96, alignment: .leading)
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {
-                        WeatherGlyph(condition: snap.condition, size: 24)
+                        WeatherGlyph(condition: snap.condition, size: 20)
                         Text(WeatherCondition.label(code: snap.conditionCode ?? 0))
                             .font(T.ui(14, .medium))
                             .foregroundStyle(S.textPrimary)
                     }
                     Text(DeltaFormat.headline(snap.overallDelta))
-                        .font(T.ui(24, .bold))
+                        .font(T.ui(22, .bold))
                         .foregroundStyle(S.textPrimary)
-                        .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 6)
             }
 
             Rectangle().fill(S.line).frame(height: 1)
@@ -93,7 +101,8 @@ struct HomeView: View {
                         .font(T.ui(11, .semibold))
                         .foregroundStyle(S.textOnDark)
                         .padding(.vertical, 5)
-                        .padding(.horizontal, 10)
+                        .padding(.leading, 10)
+                        .padding(.trailing, 11)
                         .background(DeltaTint.color(for: delta), in: Capsule())
                 }
                 metricRow("濕度", "\(snap.currentHumidity)%") { EmptyView() }
@@ -103,11 +112,15 @@ struct HomeView: View {
     }
 
     private func metricRow<Trailing: View>(_ label: String, _ value: String, @ViewBuilder trailing: () -> Trailing) -> some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 24) {
+            // Web uses 42px; the CJK fallback for the mono face runs slightly
+            // wider on iOS, so give it 46pt and never wrap.
             Text(label)
-                .font(T.ui(10.5))
+                .font(T.mono(10.5))
                 .foregroundStyle(S.textLabel)
-                .frame(width: 52, alignment: .leading)
+                .lineLimit(1)
+                .fixedSize()
+                .frame(width: 46, alignment: .leading)
             Text(value)
                 .font(T.ui(16, .semibold))
                 .foregroundStyle(S.textPrimary)
@@ -133,16 +146,23 @@ struct HomeView: View {
             }
             SectionLabel("今日建議穿搭")
             ChipFlow {
-                ForEach(Array(suggestion.chips.enumerated()), id: \.element) { i, c in
-                    OutfitChip(label: c.label, asset: c.asset, selected: i == 0, compact: true)
+                ForEach(suggestion.chips, id: \.self) { c in
+                    OutfitChip(label: c.label, asset: c.asset, compact: true)
                 }
             }
-            Text(suggestion.advice)
+            adviceText(suggestion.advice)
                 .font(T.ui(12))
-                .lineSpacing(12 * 0.1)
-                .foregroundStyle(S.textMutedWarm)
+                .lineSpacing(12 * 0.3)   // web line-height 1.6
         }
         .ywCard()
+    }
+
+    /// 「建議：」 bold ink + the rest in the label gray (Figma 173:2914).
+    private func adviceText(_ advice: String) -> Text {
+        let prefix = "建議："
+        guard advice.hasPrefix(prefix) else { return Text(advice).foregroundColor(S.textLabel) }
+        return Text(prefix).bold().foregroundColor(S.textPrimary)
+            + Text(advice.dropFirst(prefix.count)).foregroundColor(S.textLabel)
     }
 
     // MARK: Commute
@@ -177,7 +197,7 @@ struct HomeView: View {
 
     // MARK: Forecast
 
-    private func forecast(_ days: [DailyForecast], currentApparent: Double) -> some View {
+    private func forecast(_ days: [DailyForecast]) -> some View {
         let lows = days.map { deg($0.low) }, highs = days.map { deg($0.high) }
         let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
         return VStack(alignment: .leading, spacing: 12) {
@@ -193,13 +213,13 @@ struct HomeView: View {
                         high: highs[i],
                         weekMin: weekMin,
                         weekMax: weekMax,
-                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil,
-                        current: i == 0 ? deg(currentApparent) : nil
+                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil
                     )
-                    if i < days.count - 1 { Rectangle().fill(S.line).frame(height: 1) }
+                    // Full-bleed 6% ink separators (Figma 174:102).
+                    if i < days.count - 1 { Rectangle().fill(S.textPrimary.opacity(0.06)).frame(height: 1) }
                 }
             }
-            .ywCard(padding: EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 16))
+            .ywCard(padding: EdgeInsets())
         }
     }
 
