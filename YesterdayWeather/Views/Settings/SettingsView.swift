@@ -5,8 +5,6 @@ import UserNotifications
 /// (Figma 404:10). Warm ground, white grouped cards with hairline dividers.
 struct SettingsView: View {
     @EnvironmentObject private var store: SettingsStore
-    @EnvironmentObject private var outfit: OutfitStore
-    @EnvironmentObject private var weather: WeatherSnapshotStore
     @Environment(\.openURL) private var openURL
 
     @State private var query = ""
@@ -44,14 +42,6 @@ struct SettingsView: View {
         }
         .background(S.surfaceWarm.ignoresSafeArea())
         .task { await refreshNotifStatus() }
-        .onChange(of: store.settings) { old, new in
-            // Only refetch when something that affects the weather changed.
-            let weatherKeys = (old.latitude, old.longitude, old.leaveHour, old.returnHour)
-                != (new.latitude, new.longitude, new.leaveHour, new.returnHour)
-            if weatherKeys {
-                Task { await weather.refresh(settings: new, yesterdayOutfit: outfit.yesterday) }
-            }
-        }
     }
 
     // MARK: 通勤時段

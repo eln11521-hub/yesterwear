@@ -33,6 +33,14 @@ struct YesterdayWeatherApp: App {
                     yesterdayOutfit: outfitStore.yesterday
                 )
             }
+            // Any change to where/when we compare (Welcome's location fix, the
+            // Settings screen) refetches, so the city label and the weather
+            // never disagree.
+            .onChange(of: settingsStore.settings) { old, new in
+                guard old.latitude != new.latitude || old.longitude != new.longitude
+                        || old.leaveHour != new.leaveHour || old.returnHour != new.returnHour else { return }
+                Task { await weatherStore.refresh(settings: new, yesterdayOutfit: outfitStore.yesterday) }
+            }
         }
     }
 }
