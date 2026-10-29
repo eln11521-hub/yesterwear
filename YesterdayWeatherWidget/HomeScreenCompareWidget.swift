@@ -81,7 +81,7 @@ struct HomeScreenCompareView: View {
                         Text("昨日").font(T.mono(10)).foregroundStyle(S.textLabel)
                         if let y = entry.yesterday {
                             HStack(spacing: 6) {
-                                ForEach(y.chips, id: \.self) { chip in
+                                ForEach(y.picks.keyChips, id: \.self) { chip in
                                     Text(chip.label)
                                         .font(T.ui(12, .medium))
                                         .foregroundStyle(S.textPrimary)

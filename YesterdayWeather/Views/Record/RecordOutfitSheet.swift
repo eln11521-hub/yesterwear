@@ -4,75 +4,75 @@ import UIKit
 /// 記錄今天穿搭 — ported from design-system-web/src/pages/record-outfit/RecordOutfitSheet.tsx
 /// (Figma 226:3150).
 ///
-/// 主動線: pick 上身基礎層 (required) + 外套疊搭層 (optional) → 儲存今日紀錄.
+/// 主動線: every group (上身 / 外套 / 下身 / 配件) is multi-select; 上身 needs at
+/// least one item → 儲存今日紀錄. Fixed height: the title stays on top, the actions
+/// stay at the bottom and only the chip groups scroll.
 /// 輔助線: 拍照記錄 → recognition prefills the labels and the sheet enters a 待確認
 /// state with the thumbnail beside the tags; nothing auto-saves.
 struct RecordOutfitSheet: View {
-    var initialTop: TopLayer
-    var initialOuter: OuterLayer
     var initialThumb: UIImage? = nil
-    var onSave: (_ top: TopLayer, _ outer: OuterLayer, _ photo: UIImage?, _ keptExisting: Bool) -> Void
+    var onSave: (_ picks: OutfitPicks, _ photo: UIImage?, _ keptExisting: Bool) -> Void
 
-    @State private var top: TopLayer
-    @State private var outer: OuterLayer?
+    @State private var picks: OutfitPicks
     @State private var thumb: UIImage?
     @State private var hint: String?
+    @State private var outerUnsure = false
     @State private var thumbIsNew = false
     @State private var picking = false
 
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
 
-    init(initialTop: TopLayer, initialOuter: OuterLayer, initialThumb: UIImage? = nil,
-         onSave: @escaping (_ top: TopLayer, _ outer: OuterLayer, _ photo: UIImage?, _ keptExisting: Bool) -> Void) {
-        self.initialTop = initialTop
-        self.initialOuter = initialOuter
+    init(initial: OutfitPicks, initialThumb: UIImage? = nil,
+         onSave: @escaping (_ picks: OutfitPicks, _ photo: UIImage?, _ keptExisting: Bool) -> Void) {
         self.initialThumb = initialThumb
         self.onSave = onSave
-        _top = State(initialValue: initialTop)
-        _outer = State(initialValue: initialOuter)
+        _picks = State(initialValue: initial)
         _thumb = State(initialValue: initialThumb)
         // A seeded thumbnail is a saved photo reopened via 更新穿搭 — informational hint.
         _hint = State(initialValue: initialThumb == nil ? nil : "幫你記得今天穿了什麼。")
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("記錄今天穿搭")
                     .font(T.ui(22, .semibold))
                     .foregroundStyle(S.textPrimary)
+                Text("每一區都可以複選，上身至少選一件。")
+                    .font(T.ui(12))
+                    .foregroundStyle(S.textLabel)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.top, 28)
+            .padding(.bottom, 16)
 
-                if let thumb { pendingPanel(thumb) }
-
-                section("上身基礎層", badge: SectionBadge(label: "必選", tone: .required)) {
-                    ForEach(TopLayer.allCases) { layer in
-                        OutfitChip(label: layer.rawValue, asset: layer.asset, selected: top == layer) { top = layer }
-                    }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    if let thumb { pendingPanel(thumb) }
+                    ForEach(OutfitGroup.allCases) { group($0) }
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            }
+            .scrollIndicators(.hidden)
 
-                section("外套 / 疊搭層", badge: SectionBadge(label: "可選", tone: .optional)) {
-                    ForEach(OuterLayer.allCases) { layer in
-                        OutfitChip(label: layer.rawValue, asset: layer.asset, selected: outer == layer) { outer = layer }
-                    }
+            VStack(spacing: 12) {
+                YWSecondaryButton(label: thumb == nil ? "拍照記錄" : "重新拍照", icon: "icon-camera") {
+                    picking = true
                 }
-
-                VStack(spacing: 12) {
-                    YWSecondaryButton(label: thumb == nil ? "拍照記錄" : "重新拍照", icon: "icon-camera") {
-                        picking = true
-                    }
-                    YWPrimaryButton(label: "儲存今日紀錄", icon: "icon-check") {
-                        onSave(top, outer ?? .none, thumbIsNew ? thumb : nil, thumb != nil && !thumbIsNew)
-                    }
+                YWPrimaryButton(label: "儲存今日紀錄", icon: "icon-check") {
+                    onSave(picks, thumbIsNew ? thumb : nil, thumb != nil && !thumbIsNew)
                 }
-                .padding(.top, 8)
             }
             .padding(.horizontal, 20)
-            .padding(.top, 24)
+            .padding(.top, 16)
             .padding(.bottom, 20)
+            .overlay(alignment: .top) { Rectangle().fill(S.line).frame(height: 1) }
         }
-        .scrollIndicators(.hidden)
-        .presentationDetents([.large])
+        // One fixed detent — more picks or a photo never change the sheet height.
+        .presentationDetents([.fraction(0.84)])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(S.radius2xl)
         .presentationBackground(S.surfaceWhite)
@@ -88,19 +88,41 @@ struct RecordOutfitSheet: View {
 
     // MARK: Pieces
 
-    private func section<Badge: View, Chips: View>(
-        _ title: String, badge: Badge, @ViewBuilder chips: () -> Chips
-    ) -> some View {
+    private func group(_ g: OutfitGroup) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Circle().fill(S.textPrimary).frame(width: 6, height: 6)
-                Text(title)
+                Text(g.label)
                     .font(T.ui(12))
                     .foregroundStyle(S.textSecondary)
-                badge
+                SectionBadge(label: g.required ? "必選" : "可選", tone: g.required ? .required : .optional)
+                Spacer(minLength: 0)
+                if !picks[g].isEmpty {
+                    Text("已選 \(picks[g].count)")
+                        .font(T.mono(10.5))
+                        .foregroundStyle(S.textLabel)
+                }
             }
-            ChipFlow(spacing: 12) { chips() }
+            ChipFlow(spacing: 12) {
+                ForEach(g.items, id: \.self) { label in
+                    OutfitChip(label: label, asset: Garment.asset[label], selected: picks[g].contains(label)) {
+                        toggle(g, label)
+                    }
+                }
+            }
         }
+    }
+
+    private func toggle(_ g: OutfitGroup, _ label: String) {
+        var list = picks[g]
+        if let i = list.firstIndex(of: label) {
+            if g.required, list.count == 1 { return }   // 上身 keeps at least one
+            list.remove(at: i)
+        } else {
+            list.append(label)
+        }
+        picks[g] = list.sorted { (g.items.firstIndex(of: $0) ?? 0) < (g.items.firstIndex(of: $1) ?? 0) }
+        if g == .outers { outerUnsure = false }
     }
 
     private func pendingPanel(_ image: UIImage) -> some View {
@@ -118,13 +140,13 @@ struct RecordOutfitSheet: View {
                     .lineSpacing(11 * 0.2)
                     .foregroundStyle(S.textLabel)
                 ChipFlow(spacing: 8) {
-                    pill(top.rawValue)
-                    if let outer, outer != .none { pill(outer.rawValue) }
-                    if outer == nil { pill("外套待選", empty: true) }
+                    ForEach(picks.tops + picks.outers, id: \.self) { pill($0) }
+                    if outerUnsure { pill("外套待選", empty: true) }
                 }
                 Button("移除照片") {
                     thumb = nil
                     thumbIsNew = false
+                    outerUnsure = false
                     hint = nil
                 }
                 .font(T.ui(11))
@@ -155,17 +177,19 @@ struct RecordOutfitSheet: View {
     // MARK: Photo
 
     /// On-device recognition stub — same fixed result as the web prototype.
-    private func recognize(_ image: UIImage) -> (top: TopLayer?, outer: OuterLayer?) {
-        (.hoodie, .tech)
+    /// A nil layer = confidence below threshold, left blank (寧缺勿錯填).
+    private func recognize(_ image: UIImage) -> (tops: [String]?, outers: [String]?) {
+        (["帽T衛衣"], ["連帽外套"])
     }
 
     private func accept(photo: UIImage) {
         thumb = photo
         thumbIsNew = true
         let r = recognize(photo)
-        if let t = r.top { top = t }
-        outer = r.outer   // low confidence → leave blank
-        hint = r.outer != nil ? "已依照片幫你選好標籤，對一下、不對就改。" : "外套看不太出來，先留空，請你手動選。"
+        if let t = r.tops { picks.tops = t }
+        picks.outers = r.outers ?? []
+        outerUnsure = r.outers == nil
+        hint = r.outers != nil ? "已依照片幫你選好標籤，對一下、不對就改。" : "外套看不太出來，先留空，請你手動選。"
     }
 }
 

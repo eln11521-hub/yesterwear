@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
 import tagUrl from "../../assets/icon/tag.svg?url";
+import { outfitChips } from "../../app/outfit";
 import { MOCK_WEATHER, suggestOutfit, type WeatherVM } from "../../app/weather";
 import { WeatherIcon } from "../../components/weather-icon/WeatherIcon";
 import { Icon } from "../../components/_ui/Icon";
@@ -94,7 +95,7 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 export function HomeScreen({
   weather = MOCK_WEATHER,
   yesterdayChips = ["長袖上衣", "薄外套"],
-  suggestedChips = [DEFAULT_SUGGESTION.top, DEFAULT_SUGGESTION.outer],
+  suggestedChips = outfitChips(DEFAULT_SUGGESTION),
   advice = DEFAULT_SUGGESTION.advice,
   crossLocation,
   ctaLabel = "記錄今天穿搭",
