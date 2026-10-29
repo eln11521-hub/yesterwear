@@ -12,6 +12,10 @@ struct HomeView: View {
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
 
+    private var unit: TempUnit { settings.settings.unit }
+    private var suffix: String { unit == .f ? "°F" : "°C" }
+    private func deg(_ c: Double) -> Int { DeltaFormat.temp(c, unit) }
+
     var body: some View {
         VStack(spacing: 0) {
             TopBar(
@@ -56,7 +60,7 @@ struct HomeView: View {
     // MARK: Hero
 
     private func hero(_ snap: WeatherSnapshot) -> some View {
-        let delta = DeltaFormat.text(snap.overallDelta)
+        let delta = DeltaFormat.text(snap.overallDelta, unit)
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 MascotView(size: 100, state: snap.state)
@@ -64,7 +68,7 @@ struct HomeView: View {
                     Text("現在體感")
                         .font(T.ui(11))
                         .foregroundStyle(S.textMutedWarm)
-                    Text("\(Int(snap.currentApparent.rounded()))°C")
+                    Text("\(deg(snap.currentApparent))\(suffix)")
                         .font(T.ui(44))
                         .foregroundStyle(S.textPrimary)
                     HStack(spacing: 4) {
@@ -84,7 +88,7 @@ struct HomeView: View {
             Rectangle().fill(S.line).frame(height: 1)
 
             VStack(spacing: 4) {
-                metricRow("實際氣溫", "\(Int(snap.currentTemp.rounded()))°C") {
+                metricRow("實際氣溫", "\(deg(snap.currentTemp))\(suffix)") {
                     Text("較昨日 \(delta)")
                         .font(T.ui(11, .semibold))
                         .foregroundStyle(S.textOnDark)
@@ -150,14 +154,14 @@ struct HomeView: View {
             HStack(spacing: 0) {
                 CommuteColumn(
                     slot: "出門 \(snap.leave.hourLabel)",
-                    temp: "\(Int(snap.leave.todayApparent.rounded()))°",
-                    delta: DeltaFormat.text(snap.leave.delta)
+                    temp: "\(deg(snap.leave.todayApparent))°",
+                    delta: DeltaFormat.text(snap.leave.delta, unit)
                 )
                 Spacer(minLength: 0); vRule; Spacer(minLength: 0)
                 CommuteColumn(
                     slot: "下班 \(snap.return.hourLabel)",
-                    temp: "\(Int(snap.return.todayApparent.rounded()))°",
-                    delta: DeltaFormat.text(snap.return.delta)
+                    temp: "\(deg(snap.return.todayApparent))°",
+                    delta: DeltaFormat.text(snap.return.delta, unit)
                 )
                 Spacer(minLength: 0); vRule; Spacer(minLength: 0)
                 // 降雨 reuses the commute column visual (value + optional note).
@@ -174,7 +178,7 @@ struct HomeView: View {
     // MARK: Forecast
 
     private func forecast(_ days: [DailyForecast], currentApparent: Double) -> some View {
-        let lows = days.map { Int($0.low.rounded()) }, highs = days.map { Int($0.high.rounded()) }
+        let lows = days.map { deg($0.low) }, highs = days.map { deg($0.high) }
         let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
         return VStack(alignment: .leading, spacing: 12) {
             Text("未來一週天氣")
@@ -190,7 +194,7 @@ struct HomeView: View {
                         weekMin: weekMin,
                         weekMax: weekMax,
                         pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil,
-                        current: i == 0 ? Int(currentApparent.rounded()) : nil
+                        current: i == 0 ? deg(currentApparent) : nil
                     )
                     if i < days.count - 1 { Rectangle().fill(S.line).frame(height: 1) }
                 }

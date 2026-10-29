@@ -164,9 +164,15 @@ enum WeatherCondition: String, Codable {
 }
 
 /// Delta formatting shared by every surface (web fmtDelta / deltaText).
+/// Display converts to the chosen unit; the delta *logic* (color thresholds)
+/// always stays in °C.
 enum DeltaFormat {
-    static func text(_ delta: Double) -> String {
-        let r = Int(delta.rounded())
+    static func temp(_ celsius: Double, _ unit: TempUnit) -> Int {
+        Int((unit == .f ? celsius * 9 / 5 + 32 : celsius).rounded())
+    }
+
+    static func text(_ delta: Double, _ unit: TempUnit = .c) -> String {
+        let r = Int((unit == .f ? delta * 9 / 5 : delta).rounded())
         if r < 0 { return "↓\(abs(r))°" }
         if r > 0 { return "↑\(r)°" }
         return "±0°"

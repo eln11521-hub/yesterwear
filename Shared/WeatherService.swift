@@ -123,4 +123,32 @@ actor WeatherService {
         )
         return (compare, compare.delta, hour)
     }
+
+    struct Place: Identifiable, Hashable {
+        var id: String { "\(lat),\(lon)" }
+        let name: String
+        let lat: Double
+        let lon: Double
+        let timezone: String?
+    }
+
+    /// City search via Open-Meteo geocoding (web geocodeCity). Up to 5 matches.
+    func geocode(_ query: String) async throws -> [Place] {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard !q.isEmpty else { return [] }
+        var c = URLComponents(string: "https://geocoding-api.open-meteo.com/v1/search")
+        c?.queryItems = [.init(name: "name", value: q), .init(name: "count", value: "5"),
+                         .init(name: "language", value: "zh"), .init(name: "format", value: "json")]
+        guard let url = c?.url else { throw WeatherServiceError.badURL }
+        struct R: Decodable {
+            struct G: Decodable { let name: String; let latitude: Double; let longitude: Double; let admin1: String?; let timezone: String? }
+            let results: [G]?
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let r = try JSONDecoder().decode(R.self, from: data)
+        return (r.results ?? []).map { g in
+            let name = g.admin1.flatMap { $0 != g.name ? "\(g.name), \($0)" : nil } ?? g.name
+            return Place(name: name, lat: g.latitude, lon: g.longitude, timezone: g.timezone)
+        }
+    }
 }
