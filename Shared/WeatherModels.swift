@@ -47,6 +47,7 @@ struct HourlyWeather: Codable {
     let apparentTemperature: [Double]
     let relativeHumidity2m: [Int]
     let precipitationProbability: [Int?]
+    let weatherCode: [Int?]?
 
     enum CodingKeys: String, CodingKey {
         case time
@@ -54,6 +55,7 @@ struct HourlyWeather: Codable {
         case apparentTemperature = "apparent_temperature"
         case relativeHumidity2m = "relative_humidity_2m"
         case precipitationProbability = "precipitation_probability"
+        case weatherCode = "weather_code"
     }
 }
 
@@ -87,6 +89,10 @@ struct WeatherSnapshot: Codable, Equatable {
     var rainNow: Int? = nil
     /// Today + next 6 days (daily[0] = today).
     var forecast: [DailyForecast]? = nil
+    /// Today 00–23 (今天各時段溫度).
+    var hourly: [HourPoint]? = nil
+    /// Current hour of day in the city's timezone.
+    var nowHour: Int? = nil
 
     var condition: WeatherCondition { .from(code: conditionCode ?? 0) }
 
@@ -101,6 +107,15 @@ struct WeatherSnapshot: Codable, Equatable {
         let hours = mins / 60
         return "更新於 \(hours) 小時前"
     }
+}
+
+struct HourPoint: Codable, Equatable {
+    var hour: Int
+    var apparent: Double
+    var conditionCode: Int
+    var pop: Int
+
+    var condition: WeatherCondition { .from(code: conditionCode) }
 }
 
 struct DailyForecast: Codable, Equatable {

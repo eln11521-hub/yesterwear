@@ -128,6 +128,17 @@ const componentCatalogSeed = [
     keywords: ["forecast", "weather", "temperature", "range", "row"],
   },
   {
+    id: "hourly-forecast",
+    name: "Hourly Forecast",
+    category: "Data Display",
+    compositionRole: "data-display",
+    provenance: "implementation-derived",
+    purpose:
+      "Today's hours as a horizontally scrolling strip: time, weather icon, feels-like temperature, rain % when wet; the current hour is dotted and labeled 現在, commute hours tagged 出門 / 下班.",
+    useWhen: ["Showing 今天各時段溫度 under the Home CTA."],
+    keywords: ["hourly", "today", "weather", "temperature", "timeline"],
+  },
+  {
     id: "floating-nav",
     name: "Floating Nav",
     category: "Navigation",

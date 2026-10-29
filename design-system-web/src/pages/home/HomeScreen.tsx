@@ -7,7 +7,7 @@ import { Icon } from "../../components/_ui/Icon";
 import { CommuteRow } from "../../components/commute-row/CommuteRow";
 import { FloatingNav } from "../../components/floating-nav/FloatingNav";
 import { GearIcon, ThermometerIcon } from "../../components/floating-nav/NavIcons";
-import { ForecastRow } from "../../components/forecast-row/ForecastRow";
+import { HourlyForecast } from "../../components/hourly-forecast/HourlyForecast";
 import { garmentIcon } from "../../components/outfit-chip/garments";
 import { OutfitChip } from "../../components/outfit-chip/OutfitChip";
 import { PrimaryButton } from "../../components/primary-button/PrimaryButton";
@@ -84,7 +84,8 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 /**
  * HomeScreen — the 174:2 Dashboard (v4d). Paper ground with #f5f5f5 cards: a
  * hero (現在體感 + condition + comparison headline, 實際氣溫/濕度 + 較昨日 pill),
- * then commute → outfit → CTA → week forecast → widget promo. Presentational:
+ * then commute → outfit → CTA (the first screen ends here) → 今天各時段溫度 →
+ * widget promo. Presentational:
  * pass props for real data.
  */
 export function HomeScreen({
@@ -100,8 +101,6 @@ export function HomeScreen({
   navActiveId = "weather",
   onNavSelect,
 }: HomeScreenProps) {
-  const weekMin = Math.min(...weather.forecast.map((f) => f.low));
-  const weekMax = Math.max(...weather.forecast.map((f) => f.high));
   const metric = (label: string) =>
     weather.metrics.find((m) => m.label === label)?.value ?? "";
   const airTemp = metric("氣溫");
@@ -241,23 +240,14 @@ export function HomeScreen({
           onClick={onRecord}
         />
 
-        <section className="yw-home__block">
-          <h2 className="yw-home__h2">未來一週天氣</h2>
-          <div className="yw-home__card yw-home__forecast">
-            {weather.forecast.map((d) => (
-              <ForecastRow
-                key={d.day}
-                day={d.day}
-                condition={d.condition}
-                low={d.low}
-                high={d.high}
-                weekMin={weekMin}
-                weekMax={weekMax}
-                pop={"pop" in d ? d.pop : undefined}
-              />
-            ))}
-          </div>
-        </section>
+        {/* 今天各時段溫度 — below the fold; the first screen ends at the CTA.
+            Older cached snapshots have no hourly data, so hide when empty. */}
+        {weather.hourly?.length ? (
+          <section className="yw-home__card yw-home__block">
+            <SecLabel>今天各時段溫度</SecLabel>
+            <HourlyForecast items={weather.hourly} />
+          </section>
+        ) : null}
 
         <WidgetPromoCard
           title="把 Widget 加到桌面"

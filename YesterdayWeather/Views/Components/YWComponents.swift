@@ -502,3 +502,69 @@ struct SectionBadge: View {
                         in: RoundedRectangle(cornerRadius: 12))
     }
 }
+
+// MARK: - Hourly forecast
+
+/// 今天各時段溫度 (web HourlyForecast): today's hours as a horizontal strip —
+/// time · weather glyph · feels-like · rain % when wet. The current hour gets an
+/// ink dot, 「現在」 and a white chip; commute hours a 出門 / 下班 tag. Scrolls
+/// "now" to the center on appear.
+struct HourlyStrip: View {
+    struct Item: Identifiable {
+        var id: Int { hour }
+        let hour: Int
+        let temp: Int
+        let condition: WeatherCondition
+        var pop: Int? = nil
+        var now = false
+        var slot: String? = nil
+    }
+
+    let items: [Item]
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                HStack(spacing: 4) {
+                    ForEach(items) { column($0).id($0.hour) }
+                }
+                .padding(.horizontal, 12)
+            }
+            .scrollIndicators(.hidden)
+            .padding(.horizontal, -16)   // bleed under the card's 16pt inset
+            .onAppear {
+                if let now = items.first(where: \.now) { proxy.scrollTo(now.hour, anchor: .center) }
+            }
+        }
+    }
+
+    private func column(_ h: Item) -> some View {
+        VStack(spacing: 4) {
+            Circle()
+                .fill(h.now ? S.textPrimary : .clear)
+                .frame(width: 6, height: 6)
+            Group {
+                if h.now {
+                    Text("現在").font(T.ui(10.5, .bold)).foregroundStyle(S.textPrimary)
+                } else {
+                    Text(String(format: "%02d:00", h.hour)).font(T.mono(10.5)).foregroundStyle(S.textLabel)
+                }
+            }
+            .lineLimit(1)
+            .fixedSize()
+            WeatherGlyph(condition: h.condition, size: 22)
+            Text("\(h.temp)°")
+                .font(T.ui(14, .bold))
+                .foregroundStyle(S.textPrimary)
+            Text(h.pop.map { "\($0)%" } ?? " ")
+                .font(T.ui(9, .medium))
+                .foregroundStyle(S.deltaCold)
+            Text(h.slot ?? " ")
+                .font(T.mono(9))
+                .foregroundStyle(S.textMutedWarm)
+        }
+        .frame(width: 48)
+        .padding(.vertical, 8)
+        .background(h.now ? S.surfaceWhite : .clear, in: RoundedRectangle(cornerRadius: S.radiusMd))
+    }
+}

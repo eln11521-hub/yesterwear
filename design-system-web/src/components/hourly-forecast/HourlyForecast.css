@@ -1,0 +1,73 @@
+/* 今天各時段溫度 — horizontal hourly strip. Bleeds to the card edge so it can
+   scroll under the 16px card inset. Sizes on the 4pt grid. */
+.yw-hourly {
+  display: flex;
+  gap: 4px;
+  margin-inline: -16px;
+  padding-inline: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  font-family: var(--yw-sys-font-ui);
+}
+.yw-hourly::-webkit-scrollbar {
+  display: none;
+}
+
+.yw-hourly__item {
+  flex: none;
+  inline-size: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-block: 8px;
+  border-radius: var(--yw-sys-radius-md);
+}
+.yw-hourly__item[data-now] {
+  background: var(--yw-sys-color-surface-white);
+}
+
+/* ink dot marks the current hour (same 6px bullet as the section labels) */
+.yw-hourly__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: transparent;
+}
+.yw-hourly__item[data-now] .yw-hourly__dot {
+  background: var(--yw-sys-color-text-primary);
+}
+
+.yw-hourly__time {
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  color: var(--yw-sys-color-text-label);
+  white-space: nowrap;
+}
+.yw-hourly__item[data-now] .yw-hourly__time {
+  font-family: var(--yw-sys-font-ui);
+  font-weight: 700;
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-hourly__temp {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--yw-sys-color-text-primary);
+}
+
+/* rain % (wet hours only) — same treatment as the forecast row */
+.yw-hourly__pop {
+  min-block-size: 12px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--yw-sys-color-delta-cold);
+}
+
+/* 出門 / 下班 tag — reserves its line so every column aligns */
+.yw-hourly__slot {
+  min-block-size: 12px;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 9px;
+  color: var(--yw-sys-color-text-muted-warm);
+}
