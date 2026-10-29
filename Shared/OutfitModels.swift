@@ -5,7 +5,7 @@ enum TopLayer: String, Codable, CaseIterable, Identifiable {
     case tank = "背心無袖"
     case longSleeve = "長袖上衣"
     case shirt = "襯衫（單穿）"
-    case knit = "針織衫毛衣（單穿）"
+    case knit = "針織衫（單穿）"
     case hoodie = "帽T衛衣（單穿）"
 
     var id: String { rawValue }
@@ -18,6 +18,17 @@ enum TopLayer: String, Codable, CaseIterable, Identifiable {
         case .shirt: return "🧣"
         case .knit: return "🧶"
         case .hoodie: return "🧥"
+        }
+    }
+
+    /// Garment icon in Shared/SharedAssets.xcassets (web garmentIcon map).
+    var asset: String {
+        switch self {
+        case .shortSleeve: return "garment-short-sleeve"
+        case .tank: return "garment-vest"
+        case .longSleeve, .shirt: return "garment-long-sleeve"
+        case .knit: return "garment-knit"
+        case .hoodie: return "garment-hoodie"
         }
     }
 
@@ -54,6 +65,18 @@ enum OuterLayer: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Garment icon in Shared/SharedAssets.xcassets (web garmentIcon map).
+    var asset: String {
+        switch self {
+        case .none: return "garment-no-jacket"
+        case .light: return "garment-light-jacket"
+        case .tech: return "garment-hooded-jacket"
+        case .thick: return "garment-thick-jacket"
+        case .down: return "garment-down-coat"
+        case .rain: return "garment-waterproof"
+        }
+    }
+
     var shortLabel: String {
         switch self {
         case .none: return "無外套"
@@ -76,6 +99,49 @@ struct OutfitEntry: Codable, Equatable {
             return "\(top.emoji) \(top.shortLabel)"
         }
         return "\(top.emoji) \(top.shortLabel) + \(outer.emoji) \(outer.shortLabel)"
+    }
+}
+
+/// Chip labels for a top + outer combo — 「不加外套」collapses to just the top
+/// (web comboChips).
+struct OutfitChipItem: Hashable {
+    var label: String
+    var asset: String
+}
+
+extension OutfitEntry {
+    var chips: [OutfitChipItem] { OutfitSuggestion.chips(top: top, outer: outer) }
+}
+
+/// Today's suggestion, mirroring suggestOutfit() in design-system-web/src/app/weather.ts.
+struct OutfitSuggestion {
+    var top: TopLayer
+    var outer: OuterLayer
+    var advice: String
+
+    static func make(delta: Double, yesterday: OutfitEntry?) -> OutfitSuggestion {
+        let base = yesterday?.top ?? .longSleeve
+        let yOuter = yesterday?.outer ?? .light
+        if delta <= -3 {
+            return .init(top: base, outer: .thick, advice: yesterday.map {
+                "建議：比昨天冷，在「\($0.top.rawValue)」的基礎上換件厚外套。"
+            } ?? "建議：比昨天明顯變冷，多加一層外套。")
+        }
+        if delta >= 3 {
+            return .init(top: base, outer: .none, advice: yesterday != nil
+                ? "建議：比昨天熱，可比「\(yOuter.rawValue)」再減一層。"
+                : "建議：比昨天明顯變熱，減少疊搭。")
+        }
+        return .init(top: base, outer: yOuter, advice: yesterday != nil
+            ? "建議：體感接近昨天，可參考「\(yOuter.rawValue)」。"
+            : "建議：體感與昨天接近，維持平常穿搭即可。")
+    }
+
+    var chips: [OutfitChipItem] { Self.chips(top: top, outer: outer) }
+
+    static func chips(top: TopLayer, outer: OuterLayer) -> [OutfitChipItem] {
+        let t = OutfitChipItem(label: top.rawValue, asset: top.asset)
+        return outer == .none ? [t] : [t, OutfitChipItem(label: outer.rawValue, asset: outer.asset)]
     }
 }
 

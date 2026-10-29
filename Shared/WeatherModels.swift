@@ -6,6 +6,7 @@ struct OpenMeteoResponse: Codable {
     let timezone: String
     let current: CurrentWeather?
     let hourly: HourlyWeather
+    let daily: DailyWeather?
 }
 
 struct CurrentWeather: Codable {
@@ -13,12 +14,30 @@ struct CurrentWeather: Codable {
     let temperature2m: Double
     let relativeHumidity2m: Int
     let apparentTemperature: Double
+    let weatherCode: Int?
 
     enum CodingKeys: String, CodingKey {
         case time
         case temperature2m = "temperature_2m"
         case relativeHumidity2m = "relative_humidity_2m"
         case apparentTemperature = "apparent_temperature"
+        case weatherCode = "weather_code"
+    }
+}
+
+struct DailyWeather: Codable {
+    let time: [String]
+    let weatherCode: [Int?]
+    let temperature2mMax: [Double?]
+    let temperature2mMin: [Double?]
+    let precipitationProbabilityMax: [Int?]
+
+    enum CodingKeys: String, CodingKey {
+        case time
+        case weatherCode = "weather_code"
+        case temperature2mMax = "temperature_2m_max"
+        case temperature2mMin = "temperature_2m_min"
+        case precipitationProbabilityMax = "precipitation_probability_max"
     }
 }
 
@@ -27,7 +46,7 @@ struct HourlyWeather: Codable {
     let temperature2m: [Double]
     let apparentTemperature: [Double]
     let relativeHumidity2m: [Int]
-    let precipitationProbability: [Int]
+    let precipitationProbability: [Int?]
 
     enum CodingKeys: String, CodingKey {
         case time
@@ -61,6 +80,15 @@ struct WeatherSnapshot: Codable, Equatable {
     var leave: SlotCompare
     var `return`: SlotCompare
     var suggestion: String
+    // Added for the web-parity Dashboard. Optional so snapshots cached by older
+    // builds still decode.
+    var conditionCode: Int? = nil
+    /// Precipitation probability for the current hour (%).
+    var rainNow: Int? = nil
+    /// Today + next 6 days (daily[0] = today).
+    var forecast: [DailyForecast]? = nil
+
+    var condition: WeatherCondition { .from(code: conditionCode ?? 0) }
 
     var state: TempDeltaState { .from(deltaCelsius: overallDelta) }
 
@@ -72,6 +100,85 @@ struct WeatherSnapshot: Codable, Equatable {
         if mins < 60 { return "更新於 \(mins) 分鐘前" }
         let hours = mins / 60
         return "更新於 \(hours) 小時前"
+    }
+}
+
+struct DailyForecast: Codable, Equatable {
+    var dateISO: String     // yyyy-MM-dd
+    var conditionCode: Int
+    var low: Double
+    var high: Double
+    var pop: Int            // max precipitation probability (%)
+
+    var condition: WeatherCondition { .from(code: conditionCode) }
+}
+
+/// WMO weather code → condition, mirroring the web decode() in
+/// design-system-web/src/app/weatherApi.ts.
+enum WeatherCondition: String, Codable {
+    case sun, partly, overcast, fog, rain, snow, thunder
+
+    static func from(code: Int) -> WeatherCondition {
+        switch code {
+        case 0: return .sun
+        case 1...2: return .partly
+        case 3: return .overcast
+        case 4...48: return .fog
+        case 49...67: return .rain
+        case 68...77: return .snow
+        case 78...82: return .rain
+        case 83...86: return .snow
+        default: return .thunder
+        }
+    }
+
+    /// Label for the current-conditions line (web decode() labels).
+    static func label(code: Int) -> String {
+        switch code {
+        case 0: return "晴天"
+        case 1...2: return "多雲時晴"
+        case 3: return "陰天"
+        case 4...48: return "起霧"
+        case 49...67: return "下雨"
+        case 68...77: return "下雪"
+        case 78...82: return "陣雨"
+        case 83...86: return "陣雪"
+        default: return "雷雨"
+        }
+    }
+
+    /// Asset in Shared/SharedAssets.xcassets.
+    var asset: String {
+        switch self {
+        case .sun: return "weather-sun"
+        case .partly: return "weather-partly"
+        case .overcast: return "weather-overcast"
+        case .fog: return "weather-fog"
+        case .rain: return "weather-rain"
+        case .snow: return "weather-snow"
+        case .thunder: return "weather-thunder"
+        }
+    }
+
+    var isWet: Bool { self == .rain || self == .snow || self == .thunder }
+}
+
+/// Delta formatting shared by every surface (web fmtDelta / deltaText).
+enum DeltaFormat {
+    static func text(_ delta: Double) -> String {
+        let r = Int(delta.rounded())
+        if r < 0 { return "↓\(abs(r))°" }
+        if r > 0 { return "↑\(r)°" }
+        return "±0°"
+    }
+
+    /// Hero headline (web headlineFor).
+    static func headline(_ delta: Double) -> String {
+        if delta <= -3 { return "比昨天涼一些" }
+        if delta <= -1 { return "比昨天略涼" }
+        if delta >= 3 { return "比昨天暖一些" }
+        if delta >= 1 { return "比昨天略暖" }
+        return "和昨天差不多"
     }
 }
 

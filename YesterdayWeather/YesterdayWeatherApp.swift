@@ -18,7 +18,7 @@ struct YesterdayWeatherApp: App {
                 if onboardingDone {
                     RootTabView()
                 } else {
-                    OnboardingFlowView(onFinished: {
+                    WelcomeView(onDone: {
                         onboardingDone = true
                     })
                 }

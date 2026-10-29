@@ -17,7 +17,7 @@ enum TempDeltaState: Equatable {
     var primary: Color {
         switch self {
         case .cooler: return YWTokens.Sys.deltaCold      // was #4A90E2
-        case .neutral: return YWTokens.Sys.deltaNeutral  // #9E9E9E (unchanged)
+        case .neutral: return YWTokens.Sys.deltaNeutral  // #A09A94
         case .warmer: return YWTokens.Sys.deltaWarm      // was #F5A623
         }
     }
