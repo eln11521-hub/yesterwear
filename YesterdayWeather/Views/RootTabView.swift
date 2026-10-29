@@ -3,6 +3,10 @@ import SwiftUI
 /// App shell, mirroring the web App: two tabs (天氣 / 設定) switched by the
 /// floating pill nav, with the record-outfit sheet raised from the Home CTA.
 struct RootTabView: View {
+    @EnvironmentObject private var settings: SettingsStore
+    @EnvironmentObject private var outfit: OutfitStore
+    @EnvironmentObject private var weather: WeatherSnapshotStore
+
     @State private var tab = "weather"
     @State private var recording = false
 
@@ -26,7 +30,26 @@ struct RootTabView: View {
                 .padding(.bottom, 8)
         }
         .sheet(isPresented: $recording) {
-            OutfitLogView()
+            recordSheet
+        }
+    }
+
+    /// Seeds with today's record when updating, otherwise today's suggestion
+    /// (web App: initialTop = today?.top ?? suggestion.top).
+    private var recordSheet: some View {
+        let suggestion = OutfitSuggestion.make(
+            delta: weather.snapshot?.overallDelta ?? 0, yesterday: outfit.yesterday)
+        let today = outfit.today
+        let thumb = today?.thumbnailURL.flatMap { UIImage(contentsOfFile: $0.path) }
+        return RecordOutfitSheet(
+            initialTop: today?.top ?? suggestion.top,
+            initialOuter: today?.outer ?? suggestion.outer,
+            initialThumb: thumb
+        ) { top, outer, photo, keptExisting in
+            outfit.saveToday(top: top, outer: outer,
+                             thumbnailJPEG: photo?.thumbnailJPEG(), keepThumbnail: keptExisting)
+            recording = false
+            Task { await weather.refresh(settings: settings.settings, yesterdayOutfit: outfit.yesterday) }
         }
     }
 }

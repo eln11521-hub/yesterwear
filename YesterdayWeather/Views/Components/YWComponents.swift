@@ -457,3 +457,47 @@ extension View {
             .background(S.surfacePaper, in: RoundedRectangle(cornerRadius: S.radiusXl))
     }
 }
+
+// MARK: - Secondary button
+
+/// Outlined secondary action (web SecondaryButton: ink hairline border, transparent).
+struct YWSecondaryButton: View {
+    let label: String
+    var icon: String? = nil
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if let icon { AssetIcon(name: icon, size: 18) }
+                Text(label).font(T.ui(15, .semibold))
+            }
+            .foregroundStyle(S.textPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .padding(.horizontal, 24)
+            .overlay(RoundedRectangle(cornerRadius: S.radiusMd).strokeBorder(S.textPrimary, lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: S.radiusMd))
+        }
+        .buttonStyle(PressScaleStyle())
+    }
+}
+
+// MARK: - Section badge
+
+/// 必選 / 可選 tag (web SectionBadge, Figma 226:3160 / 226:3191).
+struct SectionBadge: View {
+    enum Tone { case required, optional }
+    let label: String
+    let tone: Tone
+
+    var body: some View {
+        Text(label)
+            .font(T.ui(11, .medium))
+            .foregroundStyle(tone == .required ? S.badgeRequiredText : S.badgeOptionalText)
+            .padding(.vertical, 3)
+            .padding(.horizontal, 8)
+            .background(tone == .required ? S.badgeRequiredBg : S.badgeOptionalBg,
+                        in: RoundedRectangle(cornerRadius: 12))
+    }
+}

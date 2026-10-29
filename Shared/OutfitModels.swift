@@ -93,6 +93,12 @@ struct OutfitEntry: Codable, Equatable {
     var dayKey: String
     var top: TopLayer
     var outer: OuterLayer
+    /// JPEG filename in the App Group container (photo-confirmed records).
+    var thumbnailFile: String? = nil
+
+    var source: String { thumbnailFile == nil ? "manual" : "photo_confirmed" }
+
+    var thumbnailURL: URL? { thumbnailFile.flatMap { AppGroup.containerURL?.appendingPathComponent($0) } }
 
     var displayText: String {
         if outer == .none {
@@ -171,9 +177,18 @@ final class OutfitStore: ObservableObject {
     var today: OutfitEntry? { entries[DayKey.make()] }
     var yesterday: OutfitEntry? { entries[DayKey.yesterday()] }
 
-    func saveToday(top: TopLayer, outer: OuterLayer) {
+    /// Saves today's record. `thumbnailJPEG` keeps the photo as the next-day
+    /// anchor; passing nil with `keepThumbnail` retains an existing one.
+    func saveToday(top: TopLayer, outer: OuterLayer, thumbnailJPEG: Data? = nil, keepThumbnail: Bool = false) {
         let key = DayKey.make()
-        entries[key] = OutfitEntry(dayKey: key, top: top, outer: outer)
+        var file = keepThumbnail ? entries[key]?.thumbnailFile : nil
+        if let thumbnailJPEG, let dir = AppGroup.containerURL {
+            let name = "outfit-\(key).jpg"
+            if (try? thumbnailJPEG.write(to: dir.appendingPathComponent(name), options: .atomic)) != nil {
+                file = name
+            }
+        }
+        entries[key] = OutfitEntry(dayKey: key, top: top, outer: outer, thumbnailFile: file)
         persist()
     }
 
