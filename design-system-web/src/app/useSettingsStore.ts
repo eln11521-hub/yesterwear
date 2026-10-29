@@ -17,7 +17,13 @@ export type Settings = {
   returnAlert?: string;
   notifEvening: boolean;
   eveningTime: string; // HH:MM (recommended 20:00–23:00)
+  /** Most-recent-first places picked from the location switcher (max 5). */
+  recentLocations: GeoLocation[];
 };
+
+const RECENT_MAX = 5;
+const samePlace = (a: GeoLocation, b: GeoLocation) =>
+  Math.abs(a.lat - b.lat) < 0.01 && Math.abs(a.lon - b.lon) < 0.01;
 
 const KEY = "yw-settings";
 
@@ -41,6 +47,7 @@ const DEFAULTS: Settings = {
   notifCommute: true,
   notifEvening: true,
   eveningTime: "21:30",
+  recentLocations: [],
 };
 
 function load(): Settings {
@@ -92,6 +99,20 @@ export function useSettingsStore() {
     setReturnTime: (returnTime: string) => update({ returnTime }),
     setLocationMode: (locationMode: LocationMode) => update({ locationMode }),
     setLocation: (location: GeoLocation) => update({ location }),
+    /**
+     * Location switcher: show one place at a time. GPS follows the device;
+     * a picked city fixes the location and joins 最近使用.
+     */
+    selectLocation: (location: GeoLocation, locationMode: LocationMode) =>
+      setSettings((prev) => {
+        const recents =
+          locationMode === "manual"
+            ? [location, ...(prev.recentLocations ?? []).filter((r) => !samePlace(r, location))].slice(0, RECENT_MAX)
+            : prev.recentLocations ?? [];
+        const next = { ...prev, location, locationMode, recentLocations: recents };
+        persist(next);
+        return next;
+      }),
     setUnit: (unit: TempUnit) => update({ unit }),
     setNotifCommute: (notifCommute: boolean) => update({ notifCommute }),
     setLeaveAlert: (leaveAlert: string) => update({ leaveAlert }),

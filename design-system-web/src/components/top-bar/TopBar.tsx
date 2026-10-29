@@ -24,19 +24,29 @@ export type TopBarProps = {
   onRefresh?: () => void;
   /** Spins the refresh icon while a reload is in flight. */
   refreshing?: boolean;
+  /** Tap the location (pin + place) to switch places. */
+  onLocationClick?: () => void;
 };
 
 /**
- * TopBar — home header: location + date on the left, a refresh action on the right
+ * TopBar — home header: location (tap to switch places) + date on the left, a refresh action on the right
  * that reloads weather + location. Source: Figma 174:7. Place = DM Sans SemiBold
  * 15px; date = IBM Plex Mono 11px #8c8680.
  */
-export function TopBar({ location, date, onRefresh, refreshing }: TopBarProps) {
+export function TopBar({ location, date, onRefresh, refreshing, onLocationClick }: TopBarProps) {
   return (
     <header className="yw-top-bar">
       <div className="yw-top-bar__loc">
-        <PinIcon />
-        <span className="yw-top-bar__place">{location}</span>
+        <button
+          type="button"
+          className="yw-top-bar__place-btn"
+          aria-label={`目前地點：${location}，點擊切換地點`}
+          onClick={onLocationClick}
+          disabled={!onLocationClick}
+        >
+          <PinIcon />
+          <span className="yw-top-bar__place">{location}</span>
+        </button>
         <span className="yw-top-bar__date">{date}</span>
       </div>
       <div className="yw-top-bar__actions">

@@ -1,0 +1,126 @@
+/* 切換地點 — same shell as the record sheet; rows follow the Settings cards. */
+.yw-loc-sheet {
+  inline-size: 360px;
+  max-inline-size: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--yw-sys-spacing-xl);
+  padding: var(--yw-sys-spacing-md) var(--yw-sys-spacing-xl) var(--yw-sys-spacing-2xl);
+  background: var(--yw-sys-color-surface-white);
+  border-radius: var(--yw-sys-radius-2xl) var(--yw-sys-radius-2xl) 0 0;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  font-family: var(--yw-sys-font-ui);
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-loc-sheet__handle {
+  inline-size: 36px;
+  block-size: 4px;
+  border-radius: var(--yw-sys-radius-full);
+  background: var(--yw-sys-color-line);
+  align-self: center;
+}
+
+.yw-loc-sheet__title {
+  margin: 0;
+  font-size: var(--yw-sys-type-title-size);
+  font-weight: var(--yw-sys-type-title-weight);
+}
+
+.yw-loc-sheet__search {
+  display: flex;
+  gap: 8px;
+}
+.yw-loc-sheet__input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: 10px 12px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  border-radius: var(--yw-sys-radius-sm);
+  background: var(--yw-sys-color-surface-paper);
+  font: inherit;
+  font-size: 14px;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-loc-sheet__search-btn {
+  flex: none;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--yw-sys-radius-sm);
+  background: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.yw-loc-sheet__group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.yw-loc-sheet__seclabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--yw-sys-color-text-muted);
+}
+.yw-loc-sheet__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--yw-sys-color-text-primary);
+}
+
+.yw-loc-sheet__card {
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  border-radius: var(--yw-sys-radius-lg);
+  overflow: hidden;
+}
+.yw-loc-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-block-start: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  background: transparent;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.yw-loc-sheet__row:first-child {
+  border-block-start: none;
+}
+.yw-loc-sheet__row-icon {
+  display: inline-flex;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-loc-sheet__row-label {
+  font-size: 15px;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-loc-sheet__row-hint {
+  font-size: 13px;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-loc-sheet__check {
+  margin-inline-start: auto;
+  inline-size: 18px;
+  block-size: 18px;
+  color: var(--yw-sys-color-text-primary);
+}
+
+.yw-loc-sheet__note {
+  margin: 0;
+  padding-inline: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--yw-sys-color-text-label);
+}

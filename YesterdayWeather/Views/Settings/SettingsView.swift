@@ -275,12 +275,7 @@ struct SettingsView: View {
     }
 
     private func choose(_ place: WeatherService.Place) {
-        var s = store.settings
-        s.cityName = place.name
-        s.latitude = place.lat
-        s.longitude = place.lon
-        if let tz = place.timezone { s.timezone = tz }
-        store.settings = s
+        store.select(SavedPlace(name: place.name, latitude: place.lat, longitude: place.lon, timezone: place.timezone))
         results = []
         query = ""
     }

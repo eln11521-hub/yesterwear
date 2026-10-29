@@ -79,25 +79,36 @@ enum DeltaTint {
 
 // MARK: - TopBar
 
-/// Location + date on the left, refresh on the right (web TopBar, Figma 174:7).
+/// Location (tap to switch places) + date on the left, refresh on the right
+/// (web TopBar, Figma 174:7).
 struct TopBar: View {
     let location: String
     let date: String
     var refreshing: Bool = false
     var onRefresh: () -> Void = {}
+    /// Tap the pin + place to switch places.
+    var onLocationTap: (() -> Void)? = nil
 
     @State private var spin = false
 
     var body: some View {
         HStack(spacing: 12) {
             HStack(spacing: 6) {
-                PinGlyph()
-                    .fill(S.textPrimary, style: FillStyle(eoFill: true))
-                    .frame(width: 16, height: 16)
-                Text(location)
-                    .font(T.ui(15, .semibold))
-                    .foregroundStyle(S.textPrimary)
-                    .lineLimit(1)
+                Button { onLocationTap?() } label: {
+                    HStack(spacing: 6) {
+                        PinGlyph()
+                            .fill(S.textPrimary, style: FillStyle(eoFill: true))
+                            .frame(width: 16, height: 16)
+                        Text(location)
+                            .font(T.ui(15, .semibold))
+                            .foregroundStyle(S.textPrimary)
+                            .lineLimit(1)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(onLocationTap == nil)
+                .accessibilityLabel("目前地點：\(location)，點擊切換地點")
                 Text(date)
                     .font(T.mono(11, .bold))
                     .foregroundStyle(S.textMutedWarm)
@@ -451,10 +462,13 @@ private struct PromoSwoosh: Shape {
 
 extension View {
     /// Raised card on the paper ground (web .yw-home__card, Figma var card #f5f5f5).
-    func ywCard(padding: EdgeInsets = EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)) -> some View {
+    /// `fillHeight` lets the card stretch to the height its parent offers,
+    /// content pinned to the top (Home's outfit card on the first screen).
+    func ywCard(padding: EdgeInsets = EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16),
+                fillHeight: Bool = false) -> some View {
         self
             .padding(padding)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: fillHeight ? .infinity : nil, alignment: .topLeading)
             .background(S.surfaceRaised, in: RoundedRectangle(cornerRadius: S.radiusXl))
     }
 }

@@ -35,6 +35,29 @@
   flex-shrink: 0;
 }
 
+/* First screen = hero → commute → outfit → CTA, sized to the scroll viewport
+   minus the floating-nav clearance so the CTA sits right above the nav. The
+   outfit card absorbs the slack (fixed height for a given screen). */
+.yw-home {
+  --yw-home-nav-h: 64px;   /* Floating Nav rendered height (6 + 8 + 20 + 3 + 11 + 8 + 6 + 2 border) */
+  --yw-home-nav-inset: 16px;
+}
+.yw-home__first {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* 100% = scroll content box (viewport − 16px bottom padding); keep a 16px
+     gap above the nav. */
+  min-block-size: calc(100% - var(--yw-home-nav-h) - var(--yw-home-nav-inset));
+}
+.yw-home__first > * {
+  flex-shrink: 0;
+}
+.yw-home__outfit {
+  flex: 1 0 auto;
+  justify-content: flex-start;
+}
+
 /* Raised card on the paper ground (Figma var: card #f5f5f5) */
 .yw-home__card {
   background: var(--yw-sys-color-surface-raised);

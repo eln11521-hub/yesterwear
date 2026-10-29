@@ -2,6 +2,19 @@ import Foundation
 
 enum TempUnit: String, Codable { case c = "C", f = "F" }
 
+/// A place picked in the location switcher (最近使用).
+struct SavedPlace: Codable, Equatable, Identifiable, Hashable {
+    var id: String { String(format: "%.2f,%.2f", latitude, longitude) }
+    var name: String
+    var latitude: Double
+    var longitude: Double
+    var timezone: String?
+
+    func isSame(lat: Double, lon: Double) -> Bool {
+        abs(latitude - lat) < 0.01 && abs(longitude - lon) < 0.01
+    }
+}
+
 struct AppSettings: Codable, Equatable {
     var leaveHour: Int
     var leaveMinute: Int
@@ -20,6 +33,8 @@ struct AppSettings: Codable, Equatable {
     var returnAlertMinutes: Int? = nil
     var notifEvening: Bool = true
     var eveningMinutes: Int = 21 * 60 + 30
+    /// Most-recent-first cities from the location switcher (max 5).
+    var recentPlaces: [SavedPlace] = []
 
     static let `default` = AppSettings(
         leaveHour: 8,
@@ -51,6 +66,7 @@ struct AppSettings: Codable, Equatable {
         returnAlertMinutes = try c.decodeIfPresent(Int.self, forKey: .returnAlertMinutes)
         notifEvening = try c.decodeIfPresent(Bool.self, forKey: .notifEvening) ?? true
         eveningMinutes = try c.decodeIfPresent(Int.self, forKey: .eveningMinutes) ?? 21 * 60 + 30
+        recentPlaces = try c.decodeIfPresent([SavedPlace].self, forKey: .recentPlaces) ?? []
     }
 
     init(leaveHour: Int, leaveMinute: Int, returnHour: Int, returnMinute: Int,
@@ -93,6 +109,22 @@ final class SettingsStore: ObservableObject {
         } else {
             settings = .default
         }
+    }
+
+    /// Show one place at a time. A picked city fixes the location and joins
+    /// 最近使用; `gps: true` follows the device instead.
+    func select(_ place: SavedPlace, gps: Bool = false) {
+        var s = settings
+        s.cityName = place.name
+        s.latitude = place.latitude
+        s.longitude = place.longitude
+        s.timezone = place.timezone ?? TimeZone.current.identifier
+        s.useManualLocation = !gps
+        if !gps {
+            s.recentPlaces = [place] + s.recentPlaces.filter { !$0.isSame(lat: place.latitude, lon: place.longitude) }
+            s.recentPlaces = Array(s.recentPlaces.prefix(5))
+        }
+        settings = s
     }
 
     private func persist() {
