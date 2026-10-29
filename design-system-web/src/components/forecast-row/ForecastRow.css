@@ -1,10 +1,10 @@
 .yw-forecast-row {
   display: grid;
-  grid-template-columns: 40px 30px 28px minmax(0, 1fr) 28px;
+  grid-template-columns: 38px 30px 26px minmax(0, 1fr) 26px;
   align-items: center;
   gap: 10px;
-  padding-block: 11px;
-  border-block-end: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  padding: 11px 16px;
+  border-block-end: var(--yw-sys-border-hairline) solid rgb(17 17 17 / 6%);
   font-family: var(--yw-sys-font-ui);
 }
 
@@ -29,8 +29,8 @@
   display: block;
 }
 .yw-forecast-row__pop {
-  margin-block-start: 2px;
-  font-size: 10px;
+  margin-block-start: 1px;
+  font-size: 9px;
   font-weight: 500;
   color: var(--yw-sys-color-delta-cold);
 }

@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--yw-sys-color-surface-warm);
+  background: var(--yw-sys-color-surface-paper);
   border-radius: 28px;
   border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
   font-family: var(--yw-sys-font-ui);
@@ -35,51 +35,54 @@
   flex-shrink: 0;
 }
 
-/* Raised paper card on the warm ground */
+/* Raised card on the paper ground (Figma var: card #f5f5f5) */
 .yw-home__card {
-  background: var(--yw-sys-color-surface-paper);
+  background: var(--yw-sys-color-surface-raised);
   border-radius: var(--yw-sys-radius-xl);
   padding: 12px 16px;
 }
 
-/* ---- Hero: mascot + 現在體感 + headline, then the metrics row ---- */
+/* ---- Hero: 現在體感 + condition/headline, then the metrics rows ---- */
 .yw-home__hero {
-  background: var(--yw-sys-color-surface-paper);
+  background: var(--yw-sys-color-surface-raised);
   border-radius: var(--yw-sys-radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+/* Figma 481:310: two columns, bottom-aligned, gap 16 */
 .yw-home__hero-top {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+  gap: 16px;
 }
-.yw-home__mascot {
+.yw-home__now {
   flex: none;
-  inline-size: 100px;
-}
-.yw-home__mascot .yw-mascot {
-  inline-size: 100px;
+  inline-size: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .yw-home__hero-info {
   flex: 1;
   min-inline-size: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
-/* 現在體感: DM Sans 11px, warm muted */
+/* 現在體感: IBM Plex Mono 11px, warm muted */
 .yw-home__now-label {
+  font-family: var(--yw-sys-font-mono);
   font-size: 11px;
   color: var(--yw-sys-color-text-muted-warm);
 }
-/* 16°C: DM Sans Regular 44px, ink */
+/* 16°C: DM Sans Bold 44px, ink */
 .yw-home__now-temp {
   font-size: 44px;
-  font-weight: 400;
-  line-height: 1;
+  font-weight: 700;
+  line-height: normal;
+  white-space: nowrap;
   color: var(--yw-sys-color-text-primary);
 }
 /* 晴天: icon + DM Sans Medium 14px ink */
@@ -91,12 +94,12 @@
   font-weight: 500;
   color: var(--yw-sys-color-text-primary);
 }
-/* 比昨天涼一些: DM Sans Bold 24px ink */
+/* 比昨天涼一些: Bold 22px / 28px ink */
 .yw-home__headline {
-  margin: 4px 0 0;
-  font-size: 24px;
+  margin: 0;
+  font-size: 22px;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 28px;
   color: var(--yw-sys-color-text-primary);
 }
 
@@ -115,12 +118,13 @@
 .yw-home__hm-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 }
-/* label: DM Sans Regular 10.5px, muted label */
+/* label: IBM Plex Mono Regular 10.5px, muted label (Figma 520:1001) */
 .yw-home__hm-label {
   flex: none;
-  inline-size: 52px;
+  inline-size: 42px;
+  font-family: var(--yw-sys-font-mono);
   font-size: 10.5px;
   color: var(--yw-sys-color-text-label);
 }
@@ -133,7 +137,7 @@
 /* 較昨日 delta pill: full-radius, bg = delta direction color, white text */
 .yw-home__hm-pill {
   margin-inline-start: auto;
-  padding: 5px 10px;
+  padding: 5px 11px 5px 10px;
   border-radius: var(--yw-sys-radius-full);
   font-size: 11px;
   font-weight: 600;
@@ -168,7 +172,7 @@
 .yw-home__seclabel {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 13px;
   font-weight: 500;
   color: var(--yw-sys-color-text-muted);
@@ -191,11 +195,16 @@
   color: var(--yw-sys-color-text-label);
 }
 
+/* 建議： bold ink + regular label text (Figma 173:2914) */
 .yw-home__suggestion {
   margin: 0;
   font-size: 12px;
-  line-height: 1.4;
-  color: var(--yw-sys-color-text-muted-warm);
+  line-height: 1.6;
+  color: var(--yw-sys-color-text-label);
+}
+.yw-home__suggestion strong {
+  font-weight: 700;
+  color: var(--yw-sys-color-text-primary);
 }
 
 /* commute */
@@ -231,9 +240,10 @@
   font-weight: 600;
 }
 
-/* Forecast rows sit edge-to-edge inside their card */
+/* Forecast rows own their 16px inset so separators run edge to edge */
 .yw-home__forecast {
-  padding: 2px 16px;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* Reserve clearance for the floating nav (≈65px tall + 16px bottom inset) so the

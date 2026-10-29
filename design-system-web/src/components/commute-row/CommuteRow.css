@@ -1,4 +1,5 @@
 .yw-commute-row {
+  padding-inline: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,12 +25,9 @@
   color: var(--yw-sys-color-text-primary);
 }
 
-/* delta: 較昨日 (#8c8680, 10px) + arrow (semibold, state color) */
+/* delta / note: DM Sans Medium 10px, muted (Figma 504:230) */
 .yw-commute-row__delta {
   font-size: 10px;
   font-weight: 500;
-  color: var(--yw-sys-color-text-label);
-}
-.yw-commute-row__delta-val {
-  font-weight: 600;
+  color: var(--yw-sys-color-text-muted-warm);
 }

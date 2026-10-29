@@ -20,6 +20,11 @@
     var(--yw-sys-motion-ease-out);
 }
 
+.yw-primary-button[data-shape="pill"] {
+  border-radius: 100px;
+  font-size: 14px;
+}
+
 .yw-primary-button:active:not(:disabled) {
   transform: scale(var(--yw-comp-button-pressed-scale));
 }
