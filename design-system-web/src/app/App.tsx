@@ -8,12 +8,7 @@ import { LocationSheet } from "../pages/location-sheet/LocationSheet";
 import { RecordOutfitSheet } from "../pages/record-outfit/RecordOutfitSheet";
 import { SettingsScreen } from "../pages/settings/SettingsScreen";
 import "./App.css";
-import {
-  type BaseLayer,
-  comboChips,
-  type OuterLayer,
-  recordChips,
-} from "./outfit";
+import { keyChips, outfitChips, outfitComboText } from "./outfit";
 import { useOutfitStore } from "./useOutfitStore";
 import { useSettingsStore } from "./useSettingsStore";
 import { useWeather } from "./useWeather";
@@ -99,8 +94,8 @@ export function App() {
   };
 
   const suggestion = suggestOutfit(weather, yesterday);
-  const yesterdayChips = recordChips(yesterday);
-  const widgetChips = yesterdayChips.length ? yesterdayChips : ["—"];
+  const yesterdayChips = outfitChips(yesterday);
+  const widgetChips = yesterday ? keyChips(yesterday) : ["—"];
 
   const selectTab = (id: string) => setTab(id as Tab);
 
@@ -124,7 +119,7 @@ export function App() {
             <HomeScreen
               weather={weather}
               yesterdayChips={yesterdayChips}
-              suggestedChips={comboChips(suggestion.top, suggestion.outer)}
+              suggestedChips={outfitChips(suggestion)}
               advice={suggestion.advice}
               ctaLabel={today ? "更新今日穿搭" : "記錄今天穿搭"}
               onRecord={() => setOpen(true)}
@@ -168,16 +163,10 @@ export function App() {
                 />
                 <div className="yw-app__sheet">
                   <RecordOutfitSheet
-                    initialTop={today?.top ?? suggestion.top}
-                    initialOuter={today?.outer ?? suggestion.outer}
+                    initial={today ?? suggestion}
                     initialThumb={today?.thumbnailRef ?? undefined}
                     onSave={(r) => {
-                      saveToday({
-                        top: r.top as BaseLayer,
-                        outer: r.outer as OuterLayer,
-                        thumbnailRef: r.thumbnailRef,
-                        source: r.source,
-                      });
+                      saveToday(r);
                       setOpen(false);
                     }}
                   />
@@ -227,7 +216,7 @@ export function App() {
         </button>
         {today ? (
           <span className="yw-app__note">
-            今日已記錄：{comboChips(today.top, today.outer).join(" + ")}
+            今日已記錄：{outfitComboText(today)}
           </span>
         ) : null}
       </div>

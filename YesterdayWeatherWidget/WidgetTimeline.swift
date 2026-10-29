@@ -52,7 +52,7 @@ struct WeatherTimelineProvider: TimelineProvider {
         return map[DayKey.yesterday()]
     }
 
-    static let sampleOutfit = OutfitEntry(dayKey: DayKey.yesterday(), top: .longSleeve, outer: .light)
+    static let sampleOutfit = OutfitEntry(dayKey: DayKey.yesterday(), picks: OutfitPicks(tops: ["長袖上衣"], outers: ["薄外套"]))
 
     static let sample = WeatherSnapshot(
         fetchedAt: .now,

@@ -150,7 +150,7 @@ struct HomeView: View {
     // MARK: Outfit
 
     private func outfitCard(_ snap: WeatherSnapshot) -> some View {
-        let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, yesterday: outfit.yesterday)
+        let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
         return VStack(alignment: .leading, spacing: 12) {
             SectionLabel("昨日穿搭")
             if let y = outfit.yesterday {

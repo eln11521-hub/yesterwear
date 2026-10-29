@@ -1,17 +1,29 @@
+/* Fixed-height sheet: the head and the actions stay put, only the chip groups
+   scroll — adding options or a photo never changes the sheet's height. */
 .yw-sheet {
+  --yw-sheet-h: 640px;
   inline-size: 360px;
   max-inline-size: 100%;
+  block-size: var(--yw-sheet-h);
+  max-block-size: 100%;
   margin-inline: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--yw-sys-spacing-xl);
-  padding: var(--yw-sys-spacing-md) var(--yw-sys-spacing-xl) var(--yw-sys-spacing-xl);
   background: var(--yw-sys-color-surface-white);
   border-radius: var(--yw-sys-radius-2xl) var(--yw-sys-radius-2xl) 0 0;
   border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  overflow: hidden;
   font-family: var(--yw-sys-font-ui);
   color: var(--yw-sys-color-text-primary);
+}
+
+.yw-sheet__head {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--yw-sys-spacing-sm);
+  padding: var(--yw-sys-spacing-md) var(--yw-sys-spacing-xl) var(--yw-sys-spacing-lg);
 }
 
 .yw-sheet__handle {
@@ -20,12 +32,34 @@
   border-radius: var(--yw-sys-radius-full);
   background: var(--yw-sys-color-line);
   align-self: center;
+  margin-block-end: var(--yw-sys-spacing-md);
 }
 
 .yw-sheet__title {
   margin: 0;
   font-size: var(--yw-sys-type-title-size);
   font-weight: var(--yw-sys-type-title-weight);
+}
+
+.yw-sheet__sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--yw-sys-color-text-label);
+}
+
+.yw-sheet__body {
+  flex: 1 1 0;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--yw-sys-spacing-xl);
+  padding: 0 var(--yw-sys-spacing-xl) var(--yw-sys-spacing-xl);
+}
+.yw-sheet__body::-webkit-scrollbar {
+  display: none;
 }
 
 .yw-sheet__section {
@@ -35,7 +69,7 @@
 }
 
 .yw-sheet__seclabel {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--yw-sys-spacing-sm);
   font-size: var(--yw-sys-type-caption-size);
@@ -55,11 +89,21 @@
   gap: var(--yw-sys-spacing-md);
 }
 
+/* pinned footer — hairline marks where the chips scroll under */
 .yw-sheet__actions {
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: var(--yw-sys-spacing-md);
-  margin-block-start: var(--yw-sys-spacing-sm);
+  padding: var(--yw-sys-spacing-lg) var(--yw-sys-spacing-xl) var(--yw-sys-spacing-xl);
+  border-block-start: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+}
+
+.yw-sheet__count {
+  margin-inline-start: auto;
+  font-family: var(--yw-sys-font-mono);
+  font-size: 10.5px;
+  color: var(--yw-sys-color-text-label);
 }
 
 /* 待確認 (pending) panel — thumbnail beside the prefilled tags for comparison. */

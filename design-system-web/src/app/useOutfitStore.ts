@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-  type BaseLayer,
   type DailyOutfitRecord,
-  type OuterLayer,
+  migrateRecord,
+  type OutfitPicks,
   type OutfitSource,
   todayISO,
 } from "./outfit";
@@ -45,7 +45,12 @@ function load(): StoreState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { yesterday: null, today: null };
-    return reconcile(JSON.parse(raw) as StoreState);
+    const stored = JSON.parse(raw) as Record<string, unknown>;
+    // Records saved before multi-select are `{top, outer}` — upgrade them.
+    return reconcile({
+      yesterday: migrateRecord(stored.yesterday),
+      today: migrateRecord(stored.today),
+    });
   } catch {
     return { yesterday: null, today: null };
   }
@@ -70,9 +75,7 @@ export function useOutfitStore() {
   }, []);
 
   const saveToday = useCallback(
-    (input: {
-      top: BaseLayer;
-      outer: OuterLayer;
+    (input: OutfitPicks & {
       thumbnailRef?: string | null;
       source?: OutfitSource;
     }) => {
@@ -81,8 +84,10 @@ export function useOutfitStore() {
           yesterday: prev.yesterday,
           today: {
             date: todayISO(),
-            top: input.top,
-            outer: input.outer,
+            tops: input.tops,
+            outers: input.outers,
+            bottoms: input.bottoms,
+            accessories: input.accessories,
             thumbnailRef: input.thumbnailRef ?? null,
             source: input.source ?? "manual",
           },

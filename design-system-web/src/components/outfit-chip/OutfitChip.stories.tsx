@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
+import { ACCESSORY_LAYER, BOTTOM_LAYER, OUTER_LAYER, TOP_LAYER } from "../../app/outfit";
 import { getComponentStoryParameters } from "../../storybook/componentCatalog";
 import { garmentIcon } from "./garments";
 import { OutfitChip } from "./OutfitChip";
@@ -50,58 +51,42 @@ export const Compact: Story = {
   args: { compact: true, label: "薄外套", iconSrc: garmentIcon["薄外套"] },
 };
 
-/** The 上身基礎層 section from the record-outfit sheet. */
-export const TopBaseLayer: Story = {
-  render: () => {
-    const items = [
-      "短袖上衣",
-      "背心無袖",
-      "長袖上衣",
-      "襯衫（單穿）",
-      "針織衫（單穿）",
-      "帽T衛衣（單穿）",
-    ];
-    const [chosen, setChosen] = useState("長袖上衣");
-    return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxWidth: 320 }}>
-        {items.map((label) => (
-          <OutfitChip
-            key={label}
-            label={label}
-            iconSrc={garmentIcon[label]}
-            selected={chosen === label}
-            onClick={() => setChosen(label)}
-          />
-        ))}
-      </div>
-    );
-  },
+/** Multi-select chip group — every record-sheet section toggles independently. */
+function ChipGroup({ items, initial }: { items: readonly string[]; initial: string[] }) {
+  const [chosen, setChosen] = useState<string[]>(initial);
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxWidth: 320 }}>
+      {items.map((label) => (
+        <OutfitChip
+          key={label}
+          label={label}
+          iconSrc={garmentIcon[label]}
+          selected={chosen.includes(label)}
+          onClick={() =>
+            setChosen((c) => (c.includes(label) ? c.filter((x) => x !== label) : [...c, label]))
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
+/** 上身 (multi-select, at least one). */
+export const TopLayer: Story = {
+  render: () => <ChipGroup items={TOP_LAYER} initial={["背心無袖", "襯衫"]} />,
 };
 
-/** The 外套 / 疊搭層 section. */
+/** 外套 / 疊搭 (multi-select). */
 export const OuterLayer: Story = {
-  render: () => {
-    const items = [
-      "不加外套",
-      "薄外套",
-      "連帽外套",
-      "厚外套夾克",
-      "羽絨外套大衣",
-      "防風防水外套",
-    ];
-    const [chosen, setChosen] = useState("薄外套");
-    return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxWidth: 320 }}>
-        {items.map((label) => (
-          <OutfitChip
-            key={label}
-            label={label}
-            iconSrc={garmentIcon[label]}
-            selected={chosen === label}
-            onClick={() => setChosen(label)}
-          />
-        ))}
-      </div>
-    );
-  },
+  render: () => <ChipGroup items={OUTER_LAYER} initial={["薄外套"]} />,
+};
+
+/** 下身 (multi-select). */
+export const BottomLayer: Story = {
+  render: () => <ChipGroup items={BOTTOM_LAYER} initial={["長褲"]} />,
+};
+
+/** 配件 (multi-select). */
+export const Accessories: Story = {
+  render: () => <ChipGroup items={ACCESSORY_LAYER} initial={["圍巾", "雨傘"]} />,
 };

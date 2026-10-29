@@ -1,98 +1,103 @@
 import Foundation
 
-enum TopLayer: String, Codable, CaseIterable, Identifiable {
-    case shortSleeve = "短袖上衣"
-    case tank = "背心無袖"
-    case longSleeve = "長袖上衣"
-    case shirt = "襯衫（單穿）"
-    case knit = "針織衫（單穿）"
-    case hoodie = "帽T衛衣（單穿）"
+/// The record sheet's four multi-select groups — mirrors OUTFIT_GROUPS in
+/// design-system-web/src/app/outfit.ts. 上身 needs at least one item.
+enum OutfitGroup: String, CaseIterable, Identifiable {
+    case tops, outers, bottoms, accessories
 
     var id: String { rawValue }
 
-    var emoji: String {
+    var label: String {
         switch self {
-        case .shortSleeve: return "👕"
-        case .tank: return "🎽"
-        case .longSleeve: return "👔"
-        case .shirt: return "🧣"
-        case .knit: return "🧶"
-        case .hoodie: return "🧥"
+        case .tops: return "上身"
+        case .outers: return "外套 / 疊搭"
+        case .bottoms: return "下身"
+        case .accessories: return "配件"
         }
     }
 
-    /// Garment icon in Shared/SharedAssets.xcassets (web garmentIcon map).
-    var asset: String {
-        switch self {
-        case .shortSleeve: return "garment-short-sleeve"
-        case .tank: return "garment-vest"
-        case .longSleeve, .shirt: return "garment-long-sleeve"
-        case .knit: return "garment-knit"
-        case .hoodie: return "garment-hoodie"
-        }
-    }
+    var required: Bool { self == .tops }
 
-    var shortLabel: String {
+    /// Display order; 外套 is ordered light → heavy.
+    var items: [String] {
         switch self {
-        case .shortSleeve: return "短袖"
-        case .tank: return "背心"
-        case .longSleeve: return "長袖"
-        case .shirt: return "襯衫"
-        case .knit: return "針織"
-        case .hoodie: return "帽T"
+        case .tops: return ["短袖上衣", "背心無袖", "Polo衫", "長袖上衣", "襯衫", "針織衫", "帽T衛衣", "高領毛衣", "發熱衣"]
+        case .outers: return ["薄外套", "連帽外套", "西裝外套", "鋪棉背心", "厚外套夾克", "毛呢大衣", "羽絨外套", "防風防水外套"]
+        case .bottoms: return ["短褲", "短裙", "長裙", "長褲", "牛仔褲", "保暖褲"]
+        case .accessories: return ["帽子", "毛帽", "圍巾", "手套", "雨傘", "墨鏡"]
         }
     }
 }
 
-enum OuterLayer: String, Codable, CaseIterable, Identifiable {
-    case none = "不加外套"
-    case light = "薄外套"
-    case tech = "連帽外套"
-    case thick = "厚外套夾克"
-    case down = "羽絨外套大衣"
-    case rain = "防風防水外套"
+/// Garment label → icon in Shared/SharedAssets.xcassets (web garmentIcon map).
+enum Garment {
+    static let asset: [String: String] = [
+        "短袖上衣": "garment-short-sleeve", "背心無袖": "garment-vest", "Polo衫": "garment-polo",
+        "長袖上衣": "garment-long-sleeve", "襯衫": "garment-shirt", "針織衫": "garment-knit",
+        "帽T衛衣": "garment-hoodie", "高領毛衣": "garment-turtleneck", "發熱衣": "garment-thermal",
+        "薄外套": "garment-light-jacket", "連帽外套": "garment-hooded-jacket", "西裝外套": "garment-blazer",
+        "鋪棉背心": "garment-puffer-vest", "厚外套夾克": "garment-thick-jacket", "毛呢大衣": "garment-wool-coat",
+        "羽絨外套": "garment-down-coat", "防風防水外套": "garment-waterproof",
+        "短褲": "garment-shorts", "短裙": "garment-skirt", "長裙": "garment-long-skirt",
+        "長褲": "garment-trousers", "牛仔褲": "garment-jeans", "保暖褲": "garment-thermal-pants",
+        "帽子": "garment-cap", "毛帽": "garment-beanie", "圍巾": "garment-scarf",
+        "手套": "garment-gloves", "雨傘": "garment-umbrella", "墨鏡": "garment-sunglasses",
+    ]
 
-    var id: String { rawValue }
+    /// Labels renamed when the sheet went multi-select (「單穿」no longer means anything).
+    static let renamed: [String: String] = [
+        "襯衫（單穿）": "襯衫", "針織衫（單穿）": "針織衫", "帽T衛衣（單穿）": "帽T衛衣", "羽絨外套大衣": "羽絨外套",
+    ]
 
-    var emoji: String {
-        switch self {
-        case .none: return "🚫"
-        case .light: return "🧥"
-        case .tech: return "🦺"
-        case .thick: return "🧥"
-        case .down: return "🥶"
-        case .rain: return "☂️"
+    static func chip(_ label: String) -> OutfitChipItem { OutfitChipItem(label: label, asset: asset[label]) }
+
+    /// The warmest outer layer picked.
+    static func heaviest(_ outers: [String]) -> String? {
+        let order = OutfitGroup.outers.items
+        return outers.max { (order.firstIndex(of: $0) ?? 0) < (order.firstIndex(of: $1) ?? 0) }
+    }
+}
+
+/// One day's picks, per group.
+struct OutfitPicks: Codable, Equatable {
+    var tops: [String] = []
+    var outers: [String] = []
+    var bottoms: [String] = []
+    var accessories: [String] = []
+
+    subscript(group: OutfitGroup) -> [String] {
+        get {
+            switch group {
+            case .tops: return tops
+            case .outers: return outers
+            case .bottoms: return bottoms
+            case .accessories: return accessories
+            }
+        }
+        set {
+            switch group {
+            case .tops: tops = newValue
+            case .outers: outers = newValue
+            case .bottoms: bottoms = newValue
+            case .accessories: accessories = newValue
+            }
         }
     }
 
-    /// Garment icon in Shared/SharedAssets.xcassets (web garmentIcon map).
-    var asset: String {
-        switch self {
-        case .none: return "garment-no-jacket"
-        case .light: return "garment-light-jacket"
-        case .tech: return "garment-hooded-jacket"
-        case .thick: return "garment-thick-jacket"
-        case .down: return "garment-down-coat"
-        case .rain: return "garment-waterproof"
-        }
-    }
+    /// Every picked label, in group order (上身 → 外套 → 下身 → 配件).
+    var all: [String] { tops + outers + bottoms + accessories }
 
-    var shortLabel: String {
-        switch self {
-        case .none: return "無外套"
-        case .light: return "薄外套"
-        case .tech: return "機能外套"
-        case .thick: return "厚外套"
-        case .down: return "羽絨"
-        case .rain: return "防水外套"
-        }
+    var chips: [OutfitChipItem] { all.map(Garment.chip) }
+
+    /// The two chips a widget has room for: the main top + the outermost layer (web keyChips).
+    var keyChips: [OutfitChipItem] {
+        [tops.first, Garment.heaviest(outers)].compactMap { $0 }.map(Garment.chip)
     }
 }
 
 struct OutfitEntry: Codable, Equatable {
     var dayKey: String
-    var top: TopLayer
-    var outer: OuterLayer
+    var picks: OutfitPicks
     /// JPEG filename in the App Group container (photo-confirmed records).
     var thumbnailFile: String? = nil
 
@@ -100,54 +105,93 @@ struct OutfitEntry: Codable, Equatable {
 
     var thumbnailURL: URL? { thumbnailFile.flatMap { AppGroup.containerURL?.appendingPathComponent($0) } }
 
-    var displayText: String {
-        if outer == .none {
-            return "\(top.emoji) \(top.shortLabel)"
+    var chips: [OutfitChipItem] { picks.chips }
+
+    /// 「長袖上衣＋薄外套」 — used in the widget/notification advice.
+    var displayText: String { picks.keyChips.map(\.label).joined(separator: "＋") }
+
+    init(dayKey: String, picks: OutfitPicks, thumbnailFile: String? = nil) {
+        self.dayKey = dayKey
+        self.picks = picks
+        self.thumbnailFile = thumbnailFile
+    }
+
+    private enum CodingKeys: String, CodingKey { case dayKey, picks, thumbnailFile, top, outer }
+
+    /// Also reads records saved before multi-select (`top` + `outer` strings).
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        dayKey = try c.decode(String.self, forKey: .dayKey)
+        thumbnailFile = try c.decodeIfPresent(String.self, forKey: .thumbnailFile)
+        if let picks = try c.decodeIfPresent(OutfitPicks.self, forKey: .picks) {
+            self.picks = picks
+        } else {
+            let fix = { (x: String) in Garment.renamed[x] ?? x }
+            let top = try c.decodeIfPresent(String.self, forKey: .top).map(fix)
+            let outer = try c.decodeIfPresent(String.self, forKey: .outer).map(fix)
+            picks = OutfitPicks(tops: top.map { [$0] } ?? [],
+                                outers: outer.flatMap { $0 == "不加外套" ? nil : [$0] } ?? [])
         }
-        return "\(top.emoji) \(top.shortLabel) + \(outer.emoji) \(outer.shortLabel)"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(dayKey, forKey: .dayKey)
+        try c.encode(picks, forKey: .picks)
+        try c.encodeIfPresent(thumbnailFile, forKey: .thumbnailFile)
     }
 }
 
-/// Chip labels for a top + outer combo — 「不加外套」collapses to just the top
-/// (web comboChips).
 struct OutfitChipItem: Hashable {
     var label: String
-    var asset: String
+    var asset: String?
 }
 
-extension OutfitEntry {
-    var chips: [OutfitChipItem] { OutfitSuggestion.chips(top: top, outer: outer) }
-}
-
-/// Today's suggestion, mirroring suggestOutfit() in design-system-web/src/app/weather.ts.
+/// Today's suggestion, mirroring suggestOutfit() in design-system-web/src/app/weather.ts:
+/// colder → the outermost layer one step warmer, warmer → drop it, close → repeat
+/// yesterday. Rain adds 雨傘.
 struct OutfitSuggestion {
-    var top: TopLayer
-    var outer: OuterLayer
+    var picks: OutfitPicks
     var advice: String
 
-    static func make(delta: Double, yesterday: OutfitEntry?) -> OutfitSuggestion {
-        let base = yesterday?.top ?? .longSleeve
-        let yOuter = yesterday?.outer ?? .light
+    var chips: [OutfitChipItem] { picks.chips }
+
+    private static let warmerOuter: [String: String] = [
+        "薄外套": "厚外套夾克", "連帽外套": "厚外套夾克", "鋪棉背心": "厚外套夾克", "防風防水外套": "厚外套夾克",
+        "西裝外套": "毛呢大衣", "厚外套夾克": "羽絨外套", "毛呢大衣": "羽絨外套", "羽絨外套": "羽絨外套",
+    ]
+    private static let coldAccessories: Set<String> = ["毛帽", "圍巾", "手套"]
+
+    static func make(delta: Double, rain: Bool = false, yesterday: OutfitEntry?) -> OutfitSuggestion {
+        let y = yesterday?.picks
+        let tops = (y?.tops.isEmpty == false) ? y!.tops : ["長袖上衣"]
+        let yOuters = y?.outers ?? ["薄外套"]
+        let bottoms = y?.bottoms ?? []
+        var accessories = y?.accessories ?? []
+        let yOuter = Garment.heaviest(yOuters)
+        func withRain(_ xs: [String]) -> [String] { rain && !xs.contains("雨傘") ? xs + ["雨傘"] : xs }
+
         if delta <= -3 {
-            return .init(top: base, outer: .thick, advice: yesterday.map {
-                "建議：比昨天冷，在「\($0.top.rawValue)」的基礎上換件厚外套。"
-            } ?? "建議：比昨天明顯變冷，多加一層外套。")
+            let up = warmerOuter[yOuter ?? ""] ?? "厚外套夾克"
+            if up == yOuter, !accessories.contains("圍巾") { accessories.append("圍巾") }
+            let change = up == "厚外套夾克" ? "換件厚外套" : "換上「\(up)」"
+            return .init(picks: .init(tops: tops, outers: [up], bottoms: bottoms, accessories: withRain(accessories)),
+                         advice: yesterday != nil
+                            ? "建議：比昨天冷，在「\(tops.joined(separator: "＋"))」的基礎上\(change)。"
+                            : "建議：比昨天明顯變冷，多加一層外套。")
         }
         if delta >= 3 {
-            return .init(top: base, outer: .none, advice: yesterday != nil
-                ? "建議：比昨天熱，可比「\(yOuter.rawValue)」再減一層。"
-                : "建議：比昨天明顯變熱，減少疊搭。")
+            let advice: String
+            if yesterday == nil { advice = "建議：比昨天明顯變熱，減少疊搭。" }
+            else if let yOuter { advice = "建議：比昨天熱，可比「\(yOuter)」再減一層。" }
+            else { advice = "建議：比昨天熱，換件更薄的上衣。" }
+            return .init(picks: .init(tops: tops, outers: yOuters.filter { $0 != yOuter }, bottoms: bottoms,
+                                      accessories: withRain(accessories.filter { !coldAccessories.contains($0) })),
+                         advice: advice)
         }
-        return .init(top: base, outer: yOuter, advice: yesterday != nil
-            ? "建議：體感接近昨天，可參考「\(yOuter.rawValue)」。"
-            : "建議：體感與昨天接近，維持平常穿搭即可。")
-    }
-
-    var chips: [OutfitChipItem] { Self.chips(top: top, outer: outer) }
-
-    static func chips(top: TopLayer, outer: OuterLayer) -> [OutfitChipItem] {
-        let t = OutfitChipItem(label: top.rawValue, asset: top.asset)
-        return outer == .none ? [t] : [t, OutfitChipItem(label: outer.rawValue, asset: outer.asset)]
+        return .init(picks: .init(tops: tops, outers: yOuters, bottoms: bottoms, accessories: withRain(accessories)),
+                     advice: yesterday.map { "建議：體感接近昨天，可參考「\($0.picks.all.joined(separator: "＋"))」。" }
+                        ?? "建議：體感與昨天接近，維持平常穿搭即可。")
     }
 }
 
@@ -179,7 +223,7 @@ final class OutfitStore: ObservableObject {
 
     /// Saves today's record. `thumbnailJPEG` keeps the photo as the next-day
     /// anchor; passing nil with `keepThumbnail` retains an existing one.
-    func saveToday(top: TopLayer, outer: OuterLayer, thumbnailJPEG: Data? = nil, keepThumbnail: Bool = false) {
+    func saveToday(_ picks: OutfitPicks, thumbnailJPEG: Data? = nil, keepThumbnail: Bool = false) {
         let key = DayKey.make()
         var file = keepThumbnail ? entries[key]?.thumbnailFile : nil
         if let thumbnailJPEG, let dir = AppGroup.containerURL {
@@ -188,7 +232,7 @@ final class OutfitStore: ObservableObject {
                 file = name
             }
         }
-        entries[key] = OutfitEntry(dayKey: key, top: top, outer: outer, thumbnailFile: file)
+        entries[key] = OutfitEntry(dayKey: key, picks: picks, thumbnailFile: file)
         persist()
     }
 

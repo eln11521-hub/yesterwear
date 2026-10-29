@@ -1,4 +1,4 @@
-import type { DailyOutfitRecord } from "./outfit";
+import { type DailyOutfitRecord, heaviest, outfitChips, type OutfitPicks } from "./outfit";
 
 export type Condition =
   | "sun"
@@ -143,46 +143,73 @@ export function metricValue(w: WeatherVM, label: string): string {
   return w.metrics.find((m) => m.label === label)?.value ?? "";
 }
 
-export type OutfitSuggestion = {
-  top: string;
-  outer: string;
-  advice: string;
+export type OutfitSuggestion = OutfitPicks & { advice: string };
+
+/** One step warmer for the outermost layer (colder-than-yesterday days). */
+const WARMER_OUTER: Record<string, string> = {
+  薄外套: "厚外套夾克",
+  連帽外套: "厚外套夾克",
+  鋪棉背心: "厚外套夾克",
+  防風防水外套: "厚外套夾克",
+  西裝外套: "毛呢大衣",
+  厚外套夾克: "羽絨外套",
+  毛呢大衣: "羽絨外套",
+  羽絨外套: "羽絨外套",
 };
+const COLD_ACCESSORIES = ["毛帽", "圍巾", "手套"];
 
 /**
  * Suggest today's outfit from the delta vs. yesterday + yesterday's actual outfit.
- * Mirrors the app's relative "add/keep/reduce a layer" logic.
+ * Mirrors the app's relative "add/keep/reduce a layer" logic: colder → the
+ * outermost layer goes one step warmer, warmer → drop the outermost layer, close
+ * → repeat yesterday. Rain adds 雨傘.
  */
 export function suggestOutfit(
   weather: WeatherVM,
   yesterday: DailyOutfitRecord | null,
 ): OutfitSuggestion {
-  const base = yesterday?.top ?? "長袖上衣";
-  const yOuter = yesterday?.outer ?? "薄外套";
+  const tops = yesterday?.tops.length ? yesterday.tops : ["長袖上衣"];
+  const yOuters = yesterday ? yesterday.outers : ["薄外套"];
+  const bottoms = yesterday?.bottoms ?? [];
+  let accessories = yesterday?.accessories ?? [];
+  const yOuter = heaviest(yOuters);
+  const withRain = (xs: string[]) =>
+    weather.rain && !xs.includes("雨傘") ? [...xs, "雨傘"] : xs;
 
   if (weather.overallDelta <= -3) {
+    const up = WARMER_OUTER[yOuter ?? ""] ?? "厚外套夾克";
+    if (up === yOuter && !accessories.includes("圍巾")) accessories = [...accessories, "圍巾"];
+    const change = up === "厚外套夾克" ? "換件厚外套" : `換上「${up}」`;
     return {
-      top: base,
-      outer: "厚外套夾克",
+      tops,
+      outers: [up],
+      bottoms,
+      accessories: withRain(accessories),
       advice: yesterday
-        ? `建議：比昨天冷，在「${yesterday.top}」的基礎上換件厚外套。`
+        ? `建議：比昨天冷，在「${tops.join("＋")}」的基礎上${change}。`
         : "建議：比昨天明顯變冷，多加一層外套。",
     };
   }
   if (weather.overallDelta >= 3) {
     return {
-      top: base,
-      outer: "不加外套",
-      advice: yesterday
-        ? `建議：比昨天熱，可比「${yOuter}」再減一層。`
-        : "建議：比昨天明顯變熱，減少疊搭。",
+      tops,
+      outers: yOuters.filter((o) => o !== yOuter),
+      bottoms,
+      accessories: withRain(accessories.filter((a) => !COLD_ACCESSORIES.includes(a))),
+      advice: !yesterday
+        ? "建議：比昨天明顯變熱，減少疊搭。"
+        : yOuter
+          ? `建議：比昨天熱，可比「${yOuter}」再減一層。`
+          : "建議：比昨天熱，換件更薄的上衣。",
     };
   }
   return {
-    top: base,
-    outer: yOuter,
+    tops,
+    outers: yOuters,
+    bottoms,
+    accessories: withRain(accessories),
     advice: yesterday
-      ? `建議：體感接近昨天，可參考「${yOuter}」。`
+      ? `建議：體感接近昨天，可參考「${outfitChips(yesterday).join("＋")}」。`
       : "建議：體感與昨天接近，維持平常穿搭即可。",
   };
 }
