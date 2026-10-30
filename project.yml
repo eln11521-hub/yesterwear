@@ -1,6 +1,8 @@
 name: YesterdayWeather
 options:
   bundleIdPrefix: com.yesterdayweather
+  # Chinese-only app: MapKit/CoreLocation localize place names to this (台灣用法).
+  developmentLanguage: zh-Hant
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true

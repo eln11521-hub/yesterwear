@@ -39,7 +39,8 @@ final class OneShotLocation: NSObject, CLLocationManagerDelegate {
         }
         guard let location else { return nil }
 
-        let place = try? await CLGeocoder().reverseGeocodeLocation(location).first
+        let place = try? await CLGeocoder()
+            .reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "zh_Hant_TW")).first
         return Fix(
             coordinate: location.coordinate,
             placeName: (place?.locality ?? place?.name)?.traditional,
