@@ -1,36 +1,31 @@
 import SwiftUI
 
-/// App shell, mirroring the web App: two tabs (天氣 / 設定) switched by the
-/// floating pill nav, with the record-outfit sheet raised from the Home CTA.
+/// App shell, mirroring the web App: Home, with Settings pushed from the header
+/// gear (no tab bar) and the record-outfit / place sheets raised over it.
 struct RootTabView: View {
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var outfit: OutfitStore
     @EnvironmentObject private var weather: WeatherSnapshotStore
 
-    @State private var tab = "weather"
+    @State private var showingSettings = false
     @State private var recording = false
     @State private var switchingPlace = false
 
-    private let items = [
-        FloatingNavItem(id: "weather", label: "天氣", icon: "nav-thermometer"),
-        FloatingNavItem(id: "settings", label: "設定", icon: "nav-gear"),
-    ]
-
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Group {
-                if tab == "weather" {
-                    HomeView(onRecord: { recording = true }, onSwitchPlace: { switchingPlace = true })
-                } else {
-                    SettingsView()
-                }
+        ZStack {
+            HomeView(onRecord: { recording = true },
+                     onSwitchPlace: { switchingPlace = true },
+                     onOpenSettings: { showingSettings = true })
+            if showingSettings {
+                SettingsView(onBack: { showingSettings = false })
+                    .background(YWTokens.Sys.surfacePaper.ignoresSafeArea())
+                    .compositingGroup()   // slide as one layer (no lagging header button)
+                    .transition(.move(edge: .trailing))
+                    .zIndex(1)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            FloatingNav(items: items, activeId: tab) { tab = $0 }
-                .padding(.bottom, 8)
         }
-        // In-app sheets (edge to edge, over the floating nav).
+        .animation(.spring(duration: 0.35, bounce: 0), value: showingSettings)
+        // In-app sheets (edge to edge).
         .ywSheet(isPresented: $recording) { recordSheet }
         .ywSheet(isPresented: $switchingPlace, fraction: 0.7) { LocationSheet() }
     }

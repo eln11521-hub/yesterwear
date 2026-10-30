@@ -84,12 +84,10 @@ enum DeltaTint {
 struct TopBar: View {
     let location: String
     let date: String
-    var refreshing: Bool = false
-    var onRefresh: () -> Void = {}
     /// Tap the pin + place to switch places.
     var onLocationTap: (() -> Void)? = nil
-
-    @State private var spin = false
+    /// Tap the gear to open Settings (refresh is pull-to-refresh).
+    var onSettingsTap: () -> Void = {}
 
     var body: some View {
         HStack(spacing: 12) {
@@ -110,33 +108,27 @@ struct TopBar: View {
                 .disabled(onLocationTap == nil)
                 .accessibilityLabel("目前地點：\(location)，點擊切換地點")
                 Text(date)
-                    .font(T.mono(11, .bold))
+                    .font(T.mono(11))
                     .foregroundStyle(S.textMutedWarm)
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
-            Button(action: onRefresh) {
-                AssetIcon(name: "icon-refresh", size: 18)
+            // 44×44 hit area; the negative padding keeps the glyph flush with the
+            // card edge and centred on the place name.
+            Button(action: onSettingsTap) {
+                AssetIcon(name: "nav-gear", size: 20)
                     .foregroundStyle(S.textLabel)
-                    .rotationEffect(.degrees(spin ? 360 : 0))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .disabled(refreshing)
-            .accessibilityLabel("重新整理天氣與位置")
-        }
-        .onChange(of: refreshing) { _, on in
-            if on {
-                withAnimation(.linear(duration: 0.8).repeatForever(autoreverses: false)) { spin = true }
-            } else {
-                withAnimation(.default) { spin = false }
-            }
+            .padding(.vertical, -12)
+            .padding(.trailing, -12)
+            .accessibilityLabel("設定")
         }
     }
 }
 
-// MARK: - Section label
-
-/// Bullet + label (web .yw-home__seclabel: DM Sans Medium 13, muted).
 struct SectionLabel<Content: View>: View {
     @ViewBuilder var content: Content
 
@@ -144,7 +136,7 @@ struct SectionLabel<Content: View>: View {
         HStack(spacing: 10) {
             Circle().fill(S.textPrimary).frame(width: 6, height: 6)
             content
-                .font(T.ui(13, .medium))
+                .font(T.ui(13))
                 .foregroundStyle(S.textMuted)
         }
     }
@@ -234,12 +226,12 @@ struct CommuteColumn: View {
                 .font(T.mono(10.5))
                 .foregroundStyle(S.textLabel)
             Text(temp)
-                .font(T.ui(24, .bold))
+                .font(T.ui(24, .medium))
                 .tracking(-0.24)
                 .foregroundStyle(S.textPrimary)
             if let line = delta.map({ "較昨日 \($0)" }) ?? note {
                 Text(line)
-                    .font(T.ui(10, .medium))
+                    .font(T.ui(10))
                     .foregroundStyle(S.textMutedWarm)
             }
         }
@@ -266,25 +258,25 @@ struct ForecastRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Text(day)
-                .font(T.ui(12, .semibold))
+                .font(T.ui(12))
                 .foregroundStyle(Color(hex: 0x555553))
                 .frame(width: 38, alignment: .leading)
             VStack(spacing: 1) {
                 WeatherGlyph(condition: condition, size: 22)
                 if let pop {
                     Text("\(pop)%")
-                        .font(T.ui(9, .medium))
+                        .font(T.ui(9))
                         .foregroundStyle(S.deltaCold)
                 }
             }
             .frame(width: 30)
             Text("\(low)°")
-                .font(T.ui(14, .medium))
+                .font(T.ui(14))
                 .foregroundStyle(Color(hex: 0x8E8E8C))
                 .frame(width: 26, alignment: .trailing)
             bar
             Text("\(high)°")
-                .font(T.ui(14, .bold))
+                .font(T.ui(14, .medium))
                 .foregroundStyle(S.textPrimary)
                 .frame(width: 26, alignment: .trailing)
         }
@@ -404,18 +396,19 @@ struct WidgetPromoCard: View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(T.ui(15, .bold))
+                    .font(T.ui(15))
                     .foregroundStyle(S.textPrimary)
                 Text(subtitle)
-                    .font(T.ui(11.5, .medium))
+                    .font(T.ui(11.5))
                     .foregroundStyle(S.textPrimary.opacity(0.7))
             }
             Spacer(minLength: 0)
             Button(action: action) {
+                // White, not ink: the sticky CTA is the page's only solid-ink element.
                 AssetIcon(name: "icon-arrow-right", size: 18)
-                    .foregroundStyle(S.textOnDark)
+                    .foregroundStyle(S.textPrimary)
                     .frame(width: 38, height: 38)
-                    .background(S.textPrimary, in: Circle())
+                    .background(S.surfaceWhite, in: Circle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(title)
@@ -559,7 +552,7 @@ struct HourlyStrip: View {
                 .frame(width: 6, height: 6)
             Group {
                 if h.now {
-                    Text("現在").font(T.ui(10.5, .bold)).foregroundStyle(S.textPrimary)
+                    Text("現在").font(T.ui(10.5)).foregroundStyle(S.textPrimary)
                 } else {
                     Text(String(format: "%02d:00", h.hour)).font(T.mono(10.5)).foregroundStyle(S.textLabel)
                 }
@@ -568,10 +561,10 @@ struct HourlyStrip: View {
             .fixedSize()
             WeatherGlyph(condition: h.condition, size: 22)
             Text("\(h.temp)°")
-                .font(T.ui(14, .bold))
+                .font(T.ui(14, .medium))
                 .foregroundStyle(S.textPrimary)
             Text(h.pop.map { "\($0)%" } ?? " ")
-                .font(T.ui(9, .medium))
+                .font(T.ui(9))
                 .foregroundStyle(S.deltaCold)
             Text(h.slot ?? " ")
                 .font(T.mono(9))

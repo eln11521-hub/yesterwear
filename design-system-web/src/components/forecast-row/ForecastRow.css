@@ -15,7 +15,7 @@
 /* Figma-exact grays (174:87) */
 .yw-forecast-row__day {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400; /* Regular */
   color: #555553;
 }
 
@@ -31,20 +31,20 @@
 .yw-forecast-row__pop {
   margin-block-start: 1px;
   font-size: 9px;
-  font-weight: 500;
+  font-weight: 400; /* Regular */
   color: var(--yw-sys-color-delta-cold);
 }
 
 .yw-forecast-row__low {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400; /* Regular */
   color: #8e8e8c;
   text-align: end;
 }
 
 .yw-forecast-row__high {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500; /* 數值 tier: Medium */
   color: var(--yw-sys-color-text-primary);
   text-align: end;
 }

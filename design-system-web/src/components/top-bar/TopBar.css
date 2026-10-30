@@ -38,7 +38,7 @@
 .yw-top-bar__date {
   font-family: var(--yw-sys-font-mono);
   font-size: 11px;
-  font-weight: 700; /* Figma: IBM Plex Mono Bold */
+  font-weight: 400; /* Regular */
   color: var(--yw-sys-color-text-muted-warm);
 }
 
@@ -48,27 +48,23 @@
   color: var(--yw-sys-color-text-label);
 }
 
+/* 44×44 hit area around the 20px gear; the negative margin keeps the glyph
+   flush with the card edge and vertically centred on the place name. */
 .yw-top-bar__action {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  margin: -12px -12px -12px 0;
   padding: 0;
   border: none;
   background: transparent;
   color: inherit;
   cursor: pointer;
 }
-.yw-top-bar__action:disabled {
-  cursor: default;
-}
-.yw-top-bar__action[data-spinning] {
-  animation: yw-top-bar-spin 0.8s linear infinite;
-}
-@keyframes yw-top-bar-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .yw-top-bar__action[data-spinning] {
-    animation: none;
-  }
+.yw-top-bar__action:focus-visible {
+  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
+  outline-offset: -6px;
+  border-radius: var(--yw-sys-radius-sm);
 }

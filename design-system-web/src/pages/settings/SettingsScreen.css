@@ -16,7 +16,24 @@
 }
 
 .yw-settings__top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: 20px 20px 8px;
+}
+/* back chevron — 44×44 hit area, glyph flush with the content edge */
+.yw-settings__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  margin: -12px 0 -12px -12px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--yw-sys-color-text-primary);
+  cursor: pointer;
 }
 .yw-settings__title {
   margin: 0;
@@ -260,17 +277,4 @@
   transform: translateX(18px);
 }
 
-.yw-settings__nav-spacer {
-  block-size: 64px;
-}
-.yw-settings__nav {
-  position: absolute;
-  inset-block-end: 16px;
-  inset-inline: 0;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-}
-.yw-settings__nav > * {
-  pointer-events: auto;
-}
+

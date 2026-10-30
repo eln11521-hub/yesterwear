@@ -97,7 +97,6 @@ export function App() {
   const yesterdayChips = outfitChips(yesterday);
   const widgetChips = yesterday ? keyChips(yesterday) : ["—"];
 
-  const selectTab = (id: string) => setTab(id as Tab);
 
   const stale = status === "cached" ? agoText(weather.updatedAt) : undefined;
   const statusLabel =
@@ -126,8 +125,7 @@ export function App() {
               onRefresh={refresh}
               refreshing={status === "loading"}
               onLocationPress={() => setLocOpen(true)}
-              navActiveId="weather"
-              onNavSelect={selectTab}
+              onSettingsPress={() => setTab("settings")}
             />
 
             {locOpen ? (
@@ -197,8 +195,7 @@ export function App() {
             eveningTime={settings.eveningTime}
             onEveningTimeChange={setEveningTime}
             onNotifPermissionGranted={restoreNotifDefaults}
-            navActiveId="settings"
-            onNavSelect={selectTab}
+            onBack={() => setTab("weather")}
           />
         )}
       </div>

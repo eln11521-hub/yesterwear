@@ -2,11 +2,6 @@ import { type ReactNode, useState } from "react";
 
 import type { LocationMode, TempUnit } from "../../app/useSettingsStore";
 import { geocodeCity, type GeoLocation } from "../../app/weatherApi";
-import { FloatingNav } from "../../components/floating-nav/FloatingNav";
-import {
-  GearIcon,
-  ThermometerIcon,
-} from "../../components/floating-nav/NavIcons";
 import "./SettingsScreen.css";
 
 export type SettingsScreenProps = {
@@ -32,8 +27,8 @@ export type SettingsScreenProps = {
   onEveningTimeChange?: (t: string) => void;
   /** Called when notification permission transitions to granted (PRD 4-3). */
   onNotifPermissionGranted?: () => void;
-  navActiveId?: string;
-  onNavSelect?: (id: string) => void;
+  /** Back to Home (Settings is pushed from the Home header gear). */
+  onBack?: () => void;
 };
 
 function minus30(t: string): string {
@@ -80,7 +75,7 @@ function SecLabel({ children }: { children: ReactNode }) {
 
 /**
  * SettingsScreen — 設定頁 (PRD 3.2.2). Built from the design system (paper frame,
- * bullet section labels, floating nav, tokens). Commute times + location drive the
+ * bullet section labels, tokens). Commute times + location drive the
  * weather fetch; single location only (MVP).
  */
 export function SettingsScreen({
@@ -105,8 +100,7 @@ export function SettingsScreen({
   eveningTime = "21:30",
   onEveningTimeChange,
   onNotifPermissionGranted,
-  navActiveId = "settings",
-  onNavSelect,
+  onBack,
 }: SettingsScreenProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeoLocation[]>([]);
@@ -164,6 +158,14 @@ export function SettingsScreen({
   return (
     <div className="yw-settings">
       <div className="yw-settings__top">
+        {onBack ? (
+          <button type="button" className="yw-settings__back" aria-label="返回天氣" onClick={onBack}>
+            <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+        ) : null}
         <h1 className="yw-settings__title">設定</h1>
       </div>
 
@@ -414,18 +416,6 @@ export function SettingsScreen({
           </p>
         </section>
 
-        <div className="yw-settings__nav-spacer" />
-      </div>
-
-      <div className="yw-settings__nav">
-        <FloatingNav
-          activeId={navActiveId}
-          onSelect={onNavSelect}
-          items={[
-            { id: "weather", label: "天氣", icon: <ThermometerIcon /> },
-            { id: "settings", label: "設定", icon: <GearIcon /> },
-          ]}
-        />
       </div>
     </div>
   );

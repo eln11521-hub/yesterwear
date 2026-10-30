@@ -46,13 +46,13 @@
 }
 .yw-hourly__item[data-now] .yw-hourly__time {
   font-family: var(--yw-sys-font-ui);
-  font-weight: 700;
+  font-weight: 400; /* Regular — the dot + white chip carry the emphasis */
   color: var(--yw-sys-color-text-primary);
 }
 
 .yw-hourly__temp {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500; /* 數值 tier: Medium */
   color: var(--yw-sys-color-text-primary);
 }
 
@@ -60,7 +60,7 @@
 .yw-hourly__pop {
   min-block-size: 12px;
   font-size: 9px;
-  font-weight: 500;
+  font-weight: 400; /* Regular */
   color: var(--yw-sys-color-delta-cold);
 }
 
