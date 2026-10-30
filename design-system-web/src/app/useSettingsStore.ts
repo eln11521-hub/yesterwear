@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { toTraditional } from "./traditional";
+import { twSavedName } from "./placeName";
 import { DEFAULT_LOCATION, type GeoLocation } from "./weatherApi";
 
 export type LocationMode = "gps" | "manual";
@@ -66,10 +66,10 @@ function load(): Settings {
     }
     // Places saved before geocoder names were converted may hold Simplified
     // characters (東京, 东京都) — the app only shows Traditional.
-    merged.location = { ...merged.location, name: toTraditional(merged.location.name) };
+    merged.location = { ...merged.location, name: twSavedName(merged.location.name) };
     merged.recentLocations = (merged.recentLocations ?? []).map((r) => ({
       ...r,
-      name: toTraditional(r.name),
+      name: twSavedName(r.name),
     }));
     return merged;
   } catch {

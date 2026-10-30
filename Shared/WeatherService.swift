@@ -1,4 +1,5 @@
 import Foundation
+import MapKit
 
 enum WeatherServiceError: LocalizedError {
     case badURL
@@ -148,23 +149,32 @@ actor WeatherService {
         let timezone: String?
     }
 
-    /// City search via Open-Meteo geocoding (web geocodeCity). Up to 5 matches.
+    /// City search via Apple Maps (MKLocalSearch) — the same place data as the
+    /// Maps app, already localized to Taiwan usage (雪梨、亞伯達、臺中市). Up to 5 matches.
     func geocode(_ query: String) async throws -> [Place] {
         let q = query.trimmingCharacters(in: .whitespaces)
         guard !q.isEmpty else { return [] }
-        var c = URLComponents(string: "https://geocoding-api.open-meteo.com/v1/search")
-        c?.queryItems = [.init(name: "name", value: q), .init(name: "count", value: "5"),
-                         .init(name: "language", value: "zh"), .init(name: "format", value: "json")]
-        guard let url = c?.url else { throw WeatherServiceError.badURL }
-        struct R: Decodable {
-            struct G: Decodable { let name: String; let latitude: Double; let longitude: Double; let admin1: String?; let timezone: String? }
-            let results: [G]?
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = q
+        request.resultTypes = .address
+        let items = try await MKLocalSearch(request: request).start().mapItems
+        var seen = Set<String>()
+        return items.compactMap { item -> Place? in
+            let name = Self.placeName(item.placemark)
+            guard seen.insert(name).inserted else { return nil }
+            let c = item.placemark.coordinate
+            return Place(name: name, lat: c.latitude, lon: c.longitude, timezone: item.timeZone?.identifier)
         }
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let r = try JSONDecoder().decode(R.self, from: data)
-        return (r.results ?? []).map { g in
-            let name = g.admin1.flatMap { $0 != g.name ? "\(g.name), \($0)" : nil } ?? g.name
-            return Place(name: name.traditional, lat: g.latitude, lon: g.longitude, timezone: g.timezone)
-        }
+        .prefix(5)
+        .map { $0 }
+    }
+
+    /// 「信義區, 臺北市」「雪梨, 澳大利亞」: the place, then its Chinese-named
+    /// state / city (codes like NSW / AB fall back to the country).
+    static func placeName(_ p: CLPlacemark) -> String {
+        let primary = p.locality ?? p.name ?? p.administrativeArea ?? ""
+        let region = p.administrativeArea.flatMap { $0 != primary && !$0.allSatisfy(\.isASCII) ? $0 : nil }
+        let secondary = region ?? (p.country != primary ? p.country : nil)
+        return [primary, secondary].compactMap { $0 }.joined(separator: ", ").traditional
     }
 }

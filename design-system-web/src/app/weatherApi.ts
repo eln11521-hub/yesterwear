@@ -1,5 +1,5 @@
 import type { Condition, WeatherVM } from "./weather";
-import { toTraditional } from "./traditional";
+import { twPlaceName, twPlacePart } from "./placeName";
 
 export type GeoLocation = { name: string; lat: number; lon: number };
 
@@ -201,10 +201,83 @@ type GeoResult = {
   country?: string;
 };
 
-/** City search via Open-Meteo geocoding (no key). Returns up to 5 matches. */
+type OsmResult = {
+  addresstype?: string;
+  lat: string;
+  lon: string;
+  name?: string;
+  display_name: string;
+  address?: Record<string, string | undefined>;
+};
+
+/**
+ * City search. OpenStreetMap (Nominatim) first: it understands Taiwan names
+ * (台中、信義區、雪梨) and carries Traditional variants. Open-Meteo is the fallback.
+ * Names are normalized to Taiwan usage (placeName.ts). Up to 5 matches.
+ */
 export async function geocodeCity(query: string): Promise<GeoLocation[]> {
   const q = query.trim();
   if (!q) return [];
+  try {
+    const osm = await searchOsm(q);
+    if (osm.length) return osm;
+  } catch {
+    /* fall back to Open-Meteo */
+  }
+  return searchOpenMeteo(q);
+}
+
+async function searchOsm(q: string): Promise<GeoLocation[]> {
+  const key = sameTai(twPlacePart(q));
+  if (!/[\u3400-\u9fff]/.test(key)) return (await queryOsm(q)).map((r) => r.loc);
+  // Nominatim matches loosely (台中 also finds 太中, 壽縣): keep results that
+  // contain the query — unless that leaves nothing (艾德蒙頓 → "Edmonton").
+  const pick = (rs: OsmHit[]) => {
+    const relevant = rs.filter((r) => sameTai(r.loc.name).includes(key));
+    return relevant.length ? relevant : rs;
+  };
+  let hits = pick(await queryOsm(q));
+  // Bare Taiwan city names (高雄、新竹) only find stations; 「高雄市」 finds the city.
+  if (!/[市縣區鄉鎮州省都府]$/.test(key) && !hits.some((h) => h.city)) {
+    await new Promise((r) => setTimeout(r, 1100)); // Nominatim: ≤ 1 req/s
+    const more = (await queryOsm(`${q}市`)).filter(
+      (h) => h.city && sameTai(h.loc.name).startsWith(key),
+    );
+    hits = [...more, ...hits.filter((h) => !more.some((m) => m.loc.name === h.loc.name))];
+  }
+  return hits.slice(0, 5).map((h) => h.loc);
+}
+
+type OsmHit = { loc: GeoLocation; city: boolean };
+
+async function queryOsm(q: string): Promise<OsmHit[]> {
+  // Nominatim usage policy: search on submit only (no autocomplete), ≤ 1 req/s.
+  const url =
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}` +
+    `&format=jsonv2&limit=5&addressdetails=1&featureType=settlement&accept-language=zh-TW`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`osm ${res.status}`);
+  const data = (await res.json()) as OsmResult[];
+  const seen = new Set<string>();
+  return data.flatMap((r) => {
+    const a = r.address ?? {};
+    const place = r.name || r.display_name.split(",")[0];
+    const placeTw = twPlacePart(place);
+    // First region that adds information (臺北市 → 臺灣, not 臺北市 again).
+    const region = [a.state, a.province, a.city, a.county, a.country].find(
+      (x) => x && twPlacePart(x) !== placeTw,
+    );
+    const name = twPlaceName(place, region);
+    if (seen.has(name)) return [];
+    seen.add(name);
+    return [{ loc: { name, lat: Number(r.lat), lon: Number(r.lon) }, city: r.addresstype === "city" }];
+  });
+}
+
+/** 台 and 臺 are interchangeable in Taiwan names. */
+const sameTai = (s: string) => s.replace(/台/g, "臺");
+
+async function searchOpenMeteo(q: string): Promise<GeoLocation[]> {
   const url =
     `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}` +
     `&count=5&language=zh&format=json`;
@@ -212,7 +285,7 @@ export async function geocodeCity(query: string): Promise<GeoLocation[]> {
   if (!res.ok) throw new Error(`geocode ${res.status}`);
   const data = (await res.json()) as { results?: GeoResult[] };
   return (data.results ?? []).map((r) => ({
-    name: toTraditional(r.admin1 && r.admin1 !== r.name ? `${r.name}, ${r.admin1}` : r.name),
+    name: twPlaceName(r.name, r.admin1 ?? r.country),
     lat: r.latitude,
     lon: r.longitude,
   }));
