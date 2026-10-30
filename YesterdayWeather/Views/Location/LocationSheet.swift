@@ -5,7 +5,7 @@ import SwiftUI
 /// 最近使用. Picking one switches Home to that place's weather and closes.
 struct LocationSheet: View {
     @EnvironmentObject private var store: SettingsStore
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.ywDismissSheet) private var dismiss
 
     @State private var query = ""
     @State private var results: [WeatherService.Place] = []
@@ -69,14 +69,10 @@ struct LocationSheet: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 24)
+            .padding(.top, 4)
             .padding(.bottom, 24)
         }
         .scrollIndicators(.hidden)
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-        .presentationCornerRadius(S.radius2xl)
-        .presentationBackground(S.surfaceWhite)
     }
 
     // MARK: Pieces
