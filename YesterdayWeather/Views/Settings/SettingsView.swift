@@ -4,6 +4,9 @@ import UserNotifications
 /// 設定 — ported from design-system-web/src/pages/settings/SettingsScreen.tsx
 /// (Figma 404:10). Warm ground, white grouped cards with hairline dividers.
 struct SettingsView: View {
+    /// Back to Home (Settings is pushed from the Home header gear).
+    var onBack: (() -> Void)? = nil
+
     @EnvironmentObject private var store: SettingsStore
     @Environment(\.openURL) private var openURL
 
@@ -20,12 +23,28 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("設定")
-                .font(T.ui(22, .semibold))
-                .foregroundStyle(S.textPrimary)
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 8)
+            HStack(spacing: 4) {
+                if let onBack {
+                    // 44×44 hit area, glyph flush with the content edge.
+                    Button(action: onBack) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(S.textPrimary)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.vertical, -12)
+                    .padding(.leading, -12)
+                    .accessibilityLabel("返回天氣")
+                }
+                Text("設定")
+                    .font(T.ui(22, .semibold))
+                    .foregroundStyle(S.textPrimary)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 8)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
@@ -33,7 +52,7 @@ struct SettingsView: View {
                     locationGroup
                     unitGroup
                     notificationGroup
-                    Color.clear.frame(height: 64 + 32)   // floating-nav clearance
+                    Color.clear.frame(height: 24)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)

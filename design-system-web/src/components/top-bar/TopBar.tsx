@@ -1,5 +1,4 @@
-import refreshUrl from "../../assets/icon/refresh.svg?url";
-import { Icon } from "../_ui/Icon";
+import { GearIcon } from "../floating-nav/NavIcons";
 import "./TopBar.css";
 
 /** Solid map-pin (filled teardrop with a punched-out inner circle), currentColor. */
@@ -20,20 +19,19 @@ export type TopBarProps = {
   location: string;
   /** e.g. · 今天 週四 8/20 */
   date: string;
-  /** Reload weather + location data. */
-  onRefresh?: () => void;
-  /** Spins the refresh icon while a reload is in flight. */
-  refreshing?: boolean;
   /** Tap the location (pin + place) to switch places. */
   onLocationClick?: () => void;
+  /** Tap the gear to open Settings. */
+  onSettingsClick?: () => void;
 };
 
 /**
- * TopBar — home header: location (tap to switch places) + date on the left, a refresh action on the right
- * that reloads weather + location. Source: Figma 174:7. Place = DM Sans SemiBold
- * 15px; date = IBM Plex Mono 11px #8c8680.
+ * TopBar — home header: location (tap to switch places) + date on the left, a
+ * Settings gear on the right (44×44 hit area; refreshing is pull-to-refresh).
+ * Source: Figma 174:7. Place = DM Sans SemiBold 15px; date = IBM Plex Mono
+ * Regular 11px.
  */
-export function TopBar({ location, date, onRefresh, refreshing, onLocationClick }: TopBarProps) {
+export function TopBar({ location, date, onLocationClick, onSettingsClick }: TopBarProps) {
   return (
     <header className="yw-top-bar">
       <div className="yw-top-bar__loc">
@@ -53,12 +51,10 @@ export function TopBar({ location, date, onRefresh, refreshing, onLocationClick 
         <button
           type="button"
           className="yw-top-bar__action"
-          aria-label="重新整理天氣與位置"
-          data-spinning={refreshing || undefined}
-          disabled={refreshing}
-          onClick={onRefresh}
+          aria-label="設定"
+          onClick={onSettingsClick}
         >
-          <Icon src={refreshUrl} size={18} />
+          <GearIcon size={20} />
         </button>
       </div>
     </header>

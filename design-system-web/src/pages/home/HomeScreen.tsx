@@ -1,4 +1,6 @@
-import { Fragment } from "react";
+import { Fragment, useRef, useState } from "react";
+
+import refreshUrl from "../../assets/icon/refresh.svg?url";
 
 import tagUrl from "../../assets/icon/tag.svg?url";
 import { outfitChips } from "../../app/outfit";
@@ -6,8 +8,6 @@ import { MOCK_WEATHER, suggestOutfit, type WeatherVM } from "../../app/weather";
 import { WeatherIcon } from "../../components/weather-icon/WeatherIcon";
 import { Icon } from "../../components/_ui/Icon";
 import { CommuteRow } from "../../components/commute-row/CommuteRow";
-import { FloatingNav } from "../../components/floating-nav/FloatingNav";
-import { GearIcon, ThermometerIcon } from "../../components/floating-nav/NavIcons";
 import { ForecastRow } from "../../components/forecast-row/ForecastRow";
 import { HourlyForecast } from "../../components/hourly-forecast/HourlyForecast";
 import { garmentIcon } from "../../components/outfit-chip/garments";
@@ -37,15 +37,18 @@ export type HomeScreenProps = {
   };
   ctaLabel?: string;
   onRecord?: () => void;
-  /** Reload weather + location (wired to the top-bar refresh button). */
+  /** Reload weather + location (pull-to-refresh). */
   onRefresh?: () => void;
-  /** Spins the refresh icon while a reload is in flight. */
+  /** Shows the pull-to-refresh spinner while a reload is in flight. */
   refreshing?: boolean;
   /** Top-bar location tapped → open the place switcher. */
   onLocationPress?: () => void;
-  navActiveId?: string;
-  onNavSelect?: (id: string) => void;
+  /** Top-bar gear tapped → open Settings. */
+  onSettingsPress?: () => void;
 };
+
+/** Pull distance (px) that triggers a refresh; the list follows at half speed. */
+const PTR_THRESHOLD = 64;
 
 function SecLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -88,9 +91,10 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 /**
  * HomeScreen — the 174:2 Dashboard (v4d). Paper ground with #f5f5f5 cards: a
  * hero (現在體感 + condition + comparison headline, 實際氣溫/濕度 + 較昨日 pill),
- * then commute → outfit → CTA (the first screen ends here, right above the
- * floating nav) → 今天各時段溫度 → week forecast → widget promo. Presentational:
- * pass props for real data.
+ * then commute → outfit → 今天各時段溫度 → week forecast → widget promo. No tab
+ * bar: the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭
+ * is a sticky CTA at the bottom. Weight tiers: 21°C Bold, headline SemiBold,
+ * numbers Medium, everything else Regular. Presentational: pass props for real data.
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
@@ -103,9 +107,9 @@ export function HomeScreen({
   onRefresh,
   refreshing = false,
   onLocationPress,
-  navActiveId = "weather",
-  onNavSelect,
+  onSettingsPress,
 }: HomeScreenProps) {
+  const pull = usePullToRefresh(onRefresh, refreshing);
   const weekMin = Math.min(...weather.forecast.map((f) => f.low));
   const weekMax = Math.max(...weather.forecast.map((f) => f.high));
   const metric = (label: string) =>
@@ -121,17 +125,27 @@ export function HomeScreen({
         <TopBar
           location={weather.location}
           date={weather.date}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
           onLocationClick={onLocationPress}
+          onSettingsClick={onSettingsPress}
         />
       </div>
 
-      <div className="yw-home__scroll">
-        {/* First screen: hero → commute → outfit → CTA. The outfit card takes a
-            fixed share of the height so the CTA always lands right above the
-            floating nav, whatever yesterday's record / the advice length is. */}
-        <div className="yw-home__first">
+      <div className="yw-home__scroll" ref={pull.ref} {...pull.handlers}>
+        <div
+          className="yw-home__ptr"
+          style={{ blockSize: pull.offset }}
+          data-dragging={pull.dragging || undefined}
+          data-loading={refreshing || undefined}
+          role="status"
+          aria-label={refreshing ? "天氣更新中" : undefined}
+        >
+          <span
+            className="yw-home__ptr-icon"
+            style={{ transform: refreshing ? undefined : `rotate(${pull.offset * 4}deg)` }}
+          >
+            <Icon src={refreshUrl} size={18} />
+          </span>
+        </div>
         {/* Hero: 現在體感 + condition/headline, then the metrics rows (Figma 173:2893) */}
         <section className="yw-home__hero">
           <div className="yw-home__hero-top">
@@ -197,7 +211,7 @@ export function HomeScreen({
           </div>
         </section>
 
-        <section className="yw-home__card yw-home__block yw-home__outfit">
+        <section className="yw-home__card yw-home__block">
           <SecLabel>
             {crossLocation ? (
               <span className="yw-home__sec-city">
@@ -245,16 +259,8 @@ export function HomeScreen({
           </p>
         </section>
 
-        <PrimaryButton
-          shape="pill"
-          label={ctaLabel}
-          icon={<Icon src={tagUrl} size={18} />}
-          onClick={onRecord}
-        />
-        </div>
-
-        {/* 今天各時段溫度 — below the fold. Older cached snapshots have no
-            hourly data, so hide when empty. */}
+        {/* 今天各時段溫度 — older cached snapshots have no hourly data, so hide
+            when empty. */}
         {weather.hourly?.length ? (
           <section className="yw-home__card yw-home__block">
             <SecLabel>今天各時段溫度</SecLabel>
@@ -285,19 +291,62 @@ export function HomeScreen({
           title="把 Widget 加到桌面"
           subtitle="長按桌面 →「+」→ 搜尋加入"
         />
-        <div className="yw-home__nav-spacer" />
+        <div className="yw-home__cta-spacer" />
       </div>
 
-      <div className="yw-home__nav">
-        <FloatingNav
-          activeId={navActiveId}
-          onSelect={onNavSelect}
-          items={[
-            { id: "weather", label: "天氣", icon: <ThermometerIcon /> },
-            { id: "settings", label: "設定", icon: <GearIcon /> },
-          ]}
+      {/* Sticky CTA — the only solid-ink element on the page. */}
+      <div className="yw-home__cta">
+        <PrimaryButton
+          shape="pill"
+          label={ctaLabel}
+          icon={<Icon src={tagUrl} size={18} />}
+          onClick={onRecord}
         />
       </div>
     </div>
   );
+}
+
+/**
+ * Pull-to-refresh for the scroll area: touch events on phones (pointer events
+ * get cancelled once the browser starts scrolling) and pointer events for a
+ * mouse drag in Storybook. Only engages when the list is at the top.
+ */
+function usePullToRefresh(onRefresh?: () => void, refreshing = false) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [startY, setStartY] = useState<number | null>(null);
+  const [drag, setDrag] = useState(0);
+
+  function begin(y: number) {
+    if (!onRefresh || refreshing || (ref.current?.scrollTop ?? 0) > 0) return;
+    setStartY(y);
+  }
+  function move(y: number) {
+    if (startY === null) return;
+    const dy = y - startY;
+    setDrag(dy <= 0 ? 0 : Math.min(dy / 2, PTR_THRESHOLD + 16));
+  }
+  function end() {
+    if (startY === null) return;
+    setStartY(null);
+    if (drag >= PTR_THRESHOLD) onRefresh?.();
+    setDrag(0);
+  }
+  const mouse = (e: React.PointerEvent) => e.pointerType === "mouse";
+
+  return {
+    ref,
+    offset: refreshing ? 40 : drag,
+    dragging: startY !== null && drag > 0,
+    handlers: {
+      onTouchStart: (e: React.TouchEvent) => begin(e.touches[0].clientY),
+      onTouchMove: (e: React.TouchEvent) => move(e.touches[0].clientY),
+      onTouchEnd: end,
+      onTouchCancel: end,
+      onPointerDown: (e: React.PointerEvent) => mouse(e) && begin(e.clientY),
+      onPointerMove: (e: React.PointerEvent) => mouse(e) && move(e.clientY),
+      onPointerUp: (e: React.PointerEvent) => mouse(e) && end(),
+      onPointerLeave: (e: React.PointerEvent) => mouse(e) && end(),
+    },
+  };
 }

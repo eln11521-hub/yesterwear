@@ -1,12 +1,14 @@
 import SwiftUI
 
 /// Home — the Dashboard, ported from design-system-web/src/pages/home/HomeScreen.tsx
-/// (Figma 174:2 v4d). Paper ground with #f5f5f5 cards: hero → commute → outfit
-/// → CTA (the first screen ends here, right above the floating nav) →
-/// 今天各時段溫度 → week forecast → widget promo.
+/// (Figma 174:2 v4d). Paper ground with #f5f5f5 cards: hero → commute → outfit →
+/// 今天各時段溫度 → week forecast → widget promo. No tab bar: the header gear opens
+/// Settings, pull-to-refresh reloads, and 記錄今天穿搭 is a sticky CTA at the
+/// bottom. Weight tiers: 21°C Bold, headline SemiBold, numbers Medium, rest Regular.
 struct HomeView: View {
     var onRecord: () -> Void = {}
     var onSwitchPlace: () -> Void = {}
+    var onOpenSettings: () -> Void = {}
 
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var outfit: OutfitStore
@@ -14,9 +16,6 @@ struct HomeView: View {
 
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
-
-    /// Floating nav (≈65pt) + its 8pt bottom inset + a 16pt gap above it.
-    private static let navClearance: CGFloat = 65 + 8 + 16
 
     private var unit: TempUnit { settings.settings.unit }
     private var suffix: String { unit == .f ? "°F" : "°C" }
@@ -27,33 +26,19 @@ struct HomeView: View {
             TopBar(
                 location: settings.settings.cityName,
                 date: dateLabel,
-                refreshing: weather.isLoading,
-                onRefresh: refresh,
-                onLocationTap: { onSwitchPlace() }
+                onLocationTap: { onSwitchPlace() },
+                onSettingsTap: onOpenSettings
             )
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 8)
 
-            GeometryReader { viewport in
             ScrollView {
                 VStack(spacing: 16) {
                     if let snap = weather.snapshot {
-                        // First screen: hero → commute → outfit → CTA, sized so the
-                        // CTA lands right above the floating nav; the outfit card
-                        // absorbs the slack (fixed height for a given screen).
-                        VStack(spacing: 16) {
-                            hero(snap)
-                            commuteCard(snap)
-                            outfitCard(snap)
-                            YWPrimaryButton(
-                                label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
-                                icon: "icon-tag",
-                                pill: true,
-                                action: onRecord
-                            )
-                        }
-                        .frame(minHeight: max(0, viewport.size.height - Self.navClearance))
+                        hero(snap)
+                        commuteCard(snap)
+                        outfitCard(snap)
                         if let hours = snap.hourly, !hours.isEmpty {
                             hourlyCard(hours, nowHour: snap.nowHour)
                         }
@@ -64,16 +49,37 @@ struct HomeView: View {
                         placeholder
                     }
                     WidgetPromoCard(title: "把 Widget 加到桌面", subtitle: "長按桌面 →「+」→ 搜尋加入")
-                    // Clearance for the floating nav (≈65pt + 16pt inset).
-                    Color.clear.frame(height: 96)
                 }
                 .padding(.horizontal, 16)
+                .padding(.bottom, 24)
             }
             .scrollIndicators(.hidden)
             .refreshable { await reload() }
-            }
+            // Sticky CTA. The inset makes the scroll content end CTA + safe area +
+            // 24pt above the bottom, so the last card always scrolls clear of it.
+            .safeAreaInset(edge: .bottom, spacing: 0) { stickyCTA }
         }
         .background(S.surfacePaper.ignoresSafeArea())
+    }
+
+    /// 記錄今天穿搭 pinned to the bottom (card-aligned), behind it a 24pt fade
+    /// from clear to the paper ground — the only solid-ink element on the page.
+    private var stickyCTA: some View {
+        VStack(spacing: 0) {
+            LinearGradient(colors: [S.surfacePaper.opacity(0), S.surfacePaper],
+                           startPoint: .top, endPoint: .bottom)
+                .frame(height: 24)
+                .allowsHitTesting(false)
+            YWPrimaryButton(
+                label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
+                icon: "icon-tag",
+                pill: true,
+                action: onRecord
+            )
+            .padding(.horizontal, 16)
+            .padding(.bottom, 4)
+            .background(S.surfacePaper)
+        }
     }
 
     // MARK: Hero
@@ -99,11 +105,11 @@ struct HomeView: View {
                     HStack(spacing: 4) {
                         WeatherGlyph(condition: snap.condition, size: 20)
                         Text(WeatherCondition.label(code: snap.conditionCode ?? 0))
-                            .font(T.ui(14, .medium))
+                            .font(T.ui(14))
                             .foregroundStyle(S.textPrimary)
                     }
                     Text(DeltaFormat.headline(snap.overallDelta))
-                        .font(T.ui(22, .bold))
+                        .font(T.ui(24, .semibold))
                         .foregroundStyle(S.textPrimary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -115,7 +121,7 @@ struct HomeView: View {
             VStack(spacing: 4) {
                 metricRow("實際氣溫", "\(deg(snap.currentTemp))\(suffix)") {
                     Text("較昨日 \(delta)")
-                        .font(T.ui(11, .semibold))
+                        .font(T.ui(11))
                         .foregroundStyle(S.textOnDark)
                         .padding(.vertical, 5)
                         .padding(.leading, 10)
@@ -139,7 +145,7 @@ struct HomeView: View {
                 .fixedSize()
                 .frame(width: 46, alignment: .leading)
             Text(value)
-                .font(T.ui(16, .semibold))
+                .font(T.ui(16))
                 .foregroundStyle(S.textPrimary)
             Spacer(minLength: 0)
             trailing()
@@ -171,14 +177,14 @@ struct HomeView: View {
                 .font(T.ui(12))
                 .lineSpacing(12 * 0.3)   // web line-height 1.6
         }
-        .ywCard(fillHeight: true)
+        .ywCard()
     }
 
     /// 「建議：」 bold ink + the rest in the label gray (Figma 173:2914).
     private func adviceText(_ advice: String) -> Text {
         let prefix = "建議："
         guard advice.hasPrefix(prefix) else { return Text(advice).foregroundColor(S.textLabel) }
-        return Text(prefix).bold().foregroundColor(S.textPrimary)
+        return Text(prefix).foregroundColor(S.textPrimary)
             + Text(advice.dropFirst(prefix.count)).foregroundColor(S.textLabel)
     }
 
@@ -240,7 +246,7 @@ struct HomeView: View {
         let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
         return VStack(alignment: .leading, spacing: 12) {
             Text("未來一週天氣")
-                .font(T.ui(15, .semibold))
+                .font(T.ui(15))
                 .foregroundStyle(S.textPrimary)
             VStack(spacing: 0) {
                 ForEach(Array(days.enumerated()), id: \.offset) { i, d in

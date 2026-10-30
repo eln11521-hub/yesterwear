@@ -1,6 +1,6 @@
 .yw-home {
   position: relative;
-  /* Contain the floating nav's z-index so it can't escape above an app-level
+  /* Contain the sticky CTA's z-index so it can't escape above an app-level
      overlay (e.g. the record-outfit sheet). */
   isolation: isolate;
   inline-size: 360px;
@@ -24,6 +24,7 @@
 .yw-home__scroll {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior-y: contain; /* pull-to-refresh is ours, not the page's */
   padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
@@ -33,29 +34,6 @@
    otherwise shrink items (e.g. the promo banner) to fit instead of scrolling. */
 .yw-home__scroll > * {
   flex-shrink: 0;
-}
-
-/* First screen = hero → commute → outfit → CTA, sized to the scroll viewport
-   minus the floating-nav clearance so the CTA sits right above the nav. The
-   outfit card absorbs the slack (fixed height for a given screen). */
-.yw-home {
-  --yw-home-nav-h: 64px;   /* Floating Nav rendered height (6 + 8 + 20 + 3 + 11 + 8 + 6 + 2 border) */
-  --yw-home-nav-inset: 16px;
-}
-.yw-home__first {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  /* 100% = scroll content box (viewport − 16px bottom padding); keep a 16px
-     gap above the nav. */
-  min-block-size: calc(100% - var(--yw-home-nav-h) - var(--yw-home-nav-inset));
-}
-.yw-home__first > * {
-  flex-shrink: 0;
-}
-.yw-home__outfit {
-  flex: 1 0 auto;
-  justify-content: flex-start;
 }
 
 /* Raised card on the paper ground (Figma var: card #f5f5f5) */
@@ -100,7 +78,9 @@
   font-size: 11px;
   color: var(--yw-sys-color-text-muted-warm);
 }
-/* 16°C: DM Sans Bold 44px, ink */
+/* Weight hierarchy (only four tiers on the page): 21°C Bold (the hero) →
+   headline SemiBold → numbers Medium → everything else Regular. */
+/* 16°C: DM Sans Bold 44px, ink — the only Bold text on the page */
 .yw-home__now-temp {
   font-size: 44px;
   font-weight: 700;
@@ -108,21 +88,21 @@
   white-space: nowrap;
   color: var(--yw-sys-color-text-primary);
 }
-/* 晴天: icon + DM Sans Medium 14px ink */
+/* 晴天: icon + DM Sans Regular 14px ink */
 .yw-home__now-cond {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--yw-sys-color-text-primary);
 }
-/* 比昨天涼一些: Bold 22px / 28px ink */
+/* 比昨天涼一些: SemiBold 24px / 32px ink — a step lighter than 21°C */
 .yw-home__headline {
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 28px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
   color: var(--yw-sys-color-text-primary);
 }
 
@@ -151,10 +131,10 @@
   font-size: 10.5px;
   color: var(--yw-sys-color-text-label);
 }
-/* value: DM Sans SemiBold 16px ink */
+/* value: DM Sans Regular 16px ink */
 .yw-home__hm-value {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--yw-sys-color-text-primary);
 }
 /* 較昨日 delta pill: full-radius, bg = delta direction color, white text */
@@ -163,7 +143,7 @@
   padding: 5px 11px 5px 10px;
   border-radius: var(--yw-sys-radius-full);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1;
   color: var(--yw-sys-color-text-on-dark);
   white-space: nowrap;
@@ -197,7 +177,7 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--yw-sys-color-text-muted);
 }
 .yw-home__dot {
@@ -226,7 +206,7 @@
   color: var(--yw-sys-color-text-label);
 }
 .yw-home__suggestion strong {
-  font-weight: 700;
+  font-weight: 400;
   color: var(--yw-sys-color-text-primary);
 }
 
@@ -254,13 +234,13 @@
 }
 .yw-home__rain-note {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .yw-home__h2 {
   margin: 0;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 /* Forecast rows own their 16px inset so separators run edge to edge */
@@ -269,22 +249,59 @@
   overflow: hidden;
 }
 
-/* Reserve clearance for the floating nav (≈65px tall + 16px bottom inset) so the
-   last card can always scroll clear of it instead of sitting underneath. */
-.yw-home__nav-spacer {
-  block-size: 96px;
+/* Sticky CTA (記錄今天穿搭): pinned to the bottom, card-aligned (16px sides),
+   12px above the home indicator. A 24px fade from transparent to the paper
+   ground sits behind it so scrolling cards never butt into the button. */
+.yw-home {
+  --yw-home-cta-h: 48px;
+  --yw-home-cta-gap: calc(12px + env(safe-area-inset-bottom, 0px));
 }
-
-/* floating nav — always above the scrolling cards */
-.yw-home__nav {
+.yw-home__cta {
   position: absolute;
-  inset-block-end: 16px;
   inset-inline: 0;
+  inset-block-end: 0;
   z-index: 10;
-  display: flex;
-  justify-content: center;
+  padding: 24px 16px var(--yw-home-cta-gap);
+  background: linear-gradient(to bottom, transparent 0, var(--yw-sys-color-surface-paper) 24px);
   pointer-events: none;
 }
-.yw-home__nav > * {
+.yw-home__cta > * {
   pointer-events: auto;
+}
+
+/* Bottom padding of the scroll area = CTA + safe area + 24px, so the last card
+   scrolls fully clear of the button. */
+.yw-home__cta-spacer {
+  flex-shrink: 0;
+  block-size: calc(var(--yw-home-cta-h) + var(--yw-home-cta-gap) + 24px - 16px);
+}
+
+/* Pull-to-refresh: the list follows the finger; past the threshold a spinner
+   shows above it while the reload runs. */
+.yw-home__ptr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  color: var(--yw-sys-color-text-label);
+  transition: block-size var(--yw-sys-motion-state-duration) var(--yw-sys-motion-ease-out);
+}
+.yw-home__ptr[data-dragging] {
+  transition: none;
+}
+.yw-home__ptr-icon {
+  display: inline-flex;
+}
+.yw-home__ptr[data-loading] .yw-home__ptr-icon {
+  animation: yw-home-spin 0.8s linear infinite;
+}
+@keyframes yw-home-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yw-home__ptr[data-loading] .yw-home__ptr-icon {
+    animation: none;
+  }
 }
