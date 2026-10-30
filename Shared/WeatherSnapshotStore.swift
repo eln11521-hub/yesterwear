@@ -13,7 +13,9 @@ final class WeatherSnapshotStore: ObservableObject {
 
     nonisolated static func loadCached() -> WeatherSnapshot? {
         guard let data = AppGroup.defaults.data(forKey: AppGroup.Key.weatherSnapshot),
-              let decoded = try? JSONDecoder().decode(WeatherSnapshot.self, from: data) else { return nil }
+              var decoded = try? JSONDecoder().decode(WeatherSnapshot.self, from: data) else { return nil }
+        // Older caches may carry a Simplified place name from the geocoder.
+        decoded.cityName = decoded.cityName.traditional
         return decoded
     }
 

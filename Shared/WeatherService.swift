@@ -164,7 +164,7 @@ actor WeatherService {
         let r = try JSONDecoder().decode(R.self, from: data)
         return (r.results ?? []).map { g in
             let name = g.admin1.flatMap { $0 != g.name ? "\(g.name), \($0)" : nil } ?? g.name
-            return Place(name: name, lat: g.latitude, lon: g.longitude, timezone: g.timezone)
+            return Place(name: name.traditional, lat: g.latitude, lon: g.longitude, timezone: g.timezone)
         }
     }
 }

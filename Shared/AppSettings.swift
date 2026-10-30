@@ -58,7 +58,7 @@ struct AppSettings: Codable, Equatable {
         latitude = try c.decode(Double.self, forKey: .latitude)
         longitude = try c.decode(Double.self, forKey: .longitude)
         timezone = try c.decode(String.self, forKey: .timezone)
-        cityName = try c.decode(String.self, forKey: .cityName)
+        cityName = try c.decode(String.self, forKey: .cityName).traditional
         useManualLocation = try c.decode(Bool.self, forKey: .useManualLocation)
         unit = try c.decodeIfPresent(TempUnit.self, forKey: .unit) ?? .c
         notifCommute = try c.decodeIfPresent(Bool.self, forKey: .notifCommute) ?? true
@@ -66,7 +66,8 @@ struct AppSettings: Codable, Equatable {
         returnAlertMinutes = try c.decodeIfPresent(Int.self, forKey: .returnAlertMinutes)
         notifEvening = try c.decodeIfPresent(Bool.self, forKey: .notifEvening) ?? true
         eveningMinutes = try c.decodeIfPresent(Int.self, forKey: .eveningMinutes) ?? 21 * 60 + 30
-        recentPlaces = try c.decodeIfPresent([SavedPlace].self, forKey: .recentPlaces) ?? []
+        recentPlaces = (try c.decodeIfPresent([SavedPlace].self, forKey: .recentPlaces) ?? [])
+            .map { var p = $0; p.name = p.name.traditional; return p }
     }
 
     init(leaveHour: Int, leaveMinute: Int, returnHour: Int, returnMinute: Int,
