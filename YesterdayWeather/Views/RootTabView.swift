@@ -9,6 +9,7 @@ struct RootTabView: View {
 
     @State private var tab = "weather"
     @State private var recording = false
+    @State private var switchingPlace = false
 
     private let items = [
         FloatingNavItem(id: "weather", label: "天氣", icon: "nav-thermometer"),
@@ -19,7 +20,7 @@ struct RootTabView: View {
         ZStack(alignment: .bottom) {
             Group {
                 if tab == "weather" {
-                    HomeView(onRecord: { recording = true })
+                    HomeView(onRecord: { recording = true }, onSwitchPlace: { switchingPlace = true })
                 } else {
                     SettingsView()
                 }
@@ -29,9 +30,9 @@ struct RootTabView: View {
             FloatingNav(items: items, activeId: tab) { tab = $0 }
                 .padding(.bottom, 8)
         }
-        .sheet(isPresented: $recording) {
-            recordSheet
-        }
+        // In-app sheets (edge to edge, over the floating nav).
+        .ywSheet(isPresented: $recording) { recordSheet }
+        .ywSheet(isPresented: $switchingPlace, fraction: 0.7) { LocationSheet() }
     }
 
     /// Seeds with today's record when updating, otherwise today's suggestion

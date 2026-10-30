@@ -6,11 +6,11 @@ import SwiftUI
 /// 今天各時段溫度 → week forecast → widget promo.
 struct HomeView: View {
     var onRecord: () -> Void = {}
+    var onSwitchPlace: () -> Void = {}
 
     @EnvironmentObject private var settings: SettingsStore
     @EnvironmentObject private var outfit: OutfitStore
     @EnvironmentObject private var weather: WeatherSnapshotStore
-    @State private var switchingPlace = false
 
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
@@ -29,7 +29,7 @@ struct HomeView: View {
                 date: dateLabel,
                 refreshing: weather.isLoading,
                 onRefresh: refresh,
-                onLocationTap: { switchingPlace = true }
+                onLocationTap: { onSwitchPlace() }
             )
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -74,7 +74,6 @@ struct HomeView: View {
             }
         }
         .background(S.surfacePaper.ignoresSafeArea())
-        .sheet(isPresented: $switchingPlace) { LocationSheet() }
     }
 
     // MARK: Hero

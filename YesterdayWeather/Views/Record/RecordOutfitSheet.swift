@@ -45,7 +45,7 @@ struct RecordOutfitSheet: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20)
-            .padding(.top, 28)
+            .padding(.top, 4)
             .padding(.bottom, 16)
 
             ScrollView {
@@ -68,14 +68,9 @@ struct RecordOutfitSheet: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
-            .padding(.bottom, 20)
+            .padding(.bottom, 8)   // the sheet adds the home-indicator inset below
             .overlay(alignment: .top) { Rectangle().fill(S.line).frame(height: 1) }
         }
-        // One fixed detent — more picks or a photo never change the sheet height.
-        .presentationDetents([.fraction(0.84)])
-        .presentationDragIndicator(.visible)
-        .presentationCornerRadius(S.radius2xl)
-        .presentationBackground(S.surfaceWhite)
         .sheet(isPresented: $picking) {
             PhotoPicker { image in
                 picking = false

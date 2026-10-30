@@ -582,3 +582,107 @@ struct HourlyStrip: View {
         .background(h.now ? S.surfaceWhite : .clear, in: RoundedRectangle(cornerRadius: S.radiusMd))
     }
 }
+
+// MARK: Bottom sheet
+
+private struct YWSheetDismissKey: EnvironmentKey {
+    static let defaultValue: () -> Void = {}
+}
+
+extension EnvironmentValues {
+    /// Closes the enclosing `ywSheet` (the system `dismiss` doesn't apply to it).
+    var ywDismissSheet: () -> Void {
+        get { self[YWSheetDismissKey.self] }
+        set { self[YWSheetDismissKey.self] = newValue }
+    }
+}
+
+/// Edge-to-edge bottom sheet with a fixed height (web .yw-sheet): white, top
+/// corners only, flush with the screen sides and bottom. iOS 26+ draws partial-
+/// height system sheets as inset floating cards, so this is drawn in-app. Drag
+/// the handle down (or tap the scrim) to close; the content scrolls freely.
+private struct YWSheetModifier<Sheet: View>: ViewModifier {
+    @Binding var isPresented: Bool
+    /// Share of the screen height the sheet occupies.
+    var fraction: CGFloat
+    @ViewBuilder var sheet: () -> Sheet
+
+    @State private var drag: CGFloat = 0
+    private typealias S = YWTokens.Sys
+
+    func body(content: Content) -> some View {
+        content.overlay {
+            GeometryReader { geo in
+                let keyboard = geo.safeAreaInsets.bottom > 100
+                let bottomInset = keyboard ? 0 : geo.safeAreaInsets.bottom
+                let screen = geo.size.height + geo.safeAreaInsets.top + geo.safeAreaInsets.bottom
+                let height = min(screen * fraction, geo.size.height + bottomInset)
+
+                ZStack(alignment: .bottom) {
+                    if isPresented {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .onTapGesture { close() }
+                            .transition(.opacity)
+
+                        VStack(spacing: 0) {
+                            handle
+                            sheet()
+                                .frame(maxHeight: .infinity, alignment: .top)
+                                .environment(\.ywDismissSheet, close)
+                            Color.clear.frame(height: bottomInset)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: height)
+                        .background(S.surfaceWhite)
+                        .clipShape(UnevenRoundedRectangle(topLeadingRadius: S.radius2xl, topTrailingRadius: S.radius2xl))
+                        .shadow(color: .black.opacity(0.18), radius: 12, y: -3)
+                        .offset(y: drag)
+                        .transition(.move(edge: .bottom))
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                .ignoresSafeArea(.container, edges: .bottom)
+                .animation(.spring(duration: 0.35, bounce: 0), value: isPresented)
+            }
+        }
+    }
+
+    /// Grab area: the 36×4 bar plus padding, draggable to close.
+    private var handle: some View {
+        Capsule()
+            .fill(S.line)
+            .frame(width: 36, height: 4)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(coordinateSpace: .global)
+                    .onChanged { drag = max(0, $0.translation.height) }
+                    .onEnded { v in
+                        if v.translation.height > 120 || v.predictedEndTranslation.height > 240 {
+                            close()
+                        } else {
+                            withAnimation(.spring(duration: 0.3, bounce: 0)) { drag = 0 }
+                        }
+                    }
+            )
+            .accessibilityLabel("關閉")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { close() }
+    }
+
+    private func close() {
+        isPresented = false
+        drag = 0
+    }
+}
+
+extension View {
+    /// Present `sheet` as the app's fixed-height, edge-to-edge bottom sheet.
+    func ywSheet<Sheet: View>(isPresented: Binding<Bool>, fraction: CGFloat = 0.84,
+                              @ViewBuilder content: @escaping () -> Sheet) -> some View {
+        modifier(YWSheetModifier(isPresented: isPresented, fraction: fraction, sheet: content))
+    }
+}
