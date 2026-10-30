@@ -1,4 +1,5 @@
 import type { Condition, WeatherVM } from "./weather";
+import { toTraditional } from "./traditional";
 
 export type GeoLocation = { name: string; lat: number; lon: number };
 
@@ -211,7 +212,7 @@ export async function geocodeCity(query: string): Promise<GeoLocation[]> {
   if (!res.ok) throw new Error(`geocode ${res.status}`);
   const data = (await res.json()) as { results?: GeoResult[] };
   return (data.results ?? []).map((r) => ({
-    name: r.admin1 && r.admin1 !== r.name ? `${r.name}, ${r.admin1}` : r.name,
+    name: toTraditional(r.admin1 && r.admin1 !== r.name ? `${r.name}, ${r.admin1}` : r.name),
     lat: r.latitude,
     lon: r.longitude,
   }));

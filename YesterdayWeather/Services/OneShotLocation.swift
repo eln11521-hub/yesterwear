@@ -42,7 +42,7 @@ final class OneShotLocation: NSObject, CLLocationManagerDelegate {
         let place = try? await CLGeocoder().reverseGeocodeLocation(location).first
         return Fix(
             coordinate: location.coordinate,
-            placeName: place?.locality ?? place?.name,
+            placeName: (place?.locality ?? place?.name)?.traditional,
             timezone: place?.timeZone?.identifier
         )
     }

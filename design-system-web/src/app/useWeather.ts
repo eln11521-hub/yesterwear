@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { toTraditional } from "./traditional";
 import { MOCK_WEATHER, type WeatherVM } from "./weather";
 import {
   type CommuteTimes,
@@ -16,7 +17,10 @@ const CACHE_KEY = "yw-weather-cache";
 function readCache(): WeatherVM | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as WeatherVM) : null;
+    if (!raw) return null;
+    const w = JSON.parse(raw) as WeatherVM;
+    // Older caches may carry a Simplified place name from the geocoder.
+    return { ...w, location: toTraditional(w.location) };
   } catch {
     return null;
   }
