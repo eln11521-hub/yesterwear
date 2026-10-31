@@ -1,5 +1,6 @@
 /* Shares the 4×2's visual language (tokens, tint, delta pill, chips) — condensed
-   to the real WidgetKit small size, 158 × 158 pt. */
+   to the real WidgetKit small size on iPhone 17, 164 × 164 pt (the 4×2 is
+   348 = 2 × 164 + 20). */
 .yw-home-widget-sm {
   --tint-a: #efe7d9;
   --tint-b: #e4d8c4;
@@ -25,8 +26,8 @@
 
 .yw-home-widget-sm__card {
   box-sizing: border-box;
-  inline-size: 158px;
-  block-size: 158px;
+  inline-size: 164px;
+  block-size: 164px;
   display: flex;
   flex-direction: column;
   justify-content: center;

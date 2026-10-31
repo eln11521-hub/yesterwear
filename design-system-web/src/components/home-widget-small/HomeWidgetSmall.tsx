@@ -12,7 +12,7 @@ export type HomeWidgetSmallProps = {
 
 /**
  * HomeWidgetSmall — the Home Screen 2×2 widget (Figma 424:10), real WidgetKit small
- * size (158×158 pt). Same design-system language as the 4×2 (mono labels, 體感 big
+ * size (164×164 pt on iPhone 17). Same design-system language as the 4×2 (mono labels, 體感 big
  * number, 比昨天 delta pill, 昨日 chips, 出門/下班 commute) condensed for the square:
  * hero (體感 + delta) on top, 昨日 + commute below the divider. Background + delta pill
  * shift with the delta state.
