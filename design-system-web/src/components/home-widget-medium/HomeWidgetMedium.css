@@ -23,30 +23,25 @@
   --tint-b: color-mix(in srgb, #e4d8c4 74%, #e8a44a);
 }
 
+/* Real iOS systemMedium size (iPhone 17: 348×164pt). One 16px margin all
+   round; the flexible gaps absorb device-size differences. */
 .yw-home-widget__card {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  inline-size: 329px;
+  gap: 8px;
+  inline-size: 348px;
   max-inline-size: 100%;
-  padding: 16px 18px;
+  block-size: 164px;
+  padding: 16px;
   border-radius: 26px;
   background: #fff;
   box-shadow: 0 8px 24px rgb(58 46 28 / 14%);
 }
 
 .yw-home-widget__top {
+  flex: 1 0 auto;
   display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.yw-home-widget__mascot {
-  flex: none;
-  inline-size: 58px;
-  display: flex;
-  justify-content: center;
 }
 
 .yw-home-widget__info {
@@ -54,7 +49,8 @@
   min-inline-size: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .yw-home-widget__locrow {
@@ -90,7 +86,7 @@
   color: #8c8680;
 }
 .yw-home-widget__big {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 700;
   line-height: 1;
   color: #111;
@@ -133,7 +129,7 @@
   gap: 6px;
 }
 .yw-home-widget__chip {
-  padding: 5px 11px;
+  padding: 4px 10px;
   border-radius: 999px;
   background: #f0ebe4;
   font-size: 12px;

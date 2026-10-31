@@ -1,7 +1,6 @@
 import rainUmbrellaUrl from "../../assets/weather/rain-umbrella.svg?url";
 import { deltaDisplay, deltaState, type WeatherVM } from "../../app/weather";
 import { Icon } from "../_ui/Icon";
-import { Mascot } from "../mascot/Mascot";
 import "./HomeWidgetMedium.css";
 
 /** Small location pin (currentColor) flagging a cross-location 昨日. */
@@ -39,9 +38,10 @@ export type HomeWidgetMediumProps = {
 };
 
 /**
- * HomeWidgetMedium — the Home Screen 4×2 widget (Figma 390:2). White card with the
- * app's mascot + info + commute (出門 / 下班). The tinted gradient background and the
- * delta pill shift with the delta state (cold → cool, warm → warm).
+ * HomeWidgetMedium — the Home Screen 4×2 widget (Figma 390:2) at the real iOS
+ * systemMedium size (348×164 on iPhone 17): white card, info + commute (出門 /
+ * 下班), one 16px margin all round. No mascot — it doesn't fit the real widget
+ * height. The tinted backdrop and the delta pill shift with the delta state.
  */
 export function HomeWidgetMedium({
   location,
@@ -58,9 +58,6 @@ export function HomeWidgetMedium({
     <div className="yw-home-widget" data-state={state}>
       <div className="yw-home-widget__card">
         <div className="yw-home-widget__top">
-          <div className="yw-home-widget__mascot">
-            <Mascot size={58} state={state} />
-          </div>
           <div className="yw-home-widget__info">
             <div className="yw-home-widget__locrow">
               <span className="yw-home-widget__loc">
@@ -72,14 +69,14 @@ export function HomeWidgetMedium({
                 </span>
               ) : null}
             </div>
-            <div className="yw-home-widget__temp">
-              <div className="yw-home-widget__bigcol">
-                <span className="yw-home-widget__biglabel">體感</span>
+            <div className="yw-home-widget__bigcol">
+              <span className="yw-home-widget__biglabel">體感</span>
+              <div className="yw-home-widget__temp">
                 <span className="yw-home-widget__big">{shortTemp}</span>
+                <span className="yw-home-widget__delta">
+                  {d.arrow} {d.abs}° 比昨天
+                </span>
               </div>
-              <span className="yw-home-widget__delta">
-                {d.arrow} {d.abs}° 比昨天
-              </span>
             </div>
             <div className="yw-home-widget__outfit">
               <span className="yw-home-widget__olabel">
