@@ -13,7 +13,7 @@
   color: var(--yw-sys-color-text-label);
 }
 
-/* value: DM Sans Medium 13px #111 (Figma 176:13) */
+/* value: Outfit Medium 13px #111 (Figma 176:13) */
 .yw-metric-item__value {
   font-size: 13px;
   font-weight: 500;

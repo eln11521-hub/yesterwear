@@ -28,7 +28,7 @@ export type TopBarProps = {
 /**
  * TopBar — home header: location (tap to switch places) + date on the left, a
  * Settings gear on the right (44×44 hit area; refreshing is pull-to-refresh).
- * Source: Figma 174:7. Place = DM Sans SemiBold 15px; date = IBM Plex Mono
+ * Source: Figma 174:7. Place = Outfit SemiBold 15px; date = IBM Plex Mono
  * Regular 11px.
  */
 export function TopBar({ location, date, onLocationClick, onSettingsClick }: TopBarProps) {

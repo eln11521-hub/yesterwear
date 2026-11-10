@@ -60,11 +60,11 @@ Authored values extracted from Figma, design direction, and implemented code.
 
 | Token | Font Family | Size | Weight | Line Height | Source | Provenance |
 |-------|------------|------|--------|------------|--------|-----------|
-| `ref-type-hero-size` | DM Sans | 44pt | 600 (semibold) | 1.1 | design direction | authored |
-| `ref-type-title-size` | DM Sans | 22pt | 600 (semibold) | 1.2 | design direction | authored |
-| `ref-type-body-size` | DM Sans | 16pt | 500 (medium) | 1.5 | design direction | authored |
-| `ref-type-caption-size` | DM Sans | 12pt | 500 (medium) | 1.4 | design direction | authored |
-| `ref-type-micro-size` | DM Sans | 10pt | 600 (semibold) | 1.3 | design direction | authored |
+| `ref-type-hero-size` | Outfit | 44pt | 600 (semibold) | 1.1 | design direction | authored |
+| `ref-type-title-size` | Outfit | 22pt | 600 (semibold) | 1.2 | design direction | authored |
+| `ref-type-body-size` | Outfit | 16pt | 500 (medium) | 1.5 | design direction | authored |
+| `ref-type-caption-size` | Outfit | 12pt | 500 (medium) | 1.4 | design direction | authored |
+| `ref-type-micro-size` | Outfit | 10pt | 600 (semibold) | 1.3 | design direction | authored |
 | `ref-type-mono-size` | IBM Plex Mono | size varies | varies | varies | design direction | authored |
 
 **Current state:** YWTypography uses system fonts; DM Sans + IBM Plex Mono not yet integrated.
@@ -132,11 +132,11 @@ Semantic roles that map reference tokens to design intent. **System tokens are p
 
 | Token | Font Stack | Size | Weight | Line Height |
 |-------|-----------|------|--------|------------|
-| `sys-type-hero` | DM Sans | ref-type-hero-size | 600 | 1.1 |
-| `sys-type-title` | DM Sans | ref-type-title-size | 600 | 1.2 |
-| `sys-type-body` | DM Sans | ref-type-body-size | 500 | 1.5 |
-| `sys-type-caption` | DM Sans | ref-type-caption-size | 500 | 1.4 |
-| `sys-type-micro` | DM Sans | ref-type-micro-size | 600 | 1.3 |
+| `sys-type-hero` | Outfit | ref-type-hero-size | 600 | 1.1 |
+| `sys-type-title` | Outfit | ref-type-title-size | 600 | 1.2 |
+| `sys-type-body` | Outfit | ref-type-body-size | 500 | 1.5 |
+| `sys-type-caption` | Outfit | ref-type-caption-size | 500 | 1.4 |
+| `sys-type-micro` | Outfit | ref-type-micro-size | 600 | 1.3 |
 | `sys-type-mono` | IBM Plex Mono | varies | varies | varies |
 
 **Note:** Apply `sys-type-mono` to temperature values, percentages, and numeric displays.

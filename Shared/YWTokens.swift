@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 
 /// YWTokens — 昨日天氣對比 design tokens.
@@ -159,29 +160,42 @@ enum YWTokens {
 
     // MARK: - Typography（排版）
     // Bundled brand fonts, registered at launch by BrandFonts.register():
-    //   DM Sans (UI, variable) · IBM Plex Mono (numerals/dates) · Archivo Black (display).
+    //   Outfit (UI, variable) · IBM Plex Mono (numerals/dates) · Archivo Black (display).
     // Mirrors the web tokens --yw-sys-font-ui / --yw-sys-font-mono + the Archivo Black wordmark.
     enum Typography {
-        private static let uiFace = "DMSans-9ptRegular"        // variable; weight via .weight()
+        /// Outfit is a variable font whose default instance is Thin (100), so the
+        /// weight is set on its `wght` axis explicitly rather than via `.weight()`.
+        private static let uiFamily = "Outfit"
         private static let monoMedium = "IBMPlexMono-Medium"
         private static let monoSemibold = "IBMPlexMono-SemiBold"
         private static let displayFace = "ArchivoBlack-Regular"
 
-        // UI text — DM Sans
-        static let hero    = Font.custom(uiFace, size: Ref.typeHero).weight(.semibold)
-        static let title   = Font.custom(uiFace, size: Ref.typeTitle).weight(.semibold)
-        static let body    = Font.custom(uiFace, size: Ref.typeBody).weight(.medium)
-        static let caption = Font.custom(uiFace, size: Ref.typeCaption).weight(.medium)
-        static let micro   = Font.custom(uiFace, size: Ref.typeMicro).weight(.semibold)
+        // UI text — Outfit
+        static let hero    = ui(Ref.typeHero, .semibold)
+        static let title   = ui(Ref.typeTitle, .semibold)
+        static let body    = ui(Ref.typeBody, .medium)
+        static let caption = ui(Ref.typeCaption, .medium)
+        static let micro   = ui(Ref.typeMicro, .semibold)
 
         // Display — Archivo Black (brand wordmark / onboarding title)
         static func display(_ size: CGFloat = Ref.typeHero) -> Font {
             Font.custom(displayFace, size: size)
         }
 
-        /// DM Sans at an arbitrary size — the web screens use many exact px sizes.
+        private static let wght: [Font.Weight: Double] = [
+            .ultraLight: 200, .thin: 100, .light: 300, .regular: 400, .medium: 500,
+            .semibold: 600, .bold: 700, .heavy: 800, .black: 900,
+        ]
+
+        /// Outfit at an arbitrary size and weight — the web screens use many exact px sizes.
         static func ui(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-            Font.custom(uiFace, size: size).weight(weight)
+            let tag = 0x7767_6874   // 'wght'
+            let attrs: [CFString: Any] = [
+                kCTFontFamilyNameAttribute: uiFamily,
+                kCTFontVariationAttribute: [tag: wght[weight] ?? 400],
+            ]
+            let desc = CTFontDescriptorCreateWithAttributes(attrs as CFDictionary)
+            return Font(CTFontCreateWithFontDescriptor(desc, size, nil))
         }
 
         /// IBM Plex Mono at an arbitrary size. Only Medium (500) and SemiBold
