@@ -13,7 +13,7 @@
   color: var(--yw-comp-button-label-color);
   font-family: var(--yw-sys-font-ui);
   font-size: 15px;
-  font-weight: 600; /* DM Sans SemiBold */
+  font-weight: 600; /* Outfit SemiBold */
   line-height: 1.2;
   cursor: pointer;
   transition: transform var(--yw-comp-button-tap-duration)

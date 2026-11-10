@@ -13,7 +13,7 @@ export type CommuteRowProps = {
 
 /**
  * CommuteRow — a commute time slot. Centered column: IBM Plex Mono slot label
- * (#8c8680 10.5px), DM Sans Bold 24px temp, and a muted 較昨日 delta line.
+ * (#8c8680 10.5px), Outfit Bold 24px temp, and a muted 較昨日 delta line.
  * Source: Figma Commute Row 504:231.
  */
 export function CommuteRow({ slot, time, temp, delta }: CommuteRowProps) {

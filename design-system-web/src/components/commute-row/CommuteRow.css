@@ -16,7 +16,7 @@
   color: var(--yw-sys-color-text-label);
 }
 
-/* temp: DM Sans Bold 24px #111, tracking -0.24 (Figma 174:55) */
+/* temp: Outfit Bold 24px #111, tracking -0.24 (Figma 174:55) */
 .yw-commute-row__temp {
   font-size: 24px;
   font-weight: 500; /* 數值 tier: Medium */
@@ -25,7 +25,7 @@
   color: var(--yw-sys-color-text-primary);
 }
 
-/* delta / note: DM Sans Medium 10px, muted (Figma 504:230) */
+/* delta / note: Outfit Medium 10px, muted (Figma 504:230) */
 .yw-commute-row__delta {
   font-size: 10px;
   font-weight: 400; /* auxiliary: Regular */

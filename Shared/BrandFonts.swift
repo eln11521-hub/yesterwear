@@ -3,7 +3,7 @@ import Foundation
 
 /// Registers the bundled brand fonts with the current process at launch:
 ///   - Archivo Black  → display / brand wordmark (onboarding title)
-///   - DM Sans        → UI text (variable; weight applied via `.weight()`)
+///   - Outfit         → UI text (variable; weight set on the `wght` axis)
 ///   - IBM Plex Mono  → numerals / dates
 ///
 /// Call once from the app's `init()` and from the widget bundle's `init()`.

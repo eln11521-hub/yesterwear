@@ -25,7 +25,7 @@ export type ForecastRowProps = {
 
 /**
  * ForecastRow — one day of the weekly forecast. Icons and bar match Figma 174:87:
- * DM Sans type (day 12/600 #555553, low 14/500 #8e8e8c, high 14/700 ink), track at
+ * Outfit type (day 12/600 #555553, low 14/500 #8e8e8c, high 14/700 ink), track at
  * ink 8%, gradient #728188 → #C59A5D, and a white knob at the current temp for today.
  */
 export function ForecastRow({

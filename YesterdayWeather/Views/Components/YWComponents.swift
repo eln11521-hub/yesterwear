@@ -315,7 +315,7 @@ struct ForecastRow: View {
 
 // MARK: - Primary button
 
-/// Full-width primary CTA (web PrimaryButton: DM Sans SemiBold 15, py15 px24,
+/// Full-width primary CTA (web PrimaryButton: Outfit SemiBold 15, py15 px24,
 /// radius 16, ink, scale 0.95 on press).
 struct YWPrimaryButton: View {
     let label: String

@@ -33,7 +33,7 @@ HTML docs UI locale: zh-Hant
 - Active item: black rounded-rect wrapping icon + label
 
 ### Typography（排版）
-- UI: DM Sans
+- UI: Outfit (switched from DM Sans on 2026-11-10 — web token, bundled native font, Figma `en/…` text styles)
 - Numbers/Labels: IBM Plex Mono
 
 ### Brand Mascot（品牌角色）

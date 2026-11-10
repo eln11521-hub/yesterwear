@@ -76,7 +76,7 @@ Support palette for surfaces, text, and neutral elements.
 
 **Evidence:** Implemented in `Shared/DesignTokens.swift`, used throughout DashboardView, MetricBlock, CommuteDeltaCard
 
-**Font family:** Design specifies DM Sans (UI) + IBM Plex Mono (numbers/labels)  
+**Font family:** Outfit (UI; replaced DM Sans on 2026-11-10) + IBM Plex Mono (numbers/labels)  
 **⚠️ Current implementation:** Uses system fonts (rounded design) — requires font file addition to match design spec
 
 **Implementation rule:**

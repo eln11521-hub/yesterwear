@@ -132,12 +132,12 @@
      See DESIGN_PRINCIPLES.md for font integration notes
      ============================================ */
 
-  --ref-font-ui: "DM Sans", system-ui, -apple-system, sans-serif;
+  --ref-font-ui: "Outfit", system-ui, -apple-system, sans-serif;
   --ref-font-mono: "IBM Plex Mono", "Monaco", monospace;
 
   /* Note: Font files not yet integrated into project.
      Currently using system fonts; these tokens prepare
-     for future integration of DM Sans + IBM Plex Mono. */
+     for future integration of Outfit + IBM Plex Mono. */
 }
 
 @media (prefers-color-scheme: dark) {
