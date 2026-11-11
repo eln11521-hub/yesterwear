@@ -43,3 +43,16 @@ export const Rainy: Story = {
     ),
   },
 };
+
+/** Close and crossing lines (a typical Taipei day): a 0° gap shows one 「=23°」
+ *  label, and where 體感 rises above 實際 the two labels swap sides. */
+export const CloseAndCrossing: Story = {
+  args: {
+    items: MOCK_WEATHER.hourly.map((h, i) => {
+      const F = [21, 22, 23, 22, 22, 22, 23, 23];
+      const A = [22, 23, 23, 23, 23, 23, 22, 21];
+      const k = i % F.length;
+      return { ...h, temp: F[k], actual: A[k] };
+    }),
+  },
+};
