@@ -49,20 +49,21 @@
   text-align: end;
 }
 
-/* bar: track = ink 8%, solid warm fill (#e8a44a), white knob for today */
+/* bar (Figma 608:1555): 4 tall, track = ink 8%, fill = body ink (#3d3935);
+   optional white knob for today */
 .yw-forecast-row__bar {
   position: relative;
   inline-size: auto;
-  block-size: 6px;
-  border-radius: 3px;
+  block-size: 4px;
+  border-radius: 2px;
   background: rgb(17 17 17 / 8%);
 }
 .yw-forecast-row__fill {
   position: absolute;
   inset-block: 0;
   min-inline-size: 8px;
-  border-radius: 3px;
-  background: var(--yw-sys-color-delta-warm);
+  border-radius: 2px;
+  background: var(--yw-sys-color-text-body);
 }
 .yw-forecast-row__knob {
   position: absolute;

@@ -189,11 +189,7 @@ struct HomeView: View {
             )
         }
         return VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                SectionLabel("各時段體感溫度")
-                Spacer(minLength: 8)
-                Text("前 3 小時・未來 24 小時").font(T.ui(12)).foregroundStyle(S.textLabel).lineLimit(1)
-            }
+            SectionLabel("各時段體感溫度")
             HourlyChart(items: items)
         }
         .ywCard(padding: EdgeInsets(top: 12, leading: 16, bottom: 16, trailing: 16))
@@ -218,8 +214,7 @@ struct HomeView: View {
                         high: highs[i],
                         weekMin: weekMin,
                         weekMax: weekMax,
-                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil,
-                        current: i == 0 ? deg(currentApparent) : nil   // today's feels-like knob
+                        pop: d.condition.isWet && d.pop >= 40 ? d.pop : nil
                     )
                     // Full-bleed 6% ink separators (Figma 174:102).
                     if i < days.count - 1 { Rectangle().fill(S.textPrimary.opacity(0.06)).frame(height: 1) }

@@ -238,7 +238,6 @@ export function HomeScreen({
               weekMin={weekMin}
               weekMax={weekMax}
               pop={"pop" in d ? d.pop : undefined}
-              current={"current" in d ? d.current : undefined}
             />
           ))}
         </section>
