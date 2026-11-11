@@ -43,115 +43,94 @@
   padding: 12px 16px;
 }
 
-/* ---- Hero: 現在體感 + condition/headline, then the metrics rows ---- */
+/* ---- Hero (Figma 608:1479): centred 現在體感 / 溫度 / 比較句 / 天氣, then
+   實際氣溫 · 濕度 · 降雨, then the commute summary. ---- */
 .yw-home__hero {
   background: var(--yw-sys-color-surface-raised);
   border-radius: var(--yw-sys-radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-/* Figma 481:310: two columns, bottom-aligned, gap 16 */
-.yw-home__hero-top {
-  display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
 }
 .yw-home__now {
-  flex: none;
-  inline-size: 96px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
 }
-.yw-home__hero-info {
-  flex: 1;
-  min-inline-size: 0;
+.yw-home__now-main {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
 }
-/* 現在體感: IBM Plex Mono 11px, warm muted */
+/* 現在體感: 12 Regular, muted */
 .yw-home__now-label {
-  font-family: var(--yw-sys-font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--yw-sys-color-text-muted-warm);
 }
-/* Weight hierarchy (only four tiers on the page): 21°C Bold (the hero) →
-   headline SemiBold → numbers Medium → everything else Regular. */
-/* 16°C: Outfit Bold 44px, ink — the only Bold text on the page */
+/* 16°C: Outfit Bold 43 — the only Bold text on the page */
 .yw-home__now-temp {
-  font-size: 44px;
+  font-size: 43px;
   font-weight: 700;
   line-height: normal;
   white-space: nowrap;
   color: var(--yw-sys-color-text-primary);
 }
-/* 晴天: icon + Outfit Regular 14px ink */
+/* 比昨天涼一些: 16 Medium */
+.yw-home__headline {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  color: var(--yw-sys-color-text-primary);
+}
+/* 晴天: icon 20 + 14 Regular */
 .yw-home__now-cond {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 14px;
-  font-weight: 400;
-  color: var(--yw-sys-color-text-primary);
-}
-/* 比昨天涼一些: SemiBold 24px / 32px ink — a step lighter than 21°C */
-.yw-home__headline {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 32px;
+  line-height: 18px;
   color: var(--yw-sys-color-text-primary);
 }
 
-/* ---- Hero metrics: 實際氣溫 / 濕度 rows (label + value) + 較昨日 delta pill ---- */
-.yw-home__hero-divider {
-  block-size: var(--yw-sys-border-hairline);
-  border: none;
-  margin: 0;
-  background: var(--yw-sys-color-line);
-}
-.yw-home__hero-metrics {
+/* 實際氣溫 · 濕度 · 降雨: three equal centred columns */
+.yw-home__metrics {
+  align-self: stretch;
   display: flex;
-  flex-direction: column;
   gap: 4px;
 }
-.yw-home__hm-row {
+.yw-home__metric {
+  flex: 1 0 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 24px;
 }
-/* label: IBM Plex Mono Regular 10.5px, muted label (Figma 520:1001) */
-.yw-home__hm-label {
-  flex: none;
-  inline-size: 42px;
-  font-family: var(--yw-sys-font-mono);
-  font-size: 10.5px;
+.yw-home__metric-label {
+  font-size: 12px;
   color: var(--yw-sys-color-text-label);
 }
-/* value: Outfit Regular 16px ink */
-.yw-home__hm-value {
+.yw-home__metric-value {
   font-size: 16px;
-  font-weight: 400;
+  line-height: 24px;
   color: var(--yw-sys-color-text-primary);
 }
-/* 較昨日 delta pill: full-radius, bg = delta direction color, white text */
-.yw-home__hm-pill {
-  margin-inline-start: auto;
-  padding: 5px 11px 5px 10px;
-  border-radius: var(--yw-sys-radius-full);
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1;
-  color: var(--yw-sys-color-text-on-dark);
-  white-space: nowrap;
+
+/* 出門 / 下班 summary: 12 Regular, line-height 1.6, body colour */
+.yw-home__summary {
+  align-self: stretch;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--yw-sys-color-text-body);
 }
 
-/* 當地昨日補充列 — secondary reference, lower visual level than the pill */
+/* 當地昨日補充列 — secondary reference (cross-location) */
 .yw-home__crosshint {
-  margin: 8px 0 0;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -171,18 +150,19 @@
   gap: 12px;
 }
 
-/* section label with bullet: Outfit Medium 13px muted */
+/* Section Header (Figma 486:16, v5): 5px ink dot + 14 Medium ink */
 .yw-home__seclabel {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--yw-sys-color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--yw-sys-color-text-primary);
 }
 .yw-home__dot {
-  inline-size: 6px;
-  block-size: 6px;
+  inline-size: 5px;
+  block-size: 5px;
   border-radius: 50%;
   background: var(--yw-sys-color-text-primary);
 }
@@ -194,59 +174,26 @@
 }
 
 .yw-home__empty {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--yw-sys-color-text-label);
 }
 
-/* 建議： bold ink + regular label text (Figma 173:2914) */
+/* 今日建議穿搭: 12 Regular, line-height 1.6, body colour */
 .yw-home__suggestion {
   margin: 0;
   font-size: 12px;
   line-height: 1.6;
-  color: var(--yw-sys-color-text-label);
-}
-.yw-home__suggestion strong {
-  font-weight: 400;
-  color: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-body);
 }
 
-/* commute */
-.yw-home__commute {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.yw-home__vrule {
-  inline-size: 1px;
-  block-size: 40px;
-  background: var(--yw-sys-color-line);
-}
-.yw-home__rain {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  color: var(--yw-sys-color-text-label);
-}
-.yw-home__rain-label {
-  font-family: var(--yw-sys-font-mono);
-  font-size: 10.5px;
-}
-.yw-home__rain-note {
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.yw-home__h2 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 400;
-}
-
-/* Forecast rows own their 16px inset so separators run edge to edge */
+/* 未來一週天氣: heading inside the card; rows own their 16px inset so separators
+   run edge to edge */
 .yw-home__forecast {
   padding: 0;
   overflow: hidden;
+}
+.yw-home__forecast-head {
+  padding: 12px 0 12px 24px;
 }
 
 /* Sticky CTA (記錄今天穿搭): pinned to the bottom, card-aligned (16px sides),

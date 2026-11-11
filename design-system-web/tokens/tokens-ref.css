@@ -18,6 +18,7 @@
   --yw-ref-color-ink: #111111;     /* Figma var: ink — near-black */
   --yw-ref-color-white: #ffffff;   /* Figma var: white */
   --yw-ref-color-muted: #6f6964;   /* Figma var: muted — warm secondary text */
+  --yw-ref-color-medium: #3d3935;  /* Figma var: medium — body copy on cards */
   --yw-ref-color-muted2: #b5afa8;  /* Figma var: muted2 — warm tertiary / hint text */
   --yw-ref-color-gray-mid: #666666;
   --yw-ref-color-gray-light: #999999;

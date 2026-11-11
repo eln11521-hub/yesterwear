@@ -24,13 +24,13 @@
   white-space: nowrap;
 }
 
-/* compact = home display (Figma 173:2919): smaller, muted label */
+/* compact = home display (Figma 608:1516): 12 Medium in the body colour */
 .yw-outfit-chip[data-compact="true"] {
   padding: 6px 12px 6px 10px;
-  color: var(--yw-sys-color-text-label);
+  color: var(--yw-sys-color-text-body);
 }
 .yw-outfit-chip[data-compact="true"] .yw-outfit-chip__label {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .yw-outfit-chip[data-selected="true"] {
