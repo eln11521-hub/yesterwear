@@ -156,9 +156,14 @@ struct HomeView: View {
         let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
         let advice = suggestion.advice.hasPrefix("建議：") ? String(suggestion.advice.dropFirst(3)) : suggestion.advice
         return VStack(alignment: .leading, spacing: 12) {
-            // 昨日穿搭 above 今日穿搭; today's record becomes 昨日 tomorrow.
-            dayColumn("昨日穿搭", outfit.yesterday, empty: "尚無昨日紀錄")
-            dayColumn("今日穿搭", outfit.today, empty: "尚未記錄", onOpen: onRecord)
+            SectionLabel("昨日穿搭")
+            if let y = outfit.yesterday {
+                ChipLine(chips: y.picks.rankedChips)
+            } else {
+                Text("尚無昨日紀錄")
+                    .font(T.ui(12))
+                    .foregroundStyle(S.textLabel)
+            }
             SectionLabel("今日建議穿搭")
             Text(advice)
                 .font(T.ui(12))
@@ -166,20 +171,6 @@ struct HomeView: View {
                 .foregroundStyle(S.textBody)
         }
         .ywCard()
-    }
-
-    private func dayColumn(_ title: String, _ entry: OutfitEntry?, empty: String, onOpen: (() -> Void)? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionLabel(title)
-            if let entry {
-                ChipLine(chips: entry.picks.rankedChips, onOpen: onOpen)
-            } else {
-                Text(empty)
-                    .font(T.ui(12))
-                    .foregroundStyle(S.textLabel)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: Hourly
