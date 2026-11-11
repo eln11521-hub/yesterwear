@@ -18,6 +18,9 @@ export type RecordOutfitSheetProps = {
    *  stories/previews to show the photo-confirmation step (real capture goes
    *  through 拍照記錄). */
   initialThumb?: string;
+  /** Today is already recorded: the top panel shows the saved result — with its
+   *  photo when there is one (Figma 665:2745), tags only otherwise. */
+  saved?: boolean;
   onSave?: (
     record: OutfitPicks & {
       thumbnailRef: string | null;
@@ -55,6 +58,7 @@ type GroupKey = keyof OutfitPicks;
 export function RecordOutfitSheet({
   initial = { tops: ["長袖上衣"], outers: ["薄外套"] },
   initialThumb,
+  saved = false,
   onSave,
 }: RecordOutfitSheetProps) {
   const [picks, setPicks] = useState<OutfitPicks>({ ...EMPTY_PICKS, ...initial });
@@ -65,7 +69,7 @@ export function RecordOutfitSheet({
   // Seeded thumbnail = a previously-saved today photo reopened via 更新穿搭 (not a
   // fresh recognition), so its hint is informational rather than a confirm prompt.
   const [hint, setHint] = useState<string | null>(
-    initialThumb ? "幫你記得今天穿了什麼。" : null,
+    initialThumb || saved ? "幫你記得今天穿了什麼。" : null,
   );
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -126,32 +130,36 @@ export function RecordOutfitSheet({
       </div>
 
       <div className="yw-sheet__body">
-        {pending && thumb ? (
+        {(pending && thumb) || saved ? (
           <div className="yw-sheet__pending">
-            <img className="yw-sheet__pending-thumb" src={thumb} alt="今日穿搭照片" />
+            {pending && thumb ? (
+              <img className="yw-sheet__pending-thumb" src={thumb} alt="今日穿搭照片" />
+            ) : null}
             <div className="yw-sheet__pending-body">
-              <p className="yw-sheet__pending-hint">
-                {hint ?? "已依照片幫你選好標籤，對一下、不對就改。"}
-              </p>
+              <p className="yw-sheet__pending-hint">{hint ?? "幫你記得今天穿了什麼。"}</p>
               <div className="yw-sheet__pending-labels">
-                {[...picks.tops, ...picks.outers].map((label) => (
-                  <span key={label} className="yw-sheet__pending-pill">
-                    {label}
-                  </span>
-                ))}
+                {[...picks.tops, ...picks.outers, ...picks.bottoms, ...picks.accessories].map(
+                  (label) => (
+                    <span key={label} className="yw-sheet__pending-pill">
+                      {label}
+                    </span>
+                  ),
+                )}
                 {outerUnsure ? (
                   <span className="yw-sheet__pending-pill yw-sheet__pending-pill--empty">
                     外套待選
                   </span>
                 ) : null}
               </div>
-              <button
-                type="button"
-                className="yw-sheet__pending-remove"
-                onClick={removePhoto}
-              >
-                移除照片
-              </button>
+              {pending && thumb ? (
+                <button
+                  type="button"
+                  className="yw-sheet__pending-remove"
+                  onClick={removePhoto}
+                >
+                  移除照片
+                </button>
+              ) : null}
             </div>
           </div>
         ) : null}

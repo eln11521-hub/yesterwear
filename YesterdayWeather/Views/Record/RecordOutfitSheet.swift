@@ -12,6 +12,9 @@ import UIKit
 /// state with the thumbnail beside the tags; nothing auto-saves.
 struct RecordOutfitSheet: View {
     var initialThumb: UIImage? = nil
+    /// Today is already recorded: the top panel shows the saved result (with its
+    /// photo when there is one, Figma 665:2745; tags only otherwise).
+    var saved = false
     var onSave: (_ picks: OutfitPicks, _ photo: UIImage?, _ keptExisting: Bool) -> Void
 
     @State private var picks: OutfitPicks
@@ -36,14 +39,15 @@ struct RecordOutfitSheet: View {
         #endif
     }
 
-    init(initial: OutfitPicks, initialThumb: UIImage? = nil,
+    init(initial: OutfitPicks, initialThumb: UIImage? = nil, saved: Bool = false,
          onSave: @escaping (_ picks: OutfitPicks, _ photo: UIImage?, _ keptExisting: Bool) -> Void) {
         self.initialThumb = initialThumb
+        self.saved = saved
         self.onSave = onSave
         _picks = State(initialValue: initial)
         _thumb = State(initialValue: initialThumb)
         // A seeded thumbnail is a saved photo reopened via 更新穿搭 — informational hint.
-        _hint = State(initialValue: initialThumb == nil ? nil : "幫你記得今天穿了什麼。")
+        _hint = State(initialValue: initialThumb == nil && !saved ? nil : "幫你記得今天穿了什麼。")
     }
 
     var body: some View {
@@ -63,7 +67,7 @@ struct RecordOutfitSheet: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    if let thumb { pendingPanel(thumb) }
+                    if thumb != nil || saved { pendingPanel(thumb) }
                     ForEach(OutfitGroup.allCases) { group($0) }
                 }
                 .padding(.horizontal, 20)
@@ -195,34 +199,40 @@ struct RecordOutfitSheet: View {
         if g == .outers { outerUnsure = false }
     }
 
-    private func pendingPanel(_ image: UIImage) -> some View {
+    /// 待確認 / 已儲存 panel (Figma 665:2745): photo (if any) beside the hint and the
+    /// picked tags. Without a photo it's just the saved result.
+    private func pendingPanel(_ image: UIImage?) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 60, height: 60)
-                .clipShape(RoundedRectangle(cornerRadius: S.radiusMd))
-                .overlay(RoundedRectangle(cornerRadius: S.radiusMd).strokeBorder(S.line, lineWidth: 1))
-                .accessibilityLabel("今日穿搭照片")
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: S.radiusMd))
+                    .overlay(RoundedRectangle(cornerRadius: S.radiusMd).strokeBorder(S.line, lineWidth: 1))
+                    .accessibilityLabel("今日穿搭照片")
+            }
             VStack(alignment: .leading, spacing: 8) {
-                Text(hint ?? "已依照片幫你選好標籤，對一下、不對就改。")
+                Text(hint ?? "幫你記得今天穿了什麼。")
                     .font(T.ui(11))
                     .lineSpacing(11 * 0.2)
                     .foregroundStyle(S.textLabel)
                 ChipFlow(spacing: 8) {
-                    ForEach(picks.tops + picks.outers, id: \.self) { pill($0) }
+                    ForEach(picks.all, id: \.self) { pill($0) }
                     if outerUnsure { pill("外套待選", empty: true) }
                 }
-                Button("移除照片") {
-                    thumb = nil
-                    thumbIsNew = false
-                    outerUnsure = false
-                    hint = nil
+                if image != nil {
+                    Button("移除照片") {
+                        thumb = nil
+                        thumbIsNew = false
+                        outerUnsure = false
+                        hint = nil
+                    }
+                    .font(T.ui(11))
+                    .underline()
+                    .foregroundStyle(S.textLabel)
+                    .padding(.top, 2)
                 }
-                .font(T.ui(11))
-                .underline()
-                .foregroundStyle(S.textLabel)
-                .padding(.top, 2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
