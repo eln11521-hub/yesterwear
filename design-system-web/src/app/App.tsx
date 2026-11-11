@@ -8,7 +8,7 @@ import { LocationSheet } from "../pages/location-sheet/LocationSheet";
 import { RecordOutfitSheet } from "../pages/record-outfit/RecordOutfitSheet";
 import { SettingsScreen } from "../pages/settings/SettingsScreen";
 import "./App.css";
-import { keyChips, outfitChips, outfitComboText } from "./outfit";
+import { keyChips, outfitComboText, rankedChips } from "./outfit";
 import { useOutfitStore } from "./useOutfitStore";
 import { useSettingsStore } from "./useSettingsStore";
 import { useWeather } from "./useWeather";
@@ -94,7 +94,7 @@ export function App() {
   };
 
   const suggestion = suggestOutfit(weather, yesterday);
-  const yesterdayChips = outfitChips(yesterday);
+  const yesterdayChips = rankedChips(yesterday);
   const widgetChips = yesterday ? keyChips(yesterday) : ["—"];
 
 
@@ -118,7 +118,7 @@ export function App() {
             <HomeScreen
               weather={weather}
               yesterdayChips={yesterdayChips}
-              todayChips={outfitChips(today)}
+              todayChips={rankedChips(today)}
               advice={suggestion.advice}
               onRecord={() => setOpen(true)}
               onRefresh={refresh}

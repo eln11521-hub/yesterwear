@@ -183,6 +183,66 @@ struct OutfitChip: View {
     }
 }
 
+/// One day's outfit on one line (web ChipLine): up to 3 chips — fewer when they
+/// don't fit — and the rest folded into「+N」. With `onOpen` (今日穿搭) the row
+/// opens the record sheet; without it (昨日穿搭) +N expands it in place.
+struct ChipLine: View {
+    let chips: [OutfitChipItem]
+    var onOpen: (() -> Void)? = nil
+    @State private var expanded = false
+
+    private static let maxShown = 3
+
+    var body: some View {
+        if expanded {
+            ChipFlow {
+                ForEach(chips, id: \.self) { chip($0) }
+                more("收合") { expanded = false }
+            }
+        } else if let onOpen {
+            Button(action: onOpen) { line }
+                .buttonStyle(.plain)
+                .accessibilityLabel("今日穿搭：\(chips.map(\.label).joined(separator: "、"))，點一下修改")
+        } else {
+            line
+        }
+    }
+
+    /// The longest prefix (≤ 3) that fits, then +N.
+    private var line: some View {
+        ViewThatFits(in: .horizontal) {
+            ForEach(Array((1...max(1, min(Self.maxShown, chips.count))).reversed()), id: \.self) { k in
+                HStack(spacing: 8) {
+                    ForEach(chips.prefix(k), id: \.self) { chip($0) }
+                    if chips.count > k {
+                        more("+\(chips.count - k)") { if onOpen == nil { expanded = true } else { onOpen?() } }
+                    }
+                }
+            }
+        }
+    }
+
+    private func chip(_ c: OutfitChipItem) -> some View {
+        OutfitChip(label: c.label, asset: c.asset, compact: true)
+    }
+
+    /// +N / 收合 — a text-only compact chip.
+    private func more(_ label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(T.ui(12, .medium))
+                .foregroundStyle(S.textBody)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 12)
+                .frame(height: 28)
+                .background(S.surfaceWhite, in: Capsule())
+                .overlay(Capsule().strokeBorder(S.line, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 /// Wrapping row of chips (web .yw-home__chips: flex-wrap, gap 8).
 struct ChipFlow: Layout {
     var spacing: CGFloat = 8

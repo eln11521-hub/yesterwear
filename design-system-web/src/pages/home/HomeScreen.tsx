@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import refreshUrl from "../../assets/icon/refresh.svg?url";
 
@@ -18,7 +18,8 @@ import "./HomeScreen.css";
 
 export type HomeScreenProps = {
   weather?: WeatherVM;
-  /** Garment labels for the 昨日穿搭 row (「不加外套」already omitted). */
+  /** Garment labels for the 昨日穿搭 row, ranked by warmth (app/outfit
+   *  rankedChips) — the row shows the first few and folds the rest into「+N」. */
   yesterdayChips?: string[];
   /** Garment labels of today's record, shown beside 昨日穿搭. Empty/omitted =
    *  not recorded yet: the column reads 尚未記錄 and the CTA stays solid ink. */
@@ -109,7 +110,7 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
-  yesterdayChips = ["長袖上衣", "薄外套"],
+  yesterdayChips = ["薄外套", "長袖上衣"],
   todayChips = [],
   advice = DEFAULT_SUGGESTION.advice,
   crossLocation,
@@ -130,10 +131,6 @@ export function HomeScreen({
   const humidity = metric("濕度");
   const rainPossible = Number.parseInt(rain, 10) > 0;
   const recorded = todayChips.length > 0;
-  const chips = (labels: string[]) =>
-    labels.map((label) => (
-      <OutfitChip key={label} compact label={label} iconSrc={garmentIcon[label]} />
-    ));
   return (
     <div className="yw-home">
       <div className="yw-home__top">
@@ -215,19 +212,19 @@ export function HomeScreen({
                   "昨日穿搭"
                 )}
               </SecLabel>
-              <div className="yw-home__chips">
-                {yesterdayChips.length ? (
-                  chips(yesterdayChips)
-                ) : (
-                  <span className="yw-home__empty">尚無昨日紀錄</span>
-                )}
-              </div>
+              {yesterdayChips.length ? (
+                <ChipLine labels={yesterdayChips} />
+              ) : (
+                <span className="yw-home__empty">尚無昨日紀錄</span>
+              )}
             </div>
             <div className="yw-home__day">
               <SecLabel>今日穿搭</SecLabel>
-              <div className="yw-home__chips">
-                {recorded ? chips(todayChips) : <span className="yw-home__empty">尚未記錄</span>}
-              </div>
+              {recorded ? (
+                <ChipLine labels={todayChips} onOpen={onRecord} />
+              ) : (
+                <span className="yw-home__empty">尚未記錄</span>
+              )}
             </div>
           </div>
           <SecLabel>今日建議穿搭</SecLabel>
@@ -287,6 +284,87 @@ export function HomeScreen({
           />
         )}
       </div>
+    </div>
+  );
+}
+
+/** Most chips a 穿搭 row shows before folding the rest into「+N」. */
+const ROW_MAX = 3;
+
+/**
+ * One day's outfit on a single line: up to ROW_MAX chips (fewer when they don't
+ * fit the width), the rest folded into「+N」. With `onOpen` (今日穿搭) the whole
+ * row opens the record sheet; without it (昨日穿搭, read-only) +N expands the
+ * row in place and 收合 folds it back.
+ */
+function ChipLine({ labels, onOpen }: { labels: string[]; onOpen?: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(Math.min(ROW_MAX, labels.length));
+  const [expanded, setExpanded] = useState(false);
+  const key = labels.join("|");
+
+  // Start from ROW_MAX again whenever the labels or the width change, then drop
+  // one chip at a time until the line fits.
+  useLayoutEffect(() => {
+    setShown(Math.min(ROW_MAX, labels.length));
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setShown(Math.min(ROW_MAX, labels.length)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [key, labels.length]);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!expanded && el && shown > 1 && el.scrollWidth > el.clientWidth) setShown(shown - 1);
+  });
+
+  const visible = expanded ? labels : labels.slice(0, shown);
+  const more = labels.length - visible.length;
+  const chips = visible.map((label) => (
+    <OutfitChip key={label} compact label={label} iconSrc={garmentIcon[label]} />
+  ));
+  const moreLabel = `+${more}`;
+
+  if (onOpen) {
+    return (
+      // A div, not a <button>: OutfitChip renders a <button> itself.
+      <div
+        ref={ref}
+        role="button"
+        tabIndex={0}
+        className="yw-home__chipline"
+        data-action
+        onClick={onOpen}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen();
+          }
+        }}
+        aria-label={`今日穿搭：${labels.join("、")}，點一下修改`}
+      >
+        {chips}
+        {more > 0 ? <span className="yw-home__more">{moreLabel}</span> : null}
+      </div>
+    );
+  }
+  return (
+    <div ref={ref} className="yw-home__chipline" data-expanded={expanded || undefined}>
+      {chips}
+      {more > 0 ? (
+        <button
+          type="button"
+          className="yw-home__more"
+          onClick={() => setExpanded(true)}
+          aria-label={`還有 ${more} 件：${labels.slice(visible.length).join("、")}`}
+        >
+          {moreLabel}
+        </button>
+      ) : expanded && labels.length > shown ? (
+        <button type="button" className="yw-home__more" onClick={() => setExpanded(false)}>
+          收合
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -158,7 +158,7 @@ struct HomeView: View {
         return VStack(alignment: .leading, spacing: 12) {
             // 昨日穿搭 above 今日穿搭; today's record becomes 昨日 tomorrow.
             dayColumn("昨日穿搭", outfit.yesterday, empty: "尚無昨日紀錄")
-            dayColumn("今日穿搭", outfit.today, empty: "尚未記錄")
+            dayColumn("今日穿搭", outfit.today, empty: "尚未記錄", onOpen: onRecord)
             SectionLabel("今日建議穿搭")
             Text(advice)
                 .font(T.ui(12))
@@ -168,13 +168,11 @@ struct HomeView: View {
         .ywCard()
     }
 
-    private func dayColumn(_ title: String, _ entry: OutfitEntry?, empty: String) -> some View {
+    private func dayColumn(_ title: String, _ entry: OutfitEntry?, empty: String, onOpen: (() -> Void)? = nil) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionLabel(title)
             if let entry {
-                ChipFlow {
-                    ForEach(entry.chips, id: \.self) { OutfitChip(label: $0.label, asset: $0.asset, compact: true) }
-                }
+                ChipLine(chips: entry.picks.rankedChips, onOpen: onOpen)
             } else {
                 Text(empty)
                     .font(T.ui(12))
