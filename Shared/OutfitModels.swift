@@ -89,6 +89,18 @@ struct OutfitPicks: Codable, Equatable {
 
     var chips: [OutfitChipItem] { all.map(Garment.chip) }
 
+    /// Every pick ranked by how much it says about warmth (web rankedChips): the
+    /// Home rows show the first few and fold the rest into「+N」. Warmest outer →
+    /// main top → main bottom, then other outers (heavy → light), tops, bottoms,
+    /// accessories.
+    var rankedChips: [OutfitChipItem] {
+        let order = OutfitGroup.outers.items
+        let outs = outers.sorted { (order.firstIndex(of: $0) ?? 0) > (order.firstIndex(of: $1) ?? 0) }
+        let lead = [outs.first, tops.first, bottoms.first].compactMap { $0 }
+        let rest = Array(outs.dropFirst()) + Array(tops.dropFirst()) + Array(bottoms.dropFirst()) + accessories
+        return (lead + rest).map(Garment.chip)
+    }
+
     /// The two chips a widget has room for: the main top + the outermost layer (web keyChips).
     var keyChips: [OutfitChipItem] {
         [tops.first, Garment.heaviest(outers)].compactMap { $0 }.map(Garment.chip)

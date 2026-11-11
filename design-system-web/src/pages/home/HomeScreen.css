@@ -179,10 +179,50 @@
   gap: 12px;
 }
 
-.yw-home__chips {
+/* One day's outfit on one line; +N folds the rest (expandable for 昨日). */
+.yw-home__chipline {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 8px;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+/* 今日: the whole row opens the record sheet */
+.yw-home__chipline[data-action] {
+  cursor: pointer;
+}
+.yw-home__chipline[data-action] .yw-outfit-chip {
+  pointer-events: none;
+}
+.yw-home__chipline[data-action]:focus-visible {
+  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+.yw-home__chipline[data-expanded] {
+  flex-wrap: wrap;
+}
+.yw-home__chipline .yw-outfit-chip {
+  flex: none;
+}
+/* +N / 收合: a text-only compact chip */
+.yw-home__more {
+  flex: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  block-size: 28px;
+  padding: 0 12px;
+  border: var(--yw-sys-border-hairline) solid var(--yw-sys-color-line);
+  border-radius: 999px;
+  background: var(--yw-sys-color-surface-white);
+  color: var(--yw-sys-color-text-body);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .yw-home__empty {

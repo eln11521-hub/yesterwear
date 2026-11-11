@@ -112,6 +112,21 @@ export function keyChips(picks: OutfitPicks | null): string[] {
   return [top, outer].filter((x): x is string => Boolean(x));
 }
 
+/**
+ * Every pick ranked by how much it says about warmth — the Home rows show the
+ * first few and fold the rest into「+N」: warmest outer → main top → main
+ * bottom, then the other outers (heavy → light), tops, bottoms, accessories.
+ */
+export function rankedChips(picks: OutfitPicks | null): string[] {
+  if (!picks) return [];
+  const outers = [...picks.outers].sort(
+    (a, b) => OUTER_LAYER.indexOf(b as OuterItem) - OUTER_LAYER.indexOf(a as OuterItem),
+  );
+  const lead = [outers[0], picks.tops[0], picks.bottoms[0]].filter((x): x is string => Boolean(x));
+  const rest = [...outers.slice(1), ...picks.tops.slice(1), ...picks.bottoms.slice(1), ...picks.accessories];
+  return [...lead, ...rest];
+}
+
 /** The warmest outer layer picked (OUTER_LAYER is ordered light → heavy). */
 export function heaviest(outers: string[]): string | undefined {
   return [...outers].sort(
