@@ -167,17 +167,16 @@
   background: var(--yw-sys-color-text-primary);
 }
 
-/* 昨日穿搭 | 今日穿搭: two equal columns, 16 apart */
+/* 昨日穿搭 then 今日穿搭, stacked (12 apart like the rest of the card) */
 .yw-home__days {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 .yw-home__day {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-inline-size: 0;
 }
 
 .yw-home__chips {
