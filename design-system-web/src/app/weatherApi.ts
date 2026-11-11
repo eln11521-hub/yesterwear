@@ -167,12 +167,21 @@ export async function fetchWeather(
     });
   }
 
+  // 今天 vs 昨天 (00–23, feels-like): past_days=1 → hourly[0..23] is yesterday.
+  const feels24 = (from: number) =>
+    Array.from({ length: 24 }, (_, h) => toDisp(hourly.apparent_temperature[from + h] ?? 0));
+  const dayCompare =
+    hourly.apparent_temperature.length >= 48
+      ? { today: feels24(24), yesterday: feels24(0) }
+      : undefined;
+
   const cond = decode(current.weather_code);
   // PRD 4.2: rain hint when today's precipitation probability > 50%.
   const rain = (daily.precipitation_probability_max[1] ?? 0) > 50;
 
   return {
     location: loc.name,
+    ...(dayCompare ? { dayCompare } : {}),
     date: dateLabel(current.time),
     headline: headlineFor(overallDelta),
     // Hero big number = 體感 (feels-like) — the decision-relevant reading.

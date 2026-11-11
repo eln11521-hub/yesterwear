@@ -578,11 +578,11 @@ struct SectionBadge: View {
 /// ink dot, 「現在」 and a white chip; commute hours a 出門 / 下班 tag. Scrolls
 /// "now" to the center on appear.
 /// 各時段體感溫度 — ported from design-system-web/src/components/hourly-forecast/
-/// HourlyForecast.tsx (Figma 608:1520): next-commute line, then two rows that
-/// scroll together edge to edge — hour columns to read values (time · icon · 體感 ·
-/// 實際) and a gap-bar row to read the difference: 體感 colder than 實際 hangs down
-/// in the cold colour, warmer rises in the warm colour, equal is a short dash with
-/// 「0°」. Bars are 16pt per degree, capped at 5°.
+/// HourlyForecast.tsx (Figma 608:1520): one overview chart of today's feels-like
+/// (solid — ink up to now, lighter ahead) against yesterday's (dashed) across
+/// 00–24, a dot at now. It shows the shape of the day, not exact readings: the
+/// legend gives both values at now, and dragging across the chart reads any hour.
+/// Above it, one line about the next commute against the same hour the day before.
 struct HourlyChart: View {
     struct Item: Identifiable {
         var id: Int { offset }
@@ -596,120 +596,133 @@ struct HourlyChart: View {
         var slot: String? = nil
     }
 
-    let items: [Item]
+    let today: [Int]
+    let yesterday: [Int]
+    let nowHour: Int
+    /// The 3h-back → 24h-ahead window — for the next commute (incl. tomorrow).
+    var items: [Item] = []
 
-    private static let col: CGFloat = 48, colH: CGFloat = 92, gap: CGFloat = 8, bleed: CGFloat = 16,
-                       perDeg: CGFloat = 16, maxDeg = 5, labelH: CGFloat = 20
+    @State private var hover: Int?
 
-    private var diffs: [Int] { items.map { $0.feels - $0.actual } }
-    /// Baseline y (below the tallest warm bar + its label) and the row height.
-    private var layout: (base: CGFloat, height: CGFloat) {
-        let up = min(Self.maxDeg, max(0, diffs.max() ?? 0))
-        let down = min(Self.maxDeg, max(0, -(diffs.min() ?? 0)))
-        let base = CGFloat(up) * Self.perDeg + Self.labelH
-        return (base, base + CGFloat(down) * Self.perDeg + Self.labelH)
+    private static let plotH: CGFloat = 112, yLabelW: CGFloat = 28
+
+    private var at: Int { min(max(hover ?? nowHour, 0), 23) }
+    private var bounds: (lo: Int, hi: Int) {
+        let all = today + yesterday
+        let lo = all.min() ?? 0
+        return (lo, max(all.max() ?? 0, lo + 1))
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // The next commute after now — today's 下班 in the afternoon, tomorrow's
-            // 出門 once that has passed.
-            if let next = items.first(where: { $0.offset > 0 && $0.slot != nil }) { summary(next) }
-            ScrollView(.horizontal) {
-                VStack(alignment: .leading, spacing: Self.gap) {
-                    HStack(spacing: 4) { ForEach(items) { column($0) } }
-                    gapRow
-                }
-                .padding(.horizontal, Self.bleed)
-            }
-            .scrollIndicators(.hidden)
-            .padding(.horizontal, -Self.bleed)
+            if let line = summary { Text(line).font(T.ui(12)).foregroundStyle(S.textBody) }
             legend
+            VStack(spacing: 4) {
+                HStack(alignment: .top, spacing: 8) {
+                    GeometryReader { geo in plot(geo.size) }
+                        .frame(height: Self.plotH)
+                    VStack(alignment: .leading) {
+                        Text("\(bounds.hi)°")
+                        Spacer()
+                        Text("\(bounds.lo)°")
+                    }
+                    .font(T.ui(10))
+                    .foregroundStyle(S.textLabel)
+                    .frame(width: Self.yLabelW - 8, height: Self.plotH, alignment: .leading)
+                }
+                xAxis.padding(.trailing, Self.yLabelW)
+            }
         }
     }
 
-    /// Figma 669:1343: one plain 12pt body-colour line.
-    private func summary(_ h: Item) -> some View {
-        let gap = h.actual - h.feels
-        let slot = h.slot ?? "通勤"
-        let when = h.day == 0 ? "今天" : (slot == "出門" ? "明早" : "明天")
-        let diff = gap == 0 ? "與實際相同" : "比實際\(gap > 0 ? "低" : "高") \(abs(gap))°"
-        return Text("\(when) \(String(format: "%02d:00", h.hour)) \(slot)體感 \(h.feels)°，\(diff)")
-            .font(T.ui(12))
-            .foregroundStyle(S.textBody)
+    /// Next commute: today's against yesterday; once those have passed, tomorrow's
+    /// against today — the same hour the day before either way.
+    private var summary: String? {
+        guard let next = items.first(where: { $0.offset > 0 && $0.slot != nil }),
+              (0..<24).contains(next.hour) else { return nil }
+        let before = next.day == 0 ? yesterday[next.hour] : today[next.hour]
+        let d = next.feels - before
+        let slot = next.slot ?? "通勤"
+        let when = next.day == 0 ? "今天" : (slot == "出門" ? "明早" : "明天")
+        let ref = next.day == 0 ? "昨天" : "今天"
+        let diff = d == 0 ? "和\(ref)差不多" : "比\(ref)\(d > 0 ? "高" : "低") \(abs(d))°"
+        return "\(when) \(String(format: "%02d:00", next.hour)) \(slot)體感 \(next.feels)°，\(diff)"
     }
 
+    /// The legend doubles as the read-out: values at now, or at the dragged hour.
     private var legend: some View {
         HStack(spacing: 16) {
-            key("體感比實際冷") { RoundedRectangle(cornerRadius: 2).fill(S.deltaCold).frame(width: 8, height: 12) }
-            key("體感比實際暖") { RoundedRectangle(cornerRadius: 2).fill(S.deltaWarm).frame(width: 8, height: 12) }
+            HStack(spacing: 6) {
+                Capsule().fill(S.textPrimary).frame(width: 16, height: 2)
+                Text(hover == nil ? "今天" : "今天 \(String(format: "%02d:00", at))")
+                Text("\(today[at])°").font(T.ui(12, .medium)).foregroundStyle(S.textPrimary)
+            }
+            HStack(spacing: 6) {
+                Path { p in p.move(to: .init(x: 0, y: 1)); p.addLine(to: .init(x: 16, y: 1)) }
+                    .stroke(S.textHint, style: StrokeStyle(lineWidth: 2, dash: [4, 4]))
+                    .frame(width: 16, height: 2)
+                Text("昨天")
+                Text("\(yesterday[at])°").font(T.ui(12, .medium)).foregroundStyle(S.textPrimary)
+            }
         }
-        .accessibilityHidden(true)
+        .font(T.ui(12))
+        .foregroundStyle(S.textMutedWarm)
     }
 
-    private func key<Swatch: View>(_ label: String, @ViewBuilder _ swatch: () -> Swatch) -> some View {
-        HStack(spacing: 6) {
-            swatch()
-            Text(label).font(T.ui(12)).foregroundStyle(S.textMutedWarm)
-        }
-    }
-
-    /// Figma 668:1252: time 8 SemiBold, 體感 14 Medium, 實際 10. 現在 in ink, past muted.
-    private func column(_ h: Item) -> some View {
-        let past = h.offset < 0, now = h.offset == 0
-        return VStack(spacing: 6) {
-            Text(now ? "現在" : String(format: "%02d:00", h.hour))
-                .font(T.ui(8, .semibold))
-                .foregroundStyle(now ? S.textPrimary : S.textLabel)
-                .lineLimit(1).fixedSize()
-                .frame(height: 10)
-            WeatherGlyph(condition: h.condition, size: 18).opacity(past ? 0.45 : 1)
-            Text("\(h.feels)°").font(T.ui(14, .medium)).foregroundStyle(past ? S.textHint : S.textPrimary)
-                .frame(height: 18)
-            Text("實際 \(h.actual)°").font(T.ui(10))
-                .foregroundStyle(past ? S.textHint : (now ? S.textPrimary : S.textLabel))
-                .lineLimit(1).fixedSize()
-                .frame(height: 12)
-        }
-        .frame(width: Self.col, height: Self.colH)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(now ? "現在" : String(format: "%02d:00", h.hour))，體感 \(h.feels)°，實際 \(h.actual)°")
-    }
-
-    /// One bar per hour off a shared baseline (= same as 實際).
-    private var gapRow: some View {
-        let (base, height) = layout
-        let w = CGFloat(items.count) * (Self.col + 4) - 4
-        return ZStack(alignment: .topLeading) {
-            Rectangle().fill(S.line).frame(width: w, height: 1).offset(y: base)
-            HStack(spacing: 4) {
-                ForEach(Array(items.enumerated()), id: \.element.id) { i, it in
-                    gapBar(diffs[i], base: base).opacity(it.offset < 0 ? 0.45 : 1)
+    private func plot(_ size: CGSize) -> some View {
+        let (lo, hi) = bounds
+        let x = { (h: Int) in CGFloat(h) / 23 * size.width }
+        let y = { (v: Int) in 8 + CGFloat(hi - v) / CGFloat(hi - lo) * (size.height - 16) }
+        func line(_ vals: [Int], _ from: Int, _ to: Int) -> Path {
+            Path { p in
+                guard from <= to else { return }
+                for h in from...to {
+                    let pt = CGPoint(x: x(h), y: y(vals[h]))
+                    h == from ? p.move(to: pt) : p.addLine(to: pt)
                 }
             }
         }
-        .frame(width: w, height: height, alignment: .topLeading)
-        .accessibilityHidden(true)
+        let now = min(max(nowHour, 0), 23)
+        return ZStack(alignment: .topLeading) {
+            ForEach([0, 3, 6, 9, 12, 15, 18, 21], id: \.self) { h in
+                Path { p in p.move(to: .init(x: x(h), y: 0)); p.addLine(to: .init(x: x(h), y: size.height)) }
+                    .stroke(S.line, lineWidth: 1)
+            }
+            line(yesterday, 0, 23).stroke(S.textHint, style: StrokeStyle(lineWidth: 2, dash: [4, 4]))
+            line(today, now, 23).stroke(S.textMutedWarm, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+            line(today, 0, now).stroke(S.textPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+            if let hover {
+                Path { p in p.move(to: .init(x: x(hover), y: 0)); p.addLine(to: .init(x: x(hover), y: size.height)) }
+                    .stroke(S.textMutedWarm, lineWidth: 1)
+            }
+            Circle().fill(S.textPrimary)
+                .overlay(Circle().stroke(S.surfaceRaised, lineWidth: 2))
+                .frame(width: 8, height: 8)
+                .position(x: x(at), y: y(today[at]))
+        }
+        .contentShape(Rectangle())
+        // Simultaneous, so a vertical swipe that starts on the chart still scrolls the page.
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { g in hover = min(max(Int((g.location.x / size.width * 23).rounded()), 0), 23) }
+                .onEnded { _ in hover = nil }
+        )
+        .accessibilityElement()
+        .accessibilityLabel("今天與昨天的體感溫度，現在今天 \(today[now])°、昨天 \(yesterday[now])°")
     }
 
-    private func gapBar(_ d: Int, base: CGFloat) -> some View {
-        let len = CGFloat(min(Self.maxDeg, abs(d))) * Self.perDeg
-        let color: Color = d < 0 ? S.deltaCold : (d > 0 ? S.deltaWarm : S.deltaNeutral)
-        let textColor: Color = d < 0 ? S.deltaCold : (d > 0 ? S.badgeRequiredText : S.textLabel)
-        let label = (d > 0 ? "+" : d < 0 ? "−" : "") + "\(abs(d))°"
-        return ZStack(alignment: .top) {
-            if d == 0 {
-                RoundedRectangle(cornerRadius: 2).fill(color).frame(width: 18, height: 3).offset(y: base - 1)
-            } else {
-                RoundedRectangle(cornerRadius: 4).fill(color).frame(width: 18, height: len)
-                    .offset(y: d < 0 ? base : base - len)
+    private var xAxis: some View {
+        GeometryReader { geo in
+            ForEach([0, 3, 6, 9, 12, 15, 18, 21], id: \.self) { h in
+                Text("\(h)")
+                    .font(T.ui(10))
+                    .foregroundStyle(S.textLabel)
+                    .fixedSize()
+                    .position(x: h == 0 ? 4 : CGFloat(h) / 23 * geo.size.width, y: 6)
             }
-            Text(label).font(T.ui(12, .medium)).foregroundStyle(textColor)
-                .frame(height: 16)
-                .offset(y: d > 0 ? base - len - Self.labelH + 2 : base + len + 4)
         }
-        .frame(width: Self.col, alignment: .top)
-        .frame(maxHeight: .infinity, alignment: .top)
+        .frame(height: 12)
+        .accessibilityHidden(true)
     }
 }
 

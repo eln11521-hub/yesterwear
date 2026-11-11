@@ -24,7 +24,11 @@ const meta = {
   component: HourlyForecast,
   tags: ["autodocs"],
   parameters: getComponentStoryParameters("hourly-forecast"),
-  args: { items: MOCK_WEATHER.hourly },
+  args: {
+    today: MOCK_WEATHER.dayCompare!.today,
+    yesterday: MOCK_WEATHER.dayCompare!.yesterday,
+    items: MOCK_WEATHER.hourly,
+  },
   decorators: [cardDecorator],
 } satisfies Meta<typeof HourlyForecast>;
 
@@ -32,27 +36,14 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/** Today 00–23; the current hour (09:00) is dotted and centered. */
+/** Today (solid — ink up to now, lighter ahead) against yesterday (dashed),
+ *  00–24. Drag across the chart to read an hour in the legend. */
 export const Default: Story = {};
 
-/** Rainy afternoon — wet hours show their rain probability. */
-export const Rainy: Story = {
+/** Today much warmer than yesterday all day. */
+export const WarmerDay: Story = {
   args: {
-    items: MOCK_WEATHER.hourly.map((h) =>
-      h.hour >= 14 && h.hour <= 19 ? { ...h, condition: "rain", pop: 60 + (h.hour - 14) * 5 } : h,
-    ),
-  },
-};
-
-/** A typical Taipei day: gaps of 0–1°, and 體感 rising above 實際 in the
- *  afternoon — cold bars hang down, warm bars rise, equal hours read 「0°」. */
-export const CloseAndCrossing: Story = {
-  args: {
-    items: MOCK_WEATHER.hourly.map((h, i) => {
-      const F = [21, 22, 23, 22, 22, 22, 23, 23];
-      const A = [22, 23, 23, 23, 23, 23, 22, 21];
-      const k = i % F.length;
-      return { ...h, temp: F[k], actual: A[k] };
-    }),
+    today: MOCK_WEATHER.dayCompare!.yesterday.map((v) => v + 5),
+    yesterday: MOCK_WEATHER.dayCompare!.yesterday,
   },
 };

@@ -216,11 +216,16 @@ export function HomeScreen({
           <p className="yw-home__suggestion">{advice.replace(/^建議：/, "")}</p>
         </section>
 
-        {/* 各時段體感溫度 — older cached snapshots have no hourly data (or no actual
-            temperature per hour), so hide until the next refresh. */}
-        {weather.hourly?.length && weather.hourly.every((h) => typeof h.actual === "number") ? (
+        {/* 各時段體感溫度 — today vs yesterday overview; older cached snapshots
+            have no 00–23 comparison, so hide until the next refresh. */}
+        {weather.dayCompare ? (
           <section className="yw-home__card">
-            <HourlyForecast items={weather.hourly} header={<SecLabel>各時段體感溫度</SecLabel>} />
+            <HourlyForecast
+              today={weather.dayCompare.today}
+              yesterday={weather.dayCompare.yesterday}
+              items={weather.hourly}
+              header={<SecLabel>各時段體感溫度</SecLabel>}
+            />
           </section>
         ) : null}
 
