@@ -35,3 +35,8 @@ export const CrossLocation: Story = {
     advice: "比昨天在艾德蒙頓冷 5°，昨天那套要再加一層。",
   },
 };
+
+/** Today recorded: 今日穿搭 fills in beside 昨日穿搭 and the CTA turns outlined. */
+export const Recorded: Story = {
+  args: { todayChips: ["短袖上衣", "薄外套", "長褲"] },
+};

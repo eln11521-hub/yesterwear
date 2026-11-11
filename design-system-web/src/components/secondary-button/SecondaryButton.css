@@ -20,6 +20,13 @@
     var(--yw-sys-motion-ease-out);
 }
 
+.yw-secondary-button[data-shape="pill"] {
+  border-radius: 100px;
+  background: var(--yw-sys-color-surface-white);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .yw-secondary-button:active:not(:disabled) {
   transform: scale(var(--yw-sys-motion-scale-pressed));
 }

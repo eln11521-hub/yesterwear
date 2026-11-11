@@ -69,12 +69,14 @@ struct HomeView: View {
                            startPoint: .top, endPoint: .bottom)
                 .frame(height: 24)
                 .allowsHitTesting(false)
-            YWPrimaryButton(
-                label: outfit.today == nil ? "記錄今天穿搭" : "更新今日穿搭",
-                icon: "icon-tag",
-                pill: true,
-                action: onRecord
-            )
+            Group {
+                // Solid ink until today is recorded, then an outlined white pill.
+                if outfit.today == nil {
+                    YWPrimaryButton(label: "記錄今天穿搭", icon: "icon-tag", pill: true, action: onRecord)
+                } else {
+                    YWSecondaryButton(label: "更新今日穿搭", icon: "icon-tag", pill: true, action: onRecord)
+                }
+            }
             .padding(.horizontal, 16)
             .padding(.bottom, 4)
             .background(S.surfacePaper)
@@ -154,15 +156,10 @@ struct HomeView: View {
         let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
         let advice = suggestion.advice.hasPrefix("建議：") ? String(suggestion.advice.dropFirst(3)) : suggestion.advice
         return VStack(alignment: .leading, spacing: 12) {
-            SectionLabel("昨日穿搭")
-            if let y = outfit.yesterday {
-                ChipFlow {
-                    ForEach(y.chips, id: \.self) { OutfitChip(label: $0.label, asset: $0.asset, compact: true) }
-                }
-            } else {
-                Text("尚無昨日紀錄")
-                    .font(T.ui(12))
-                    .foregroundStyle(S.textLabel)
+            // 昨日穿搭 | 今日穿搭 side by side; today's column becomes 昨日 tomorrow.
+            HStack(alignment: .top, spacing: 16) {
+                dayColumn("昨日穿搭", outfit.yesterday, empty: "尚無昨日紀錄")
+                dayColumn("今日穿搭", outfit.today, empty: "尚未記錄")
             }
             SectionLabel("今日建議穿搭")
             Text(advice)
@@ -171,6 +168,22 @@ struct HomeView: View {
                 .foregroundStyle(S.textBody)
         }
         .ywCard()
+    }
+
+    private func dayColumn(_ title: String, _ entry: OutfitEntry?, empty: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel(title)
+            if let entry {
+                ChipFlow {
+                    ForEach(entry.chips, id: \.self) { OutfitChip(label: $0.label, asset: $0.asset, compact: true) }
+                }
+            } else {
+                Text(empty)
+                    .font(T.ui(12))
+                    .foregroundStyle(S.textLabel)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: Hourly
