@@ -1,8 +1,8 @@
 /* 各時段體感溫度 (Figma 608:1520). Columns are 48 wide on a 52 step so each
-   chart point sits under its column; columns + chart scroll together, the °C
-   axis stays put. Sizes on the 4pt grid. */
+   chart point sits under its column; columns + chart scroll together edge to
+   edge, the ° ticks stay put over the chart. */
 .yw-hourly {
-  --yw-hourly-col-h: 96px;
+  --yw-hourly-col-h: 92px;
   --yw-hourly-gap: 8px;
   display: flex;
   flex-direction: column;
@@ -13,29 +13,14 @@
 .yw-hourly__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.yw-hourly__range {
-  font-size: 12px;
-  color: var(--yw-sys-color-text-label);
-  white-space: nowrap;
 }
 
+/* next-commute line: 12 Regular body colour, no emphasis (Figma 669:1343) */
 .yw-hourly__summary {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
-  color: var(--yw-sys-color-text-primary);
-}
-.yw-hourly__num {
-  font-weight: 500;
-}
-.yw-hourly__summary span.yw-hourly__num {
-  font-weight: 400;
-}
-.yw-hourly__gap {
-  color: var(--yw-sys-color-delta-cold);
+  color: var(--yw-sys-color-text-body);
 }
 
 .yw-hourly__legend {
@@ -66,37 +51,40 @@
   background: color-mix(in srgb, var(--yw-sys-color-delta-cold) 20%, transparent);
 }
 
+/* Columns + chart scroll edge to edge: the body bleeds over the card's 16px
+   padding; the track starts after the 28px tick axis. */
 .yw-hourly__body {
-  display: flex;
-}
-.yw-hourly__axis {
+  --yw-hourly-axis: 28px;
   position: relative;
-  flex: none;
-  inline-size: 28px;
-  font-size: 10px;
-  color: var(--yw-sys-color-text-label);
+  margin-inline: -16px;
 }
-.yw-hourly__unit,
-.yw-hourly__tick {
-  position: absolute;
-  inset-inline-start: 0;
-  line-height: 12px;
-}
-.yw-hourly__unit {
-  top: calc(var(--yw-hourly-col-h) + var(--yw-hourly-gap) - 24px);
-}
-.yw-hourly__tick {
-  transform: translateY(calc(var(--yw-hourly-col-h) + var(--yw-hourly-gap) - 6px));
-}
-
 .yw-hourly__scroll {
-  flex: 1;
-  min-inline-size: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .yw-hourly__scroll::-webkit-scrollbar {
   display: none;
+}
+.yw-hourly__track {
+  inline-size: max-content;
+  padding-inline: calc(16px + var(--yw-hourly-axis)) 16px;
+}
+.yw-hourly__axis {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: calc(var(--yw-hourly-col-h) + var(--yw-hourly-gap));
+  inline-size: calc(16px + var(--yw-hourly-axis));
+  block-size: 120px;
+  background: var(--yw-sys-color-surface-raised);
+  font-size: 10px;
+  color: var(--yw-sys-color-text-label);
+  pointer-events: none;
+}
+.yw-hourly__tick {
+  position: absolute;
+  inset-inline-start: 16px;
+  line-height: 12px;
+  transform: translateY(-6px);
 }
 
 .yw-hourly__cols {
@@ -117,23 +105,22 @@
   padding-block: 8px;
   border-radius: var(--yw-sys-radius-md);
 }
-.yw-hourly__col[data-now] {
-  background: var(--yw-sys-color-surface-white);
-}
+/* time 8 SemiBold (Figma 668:1252) */
 .yw-hourly__time {
-  font-size: 10px;
-  line-height: 12px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 10px;
   color: var(--yw-sys-color-text-label);
   white-space: nowrap;
 }
-.yw-hourly__col[data-now] .yw-hourly__time {
-  font-weight: 500;
+.yw-hourly__col[data-now] .yw-hourly__time,
+.yw-hourly__col[data-now] .yw-hourly__actual {
   color: var(--yw-sys-color-text-primary);
 }
 .yw-hourly__temp {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 18px;
   color: var(--yw-sys-color-text-primary);
 }
 .yw-hourly__actual {

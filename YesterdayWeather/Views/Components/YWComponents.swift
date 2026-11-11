@@ -347,13 +347,13 @@ struct ForecastRow: View {
         let width = clamp(Double(high - low) / span)
         let knob = current.map { clamp(Double($0 - weekMin) / span) }
 
-        // Track = ink 8%, solid warm fill, white knob for today's feels-like.
+        // Figma 608:1555: 4pt bar, track = ink 8%, fill = body ink; optional knob.
         return GeometryReader { geo in
             let w = geo.size.width
             ZStack(alignment: .leading) {
-                Capsule().fill(S.textPrimary.opacity(0.08)).frame(height: 6)
-                Capsule().fill(S.deltaWarm)
-                    .frame(width: max(8, w * width), height: 6)
+                Capsule().fill(S.textPrimary.opacity(0.08)).frame(height: 4)
+                Capsule().fill(S.textBody)
+                    .frame(width: max(8, w * width), height: 4)
                     .offset(x: w * left)
                 if let knob {
                     Circle()
@@ -578,9 +578,10 @@ struct SectionBadge: View {
 /// ink dot, 「現在」 and a white chip; commute hours a 出門 / 下班 tag. Scrolls
 /// "now" to the center on appear.
 /// 各時段體感溫度 — ported from design-system-web/src/components/hourly-forecast/
-/// HourlyForecast.tsx (Figma 608:1520): next-commute summary, legend, then hour
-/// columns (time · icon · 體感 · 實際) over a feels-like (solid) vs actual (dashed)
-/// chart with the gap shaded. Columns + chart scroll together; the °C axis stays.
+/// HourlyForecast.tsx (Figma 608:1520): next-commute line, hour columns (time ·
+/// icon · 體感 · 實際) over a feels-like (solid) vs actual (dashed) chart with the
+/// gap shaded, then the legend. Columns + chart scroll edge to edge across the
+/// card (the body bleeds over its 16pt padding); the ° ticks float over the chart.
 struct HourlyChart: View {
     struct Item: Identifiable {
         var id: Int { offset }
@@ -596,7 +597,8 @@ struct HourlyChart: View {
 
     let items: [Item]
 
-    private static let col: CGFloat = 48, step: CGFloat = 52, chartH: CGFloat = 112, colH: CGFloat = 96, gap: CGFloat = 8
+    private static let col: CGFloat = 48, step: CGFloat = 52, chartH: CGFloat = 112, colH: CGFloat = 92, gap: CGFloat = 8,
+                       axisW: CGFloat = 28, bleed: CGFloat = 16
 
     private var nowIdx: Int { items.firstIndex { $0.offset == 0 } ?? 0 }
     private var bounds: (lo: Int, hi: Int) {
@@ -614,29 +616,32 @@ struct HourlyChart: View {
             // The next commute after now — today's 下班 in the afternoon, tomorrow's
             // 出門 once that has passed.
             if let next = items.first(where: { $0.offset > 0 && $0.slot != nil }) { summary(next) }
-            legend
-            HStack(alignment: .top, spacing: 0) {
-                axis
+            ZStack(alignment: .topLeading) {
                 ScrollView(.horizontal) {
                     VStack(alignment: .leading, spacing: Self.gap) {
                         HStack(spacing: 4) { ForEach(items) { column($0) } }
                         chart
                     }
+                    .padding(.leading, Self.bleed + Self.axisW)
+                    .padding(.trailing, Self.bleed)
                 }
                 .scrollIndicators(.hidden)
+                axis
             }
+            .padding(.horizontal, -Self.bleed)
+            legend
         }
     }
 
+    /// Figma 669:1343: one plain 12pt body-colour line.
     private func summary(_ h: Item) -> some View {
         let gap = h.actual - h.feels
         let slot = h.slot ?? "通勤"
         let when = h.day == 0 ? "今天" : (slot == "出門" ? "明早" : "明天")
-        var t = Text("\(when) \(String(format: "%02d:00", h.hour)) \(slot)體感 ")
-            + Text("\(h.feels)°").font(T.ui(14, .medium)) + Text("，")
-        if gap == 0 { t = t + Text("與實際相同") }
-        else { t = t + Text("比實際\(gap > 0 ? "低" : "高") ") + Text("\(abs(gap))°").font(T.ui(14, .medium)).foregroundColor(S.deltaCold) }
-        return t.font(T.ui(14)).foregroundStyle(S.textPrimary)
+        let diff = gap == 0 ? "與實際相同" : "比實際\(gap > 0 ? "低" : "高") \(abs(gap))°"
+        return Text("\(when) \(String(format: "%02d:00", h.hour)) \(slot)體感 \(h.feels)°，\(diff)")
+            .font(T.ui(12))
+            .foregroundStyle(S.textBody)
     }
 
     private var legend: some View {
@@ -659,33 +664,45 @@ struct HourlyChart: View {
         }
     }
 
+    /// ° ticks over the chart's left edge, on the card colour so the chart slides
+    /// under them while the columns above scroll right to the card edge.
     private var axis: some View {
         ZStack(alignment: .topLeading) {
-            Text("°C").font(T.ui(10)).foregroundStyle(S.textLabel)
-                .offset(y: Self.colH + Self.gap - 24)
             ForEach(ticks, id: \.self) { t in
                 Text("\(t)°").font(T.ui(10)).foregroundStyle(S.textLabel)
-                    .offset(y: Self.colH + Self.gap + y(t) - 6)
+                    .frame(height: 12)
+                    .offset(x: Self.bleed, y: y(t) + 4 - 6)
             }
         }
-        .frame(width: 28, height: Self.colH + Self.gap + Self.chartH + 8, alignment: .topLeading)
+        // 4pt of extra cover above and below so the top/bottom gridlines' strokes
+        // don't peek out next to the ticks.
+        .frame(width: Self.bleed + Self.axisW, height: Self.chartH + 16, alignment: .topLeading)
+        // An explicit Rectangle: a bare ShapeStyle background takes the container's
+        // rounded shape here, which let the gridlines show at its ends.
+        .background(Rectangle().fill(S.surfaceRaised))
+        .offset(y: Self.colH + Self.gap - 4)
+        .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
 
+    /// Figma 668:1252: time 8 SemiBold, 體感 14 Medium, 實際 10. 現在 in ink, past muted.
     private func column(_ h: Item) -> some View {
         let past = h.offset < 0, now = h.offset == 0
         return VStack(spacing: 6) {
             Text(now ? "現在" : String(format: "%02d:00", h.hour))
-                .font(T.ui(10, now ? .medium : .regular))
+                .font(T.ui(8, .semibold))
                 .foregroundStyle(now ? S.textPrimary : S.textLabel)
                 .lineLimit(1).fixedSize()
+                .frame(height: 10)
             WeatherGlyph(condition: h.condition, size: 18).opacity(past ? 0.45 : 1)
-            Text("\(h.feels)°").font(T.ui(16, .medium)).foregroundStyle(past ? S.textHint : S.textPrimary)
-            Text("實際 \(h.actual)°").font(T.ui(10)).foregroundStyle(past ? S.textHint : S.textLabel)
+            Text("\(h.feels)°").font(T.ui(14, .medium)).foregroundStyle(past ? S.textHint : S.textPrimary)
+                .frame(height: 18)
+            Text("實際 \(h.actual)°").font(T.ui(10))
+                .foregroundStyle(past ? S.textHint : (now ? S.textPrimary : S.textLabel))
                 .lineLimit(1).fixedSize()
+                .frame(height: 12)
         }
         .frame(width: Self.col, height: Self.colH)
-        .background(now ? S.surfaceWhite : .clear, in: RoundedRectangle(cornerRadius: S.radiusMd))
         .accessibilityElement(children: .combine)
     }
 
