@@ -596,7 +596,8 @@ struct HourlyChart: View {
         let feels: Int
         let actual: Int
         let condition: WeatherCondition
-        var leave = false
+        /// 出門 / 下班 when this hour is one of the user's commute times.
+        var slot: String? = nil
     }
 
     let items: [Item]
@@ -616,7 +617,9 @@ struct HourlyChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if let next = items.first(where: { $0.offset > 0 && $0.leave }) { summary(next) }
+            // The next commute after now — today's 下班 in the afternoon, tomorrow's
+            // 出門 once that has passed.
+            if let next = items.first(where: { $0.offset > 0 && $0.slot != nil }) { summary(next) }
             legend
             HStack(alignment: .top, spacing: 0) {
                 axis
@@ -633,7 +636,9 @@ struct HourlyChart: View {
 
     private func summary(_ h: Item) -> some View {
         let gap = h.actual - h.feels
-        var t = Text("\(h.day == 1 ? "明早" : "今天") \(String(format: "%02d:00", h.hour)) 通勤體感 ")
+        let slot = h.slot ?? "通勤"
+        let when = h.day == 0 ? "今天" : (slot == "出門" ? "明早" : "明天")
+        var t = Text("\(when) \(String(format: "%02d:00", h.hour)) \(slot)體感 ")
             + Text("\(h.feels)°").font(T.ui(14, .medium)) + Text("，")
         if gap == 0 { t = t + Text("與實際相同") }
         else { t = t + Text("比實際\(gap > 0 ? "低" : "高") ") + Text("\(abs(gap))°").font(T.ui(14, .medium)).foregroundColor(S.deltaCold) }

@@ -43,8 +43,9 @@ export function HourlyForecast({ items, header }: HourlyForecastProps) {
     " Z";
   const now = items[nowIdx];
 
-  // 明早 / 今天 08:00 通勤體感 X°，比實際低 Y° — the next 出門 hour after now.
-  const next = items.find((h, i) => i > nowIdx && h.slot === "出門");
+  // 今天 18:00 下班體感 X°，比實際低 Y° — the next commute (出門 or 下班) after
+  // now: today's 下班 in the afternoon, tomorrow's 出門 once that has passed.
+  const next = items.find((h, i) => i > nowIdx && h.slot);
   const gap = next ? next.actual - next.temp : 0;
 
   return (
@@ -56,8 +57,8 @@ export function HourlyForecast({ items, header }: HourlyForecastProps) {
 
       {next ? (
         <p className="yw-hourly__summary">
-          {next.day ? "明早" : "今天"} <span className="yw-hourly__num">{pad(next.hour)}:00</span>{" "}
-          通勤體感 <b className="yw-hourly__num">{next.temp}°</b>，
+          {next.day ? (next.slot === "出門" ? "明早" : "明天") : "今天"}{" "}
+          <span className="yw-hourly__num">{pad(next.hour)}:00</span> {next.slot}體感 <b className="yw-hourly__num">{next.temp}°</b>，
           {gap === 0 ? (
             "與實際相同"
           ) : (

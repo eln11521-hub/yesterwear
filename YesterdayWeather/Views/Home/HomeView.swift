@@ -185,7 +185,7 @@ struct HomeView: View {
     // MARK: Hourly
 
     private func hourlyCard(_ hours: [HourPoint]) -> some View {
-        let leave = settings.settings.leaveHour
+        let leave = settings.settings.leaveHour, back = settings.settings.returnHour
         let items = hours.map { h in
             HourlyChart.Item(
                 offset: h.offset ?? 0,
@@ -194,7 +194,7 @@ struct HomeView: View {
                 feels: deg(h.apparent),
                 actual: deg(h.actual ?? h.apparent),
                 condition: h.condition,
-                leave: h.hour == leave
+                slot: h.hour == leave ? "出門" : (h.hour == back ? "下班" : nil)
             )
         }
         return VStack(alignment: .leading, spacing: 12) {
