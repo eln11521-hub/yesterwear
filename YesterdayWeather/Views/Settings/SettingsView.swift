@@ -59,7 +59,7 @@ struct SettingsView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .background(S.surfaceWarm.ignoresSafeArea())
+        .background(S.surfacePaper.ignoresSafeArea())
         .task { await refreshNotifStatus() }
     }
 
