@@ -7,6 +7,9 @@ export type SecondaryButtonProps = {
   /** Optional leading line icon. */
   icon?: ReactNode;
   disabled?: boolean;
+  /** "pill" = fully rounded, 14px Bold on a white fill — the Home CTA once today
+   *  is recorded (更新今日穿搭), same size as the PrimaryButton pill. */
+  shape?: "rounded" | "pill";
   onClick?: () => void;
 };
 
@@ -18,12 +21,14 @@ export function SecondaryButton({
   label,
   icon,
   disabled = false,
+  shape = "rounded",
   onClick,
 }: SecondaryButtonProps) {
   return (
     <button
       type="button"
       className="yw-secondary-button"
+      data-shape={shape}
       disabled={disabled}
       onClick={onClick}
     >

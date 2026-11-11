@@ -474,20 +474,25 @@ extension View {
 struct YWSecondaryButton: View {
     let label: String
     var icon: String? = nil
+    /// Fully rounded, 14pt Bold on a white fill — the Home CTA once today is
+    /// recorded (更新今日穿搭); same size as the YWPrimaryButton pill.
+    var pill: Bool = false
     let action: () -> Void
 
     var body: some View {
+        let shape = RoundedRectangle(cornerRadius: pill ? 100 : S.radiusMd)
         Button(action: action) {
             HStack(spacing: 8) {
                 if let icon { AssetIcon(name: icon, size: 18) }
-                Text(label).font(T.ui(15, .semibold))
+                Text(label).font(T.ui(pill ? 14 : 15, pill ? .bold : .semibold))
             }
             .foregroundStyle(S.textPrimary)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 15)
             .padding(.horizontal, 24)
-            .overlay(RoundedRectangle(cornerRadius: S.radiusMd).strokeBorder(S.textPrimary, lineWidth: 1))
-            .contentShape(RoundedRectangle(cornerRadius: S.radiusMd))
+            .background(pill ? S.surfaceWhite : .clear, in: shape)
+            .overlay(shape.strokeBorder(S.textPrimary, lineWidth: 1))
+            .contentShape(shape)
         }
         .buttonStyle(PressScaleStyle())
     }

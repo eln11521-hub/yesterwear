@@ -11,6 +11,7 @@ import { HourlyForecast } from "../../components/hourly-forecast/HourlyForecast"
 import { garmentIcon } from "../../components/outfit-chip/garments";
 import { OutfitChip } from "../../components/outfit-chip/OutfitChip";
 import { PrimaryButton } from "../../components/primary-button/PrimaryButton";
+import { SecondaryButton } from "../../components/secondary-button/SecondaryButton";
 import { TopBar } from "../../components/top-bar/TopBar";
 import { WidgetPromoCard } from "../../components/widget-promo-card/WidgetPromoCard";
 import "./HomeScreen.css";
@@ -19,6 +20,9 @@ export type HomeScreenProps = {
   weather?: WeatherVM;
   /** Garment labels for the 昨日穿搭 row (「不加外套」already omitted). */
   yesterdayChips?: string[];
+  /** Garment labels of today's record, shown beside 昨日穿搭. Empty/omitted =
+   *  not recorded yet: the column reads 尚未記錄 and the CTA stays solid ink. */
+  todayChips?: string[];
   advice?: string;
   /**
    * Cross-location state — set only when today's city differs from where
@@ -99,16 +103,17 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 /**
  * HomeScreen — Figma 608:1477 (v5). Paper ground with #f5f5f5 cards, read top to
  * bottom: hero (現在體感 · 溫度 · 比較句 · 天氣 · 實際氣溫/濕度/降雨 · 通勤摘要) →
- * 昨日穿搭 + 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
+ * 昨日穿搭 | 今日穿搭 + 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
  * the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭 is a
  * sticky CTA at the bottom. Presentational: pass props for real data.
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
   yesterdayChips = ["長袖上衣", "薄外套"],
+  todayChips = [],
   advice = DEFAULT_SUGGESTION.advice,
   crossLocation,
-  ctaLabel = "記錄今天穿搭",
+  ctaLabel,
   onRecord,
   onRefresh,
   refreshing = false,
@@ -124,6 +129,11 @@ export function HomeScreen({
   const rain = metric("降雨");
   const humidity = metric("濕度");
   const rainPossible = Number.parseInt(rain, 10) > 0;
+  const recorded = todayChips.length > 0;
+  const chips = (labels: string[]) =>
+    labels.map((label) => (
+      <OutfitChip key={label} compact label={label} iconSrc={garmentIcon[label]} />
+    ));
   return (
     <div className="yw-home">
       <div className="yw-home__top">
@@ -190,30 +200,35 @@ export function HomeScreen({
           ) : null}
         </section>
 
+        {/* 昨日穿搭 | 今日穿搭 side by side, so the two days compare at a glance;
+            today's column becomes 昨日穿搭 tomorrow. */}
         <section className="yw-home__card yw-home__block">
-          <SecLabel>
-            {crossLocation ? (
-              <span className="yw-home__sec-city">
-                昨日穿搭 · <PinIcon size={11} />
-                {crossLocation.yesterdayCity}
-              </span>
-            ) : (
-              "昨日穿搭"
-            )}
-          </SecLabel>
-          <div className="yw-home__chips">
-            {yesterdayChips.length ? (
-              yesterdayChips.map((label) => (
-                <OutfitChip
-                  key={label}
-                  compact
-                  label={label}
-                  iconSrc={garmentIcon[label]}
-                />
-              ))
-            ) : (
-              <span className="yw-home__empty">尚無昨日紀錄</span>
-            )}
+          <div className="yw-home__days">
+            <div className="yw-home__day">
+              <SecLabel>
+                {crossLocation ? (
+                  <span className="yw-home__sec-city">
+                    昨日穿搭 · <PinIcon size={11} />
+                    {crossLocation.yesterdayCity}
+                  </span>
+                ) : (
+                  "昨日穿搭"
+                )}
+              </SecLabel>
+              <div className="yw-home__chips">
+                {yesterdayChips.length ? (
+                  chips(yesterdayChips)
+                ) : (
+                  <span className="yw-home__empty">尚無昨日紀錄</span>
+                )}
+              </div>
+            </div>
+            <div className="yw-home__day">
+              <SecLabel>今日穿搭</SecLabel>
+              <div className="yw-home__chips">
+                {recorded ? chips(todayChips) : <span className="yw-home__empty">尚未記錄</span>}
+              </div>
+            </div>
           </div>
           <SecLabel>今日建議穿搭</SecLabel>
           <p className="yw-home__suggestion">{advice.replace(/^建議：/, "")}</p>
@@ -253,14 +268,24 @@ export function HomeScreen({
         <div className="yw-home__cta-spacer" />
       </div>
 
-      {/* Sticky CTA — the only solid-ink element on the page. */}
+      {/* Sticky CTA — solid ink (the page's only one) until today is recorded,
+          then an outlined white pill: 更新今日穿搭. */}
       <div className="yw-home__cta">
-        <PrimaryButton
-          shape="pill"
-          label={ctaLabel}
-          icon={<Icon src={tagUrl} size={18} />}
-          onClick={onRecord}
-        />
+        {recorded ? (
+          <SecondaryButton
+            shape="pill"
+            label={ctaLabel ?? "更新今日穿搭"}
+            icon={<Icon src={tagUrl} size={18} />}
+            onClick={onRecord}
+          />
+        ) : (
+          <PrimaryButton
+            shape="pill"
+            label={ctaLabel ?? "記錄今天穿搭"}
+            icon={<Icon src={tagUrl} size={18} />}
+            onClick={onRecord}
+          />
+        )}
       </div>
     </div>
   );

@@ -167,6 +167,19 @@
   background: var(--yw-sys-color-text-primary);
 }
 
+/* 昨日穿搭 | 今日穿搭: two equal columns, 16 apart */
+.yw-home__days {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.yw-home__day {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-inline-size: 0;
+}
+
 .yw-home__chips {
   display: flex;
   flex-wrap: wrap;
