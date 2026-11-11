@@ -18,7 +18,7 @@ export type WeatherVM = {
   conditionLabel: string;
   metrics: { label: string; value: string }[];
   commute: { slot: string; time: string; temp: string; delta: string }[];
-  /** Today 00–23, feels-like temperature per hour (今天各時段溫度). */
+  /** 各時段體感溫度: the 3 hours before now, now, and the next 24 hours. */
   hourly: HourlyPoint[];
   forecast: {
     day: string;
@@ -42,27 +42,38 @@ export type WeatherVM = {
 export type HourlyPoint = {
   /** Hour of day 0–23. */
   hour: number;
+  /** 0 = today, 1 = tomorrow (the window runs 24 hours past now). */
+  day: 0 | 1;
   /** Feels-like temperature in the display unit. */
   temp: number;
+  /** Actual (air) temperature in the display unit. */
+  actual: number;
   condition: Condition;
   /** Precipitation probability, only when wet weather is likely (≥ 40%). */
   pop?: number;
   /** The current hour. */
   now?: boolean;
+  /** An hour before now (shown muted). */
+  past?: boolean;
   /** Commute marker for this hour. */
   slot?: "出門" | "下班";
 };
 
-/** Mock day: feels-like curve with a 15:00 peak, now = 09:00. */
+/** Mock window: 06:00 → 09:00 (now) → 09:00 tomorrow; feels-like peaks at 15:00
+ *  and runs a few degrees below the actual temperature. */
 function mockHourly(): HourlyPoint[] {
-  return Array.from({ length: 24 }, (_, hour) => {
+  return Array.from({ length: 28 }, (_, i) => {
+    const hour = (6 + i) % 24;
     const temp = Math.round(12 + 6 * Math.sin(((hour - 9) / 24) * 2 * Math.PI));
     const condition: Condition = hour < 6 || hour > 19 ? "partly" : hour >= 16 ? "overcast" : "sun";
     return {
       hour,
+      day: i >= 18 ? 1 : 0,
       temp,
+      actual: temp + 3 + Math.round(Math.sin((i + 1) / 4)),
       condition,
-      ...(hour === 9 ? { now: true } : {}),
+      ...(i < 3 ? { past: true } : {}),
+      ...(i === 3 ? { now: true } : {}),
       ...(hour === 8 ? { slot: "出門" as const } : {}),
       ...(hour === 18 ? { slot: "下班" as const } : {}),
     };

@@ -18,6 +18,7 @@
   --yw-sys-color-text-muted: var(--yw-ref-color-gray-8a);    /* section labels */
   --yw-sys-color-text-muted-warm: var(--yw-ref-color-muted);  /* warm secondary text (Figma: muted) */
   --yw-sys-color-text-hint: var(--yw-ref-color-muted2);       /* warm tertiary / hint (Figma: muted2) */
+  --yw-sys-color-text-body: var(--yw-ref-color-medium);       /* card body copy (Figma: medium) */
   --yw-sys-color-separator: var(--yw-ref-color-sep);
 
   /* Badges + promo */

@@ -25,7 +25,6 @@ struct HomeView: View {
         VStack(spacing: 0) {
             TopBar(
                 location: settings.settings.cityName,
-                date: dateLabel,
                 onLocationTap: { onSwitchPlace() },
                 onSettingsTap: onOpenSettings
             )
@@ -37,10 +36,10 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     if let snap = weather.snapshot {
                         hero(snap)
-                        commuteCard(snap)
                         outfitCard(snap)
-                        if let hours = snap.hourly, !hours.isEmpty {
-                            hourlyCard(hours, nowHour: snap.nowHour)
+                        // Older caches have no 3h-back/24h-ahead window — hide until refresh.
+                        if let hours = snap.hourly, !hours.isEmpty, hours.allSatisfy({ $0.offset != nil && $0.actual != nil }) {
+                            hourlyCard(hours)
                         }
                         if let days = snap.forecast, !days.isEmpty {
                             forecast(days, currentApparent: snap.currentApparent)
@@ -84,78 +83,76 @@ struct HomeView: View {
 
     // MARK: Hero
 
+    /// Figma 608:1479: centred 現在體感 / 溫度 / 比較句 / 天氣, then 實際氣溫 · 濕度 ·
+    /// 降雨, then the commute summary sentence.
     private func hero(_ snap: WeatherSnapshot) -> some View {
-        let delta = DeltaFormat.text(snap.overallDelta, unit)
-        // Figma 173:2893 v4d: 現在體感 column (96pt) + condition/headline,
-        // bottom-aligned, gap 16 — no mascot.
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .bottom, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
+        let rain = snap.rainNow ?? 0
+        return VStack(spacing: 16) {
+            VStack(spacing: 8) {
+                VStack(spacing: 0) {
                     Text("現在體感")
-                        .font(T.mono(11))
+                        .font(T.ui(12))
                         .foregroundStyle(S.textMutedWarm)
                     Text("\(deg(snap.currentApparent))\(suffix)")
-                        .font(T.ui(44, .bold))
+                        .font(T.ui(43, .bold))
                         .foregroundStyle(S.textPrimary)
                         .lineLimit(1)
                         .fixedSize()
                 }
-                .frame(minWidth: 96, alignment: .leading)
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 4) {
-                        WeatherGlyph(condition: snap.condition, size: 20)
-                        Text(WeatherCondition.label(code: snap.conditionCode ?? 0))
-                            .font(T.ui(14))
-                            .foregroundStyle(S.textPrimary)
-                    }
-                    Text(DeltaFormat.headline(snap.overallDelta))
-                        .font(T.ui(24, .semibold))
+                Text(DeltaFormat.headline(snap.overallDelta))
+                    .font(T.ui(16, .medium))
+                    .foregroundStyle(S.textPrimary)
+                HStack(spacing: 4) {
+                    WeatherGlyph(condition: snap.condition, size: 20)
+                    Text(WeatherCondition.label(code: snap.conditionCode ?? 0))
+                        .font(T.ui(14))
                         .foregroundStyle(S.textPrimary)
                 }
+            }
+            HStack(spacing: 4) {
+                metric("實際氣溫", "\(deg(snap.currentTemp))\(suffix)")
+                metric("濕度", "\(snap.currentHumidity)%")
+                metric("降雨", "\(rain)%")
+            }
+            Text(commuteSentence(snap, rainPossible: rain > 0))
+                .font(T.ui(12))
+                .lineSpacing(12 * 0.3)   // web line-height 1.6
+                .foregroundStyle(S.textBody)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 6)
-            }
-
-            Rectangle().fill(S.line).frame(height: 1)
-
-            VStack(spacing: 4) {
-                metricRow("實際氣溫", "\(deg(snap.currentTemp))\(suffix)") {
-                    Text("較昨日 \(delta)")
-                        .font(T.ui(11))
-                        .foregroundStyle(S.textOnDark)
-                        .padding(.vertical, 5)
-                        .padding(.leading, 10)
-                        .padding(.trailing, 11)
-                        .background(DeltaTint.color(for: delta), in: Capsule())
-                }
-                metricRow("濕度", "\(snap.currentHumidity)%") { EmptyView() }
-            }
         }
+        .frame(maxWidth: .infinity)
         .ywCard(padding: EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
     }
 
-    private func metricRow<Trailing: View>(_ label: String, _ value: String, @ViewBuilder trailing: () -> Trailing) -> some View {
-        HStack(spacing: 24) {
-            // Web uses 42px; the CJK fallback for the mono face runs slightly
-            // wider on iOS, so give it 46pt and never wrap.
-            Text(label)
-                .font(T.mono(10.5))
-                .foregroundStyle(S.textLabel)
-                .lineLimit(1)
-                .fixedSize()
-                .frame(width: 46, alignment: .leading)
-            Text(value)
-                .font(T.ui(16))
-                .foregroundStyle(S.textPrimary)
-            Spacer(minLength: 0)
-            trailing()
+    private func metric(_ label: String, _ value: String) -> some View {
+        VStack(spacing: 0) {
+            Text(label).font(T.ui(12)).foregroundStyle(S.textLabel)
+            Text(value).font(T.ui(16)).foregroundStyle(S.textPrimary).frame(height: 24)
         }
+        .frame(maxWidth: .infinity)
+    }
+
+    /// 「較昨日下降 2°」 from a delta like ↓2° / ↑1° / ±0°.
+    private func deltaPhrase(_ deltaC: Double) -> String {
+        let text = DeltaFormat.text(deltaC, unit)
+        let n = text.filter(\.isNumber)
+        if text.contains("↓") { return "較昨日下降 \(n)°" }
+        if text.contains("↑") { return "較昨日上升 \(n)°" }
+        return "與昨日持平"
+    }
+
+    /// Figma 665:2194 / web commuteSentence.
+    private func commuteSentence(_ snap: WeatherSnapshot, rainPossible: Bool) -> String {
+        "出門時間體感溫度 \(deg(snap.leave.todayApparent))°，\(deltaPhrase(snap.leave.delta))；"
+            + "下班時間體感溫度為 \(deg(snap.return.todayApparent))°，\(deltaPhrase(snap.return.delta))。"
+            + (rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "")
     }
 
     // MARK: Outfit
 
     private func outfitCard(_ snap: WeatherSnapshot) -> some View {
         let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
+        let advice = suggestion.advice.hasPrefix("建議：") ? String(suggestion.advice.dropFirst(3)) : suggestion.advice
         return VStack(alignment: .leading, spacing: 12) {
             SectionLabel("昨日穿搭")
             if let y = outfit.yesterday {
@@ -164,79 +161,42 @@ struct HomeView: View {
                 }
             } else {
                 Text("尚無昨日紀錄")
-                    .font(T.ui(13))
+                    .font(T.ui(12))
                     .foregroundStyle(S.textLabel)
             }
             SectionLabel("今日建議穿搭")
-            ChipFlow {
-                ForEach(suggestion.chips, id: \.self) { c in
-                    OutfitChip(label: c.label, asset: c.asset, compact: true)
-                }
-            }
-            adviceText(suggestion.advice)
+            Text(advice)
                 .font(T.ui(12))
                 .lineSpacing(12 * 0.3)   // web line-height 1.6
+                .foregroundStyle(S.textBody)
         }
         .ywCard()
-    }
-
-    /// 「建議：」 bold ink + the rest in the label gray (Figma 173:2914).
-    private func adviceText(_ advice: String) -> Text {
-        let prefix = "建議："
-        guard advice.hasPrefix(prefix) else { return Text(advice).foregroundColor(S.textLabel) }
-        return Text(prefix).foregroundColor(S.textPrimary)
-            + Text(advice.dropFirst(prefix.count)).foregroundColor(S.textLabel)
-    }
-
-    // MARK: Commute
-
-    private func commuteCard(_ snap: WeatherSnapshot) -> some View {
-        let rain = snap.rainNow ?? 0
-        return VStack(alignment: .leading, spacing: 12) {
-            SectionLabel("通勤時段溫度")
-            HStack(spacing: 0) {
-                CommuteColumn(
-                    slot: "出門 \(snap.leave.hourLabel)",
-                    temp: "\(deg(snap.leave.todayApparent))°",
-                    delta: DeltaFormat.text(snap.leave.delta, unit)
-                )
-                Spacer(minLength: 0); vRule; Spacer(minLength: 0)
-                CommuteColumn(
-                    slot: "下班 \(snap.return.hourLabel)",
-                    temp: "\(deg(snap.return.todayApparent))°",
-                    delta: DeltaFormat.text(snap.return.delta, unit)
-                )
-                Spacer(minLength: 0); vRule; Spacer(minLength: 0)
-                // 降雨 reuses the commute column visual (value + optional note).
-                CommuteColumn(slot: "降雨", temp: "\(rain)%", note: rain > 0 ? "攜帶雨具" : nil)
-            }
-        }
-        .ywCard()
-    }
-
-    private var vRule: some View {
-        Rectangle().fill(S.line).frame(width: 1, height: 40)
     }
 
     // MARK: Hourly
 
-    private func hourlyCard(_ hours: [HourPoint], nowHour: Int?) -> some View {
-        let leave = settings.settings.leaveHour, ret = settings.settings.returnHour
+    private func hourlyCard(_ hours: [HourPoint]) -> some View {
+        let leave = settings.settings.leaveHour
         let items = hours.map { h in
-            HourlyStrip.Item(
+            HourlyChart.Item(
+                offset: h.offset ?? 0,
                 hour: h.hour,
-                temp: deg(h.apparent),
+                day: h.day ?? 0,
+                feels: deg(h.apparent),
+                actual: deg(h.actual ?? h.apparent),
                 condition: h.condition,
-                pop: h.condition.isWet && h.pop >= 40 ? h.pop : nil,
-                now: h.hour == nowHour,
-                slot: h.hour == leave ? "出門" : h.hour == ret ? "下班" : nil
+                leave: h.hour == leave
             )
         }
         return VStack(alignment: .leading, spacing: 12) {
-            SectionLabel("今天各時段溫度")
-            HourlyStrip(items: items)
+            HStack {
+                SectionLabel("各時段體感溫度")
+                Spacer(minLength: 8)
+                Text("前 3 小時・未來 24 小時").font(T.ui(12)).foregroundStyle(S.textLabel).lineLimit(1)
+            }
+            HourlyChart(items: items)
         }
-        .ywCard()
+        .ywCard(padding: EdgeInsets(top: 12, leading: 16, bottom: 16, trailing: 16))
     }
 
     // MARK: Forecast
@@ -244,10 +204,11 @@ struct HomeView: View {
     private func forecast(_ days: [DailyForecast], currentApparent: Double) -> some View {
         let lows = days.map { deg($0.low) }, highs = days.map { deg($0.high) }
         let weekMin = lows.min() ?? 0, weekMax = highs.max() ?? 0
-        return VStack(alignment: .leading, spacing: 12) {
-            Text("未來一週天氣")
-                .font(T.ui(15))
-                .foregroundStyle(S.textPrimary)
+        // Figma 608:1543: the heading sits inside the card (24 leading, 12 vertical).
+        return VStack(alignment: .leading, spacing: 0) {
+            SectionLabel("未來一週天氣")
+                .padding(.leading, 24)
+                .padding(.vertical, 12)
             VStack(spacing: 0) {
                 ForEach(Array(days.enumerated()), id: \.offset) { i, d in
                     ForecastRow(
@@ -264,8 +225,8 @@ struct HomeView: View {
                     if i < days.count - 1 { Rectangle().fill(S.textPrimary.opacity(0.06)).frame(height: 1) }
                 }
             }
-            .ywCard(padding: EdgeInsets())
         }
+        .ywCard(padding: EdgeInsets())
     }
 
     // MARK: Placeholder
@@ -296,13 +257,6 @@ struct HomeView: View {
 
     private static let weekdays = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"]
 
-    /// 「· 今天 週四 8/20」 in the snapshot's city timezone (web dateLabel).
-    private var dateLabel: String {
-        var cal = Calendar(identifier: .gregorian)
-        if let tz = weather.snapshot.flatMap({ TimeZone(identifier: $0.timezone) }) { cal.timeZone = tz }
-        let c = cal.dateComponents([.weekday, .month, .day], from: .now)
-        return "· 今天 \(Self.weekdays[(c.weekday ?? 1) - 1]) \(c.month ?? 0)/\(c.day ?? 0)"
-    }
 
     private static func weekday(_ iso: String) -> String {
         let f = DateFormatter()

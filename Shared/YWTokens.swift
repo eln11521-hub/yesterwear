@@ -33,6 +33,7 @@ enum YWTokens {
         static let white     = Color.white
         static let muted     = Color(hex: 0x6F6964)
         static let muted2    = Color(hex: 0xB5AFA8)
+        static let medium    = Color(hex: 0x3D3935)   // Figma var: medium — card body copy
         static let grayMid   = Color(hex: 0x666666)
         static let grayLight = Color(hex: 0x999999)
         static let label     = Color(hex: 0x8C8680)
@@ -107,6 +108,7 @@ enum YWTokens {
         static let textMuted     = Ref.gray8a    // section labels
         static let textMutedWarm = Ref.muted     // warm secondary
         static let textHint      = Ref.muted2    // warm tertiary / hint
+        static let textBody      = Ref.medium    // card body copy
         static let separator     = Ref.sep
 
         // Badges + promo

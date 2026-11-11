@@ -17,8 +17,8 @@ function PinIcon() {
 export type TopBarProps = {
   /** e.g. Edmonton */
   location: string;
-  /** e.g. · 今天 週四 8/20 */
-  date: string;
+  /** e.g. · 今天 週四 8/20 — optional; the v5 home header shows only the place. */
+  date?: string;
   /** Tap the location (pin + place) to switch places. */
   onLocationClick?: () => void;
   /** Tap the gear to open Settings. */
@@ -28,7 +28,7 @@ export type TopBarProps = {
 /**
  * TopBar — home header: location (tap to switch places) + date on the left, a
  * Settings gear on the right (44×44 hit area; refreshing is pull-to-refresh).
- * Source: Figma 174:7. Place = Outfit SemiBold 15px; date = IBM Plex Mono
+ * Source: Figma 608:1661. Place = Outfit SemiBold 16px; date (optional) = mono
  * Regular 11px.
  */
 export function TopBar({ location, date, onLocationClick, onSettingsClick }: TopBarProps) {
@@ -45,7 +45,7 @@ export function TopBar({ location, date, onLocationClick, onSettingsClick }: Top
           <PinIcon />
           <span className="yw-top-bar__place">{location}</span>
         </button>
-        <span className="yw-top-bar__date">{date}</span>
+        {date ? <span className="yw-top-bar__date">{date}</span> : null}
       </div>
       <div className="yw-top-bar__actions">
         <button

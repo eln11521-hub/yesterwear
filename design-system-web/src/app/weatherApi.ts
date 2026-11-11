@@ -143,23 +143,29 @@ export async function fetchWeather(
     };
   });
 
-  // 今天各時段: hourly[24..47] is today (past_days=1), feels-like per hour.
+  // 各時段體感溫度: 3 hours before now → now → 24 hours ahead (past_days=1, so
+  // hourly[24..47] is today and [48..] tomorrow).
   const leaveHH = Number(commute.leaveTime.slice(0, 2));
   const returnHH = Number(commute.returnTime.slice(0, 2));
-  const hourlyToday = Array.from({ length: 24 }, (_, hour) => {
-    const idx = 24 + hour;
+  const hourlyWindow = [];
+  for (let idx = nowIdx - 3; idx <= nowIdx + 24; idx++) {
+    if (idx < 0 || idx >= hourly.time.length) continue;
+    const hour = Number(hourly.time[idx].slice(11, 13));
     const { condition } = decode(hourly.weather_code[idx] ?? 0);
     const pop = hourly.precipitation_probability[idx] ?? 0;
-    return {
+    hourlyWindow.push({
       hour,
+      day: (hourly.time[idx].slice(0, 10) === today ? 0 : 1) as 0 | 1,
       temp: toDisp(hourly.apparent_temperature[idx]),
+      actual: toDisp(hourly.temperature_2m[idx]),
       condition,
       ...(/rain|snow|thunder/.test(condition) && pop >= 40 ? { pop } : {}),
+      ...(idx < nowIdx ? { past: true } : {}),
       ...(idx === nowIdx ? { now: true } : {}),
       ...(hour === leaveHH ? { slot: "出門" as const } : {}),
       ...(hour === returnHH && hour !== leaveHH ? { slot: "下班" as const } : {}),
-    };
-  });
+    });
+  }
 
   const cond = decode(current.weather_code);
   // PRD 4.2: rain hint when today's precipitation probability > 50%.
@@ -184,7 +190,7 @@ export async function fetchWeather(
       commuteAt("出門", commute.leaveTime),
       commuteAt("下班", commute.returnTime),
     ],
-    hourly: hourlyToday,
+    hourly: hourlyWindow,
     forecast,
     overallDelta,
     unit,

@@ -114,6 +114,12 @@ struct HourPoint: Codable, Equatable {
     var apparent: Double
     var conditionCode: Int
     var pop: Int
+    /// Actual (air) temperature — the dashed line of 各時段體感溫度.
+    var actual: Double? = nil
+    /// Hours from now: -3…24 (0 = now). Nil in caches from before the window.
+    var offset: Int? = nil
+    /// 0 = today, 1 = tomorrow.
+    var day: Int? = nil
 
     var condition: WeatherCondition { .from(code: conditionCode) }
 }

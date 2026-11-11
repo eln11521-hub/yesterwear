@@ -1,13 +1,11 @@
-import { Fragment, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import refreshUrl from "../../assets/icon/refresh.svg?url";
 
 import tagUrl from "../../assets/icon/tag.svg?url";
-import { outfitChips } from "../../app/outfit";
 import { MOCK_WEATHER, suggestOutfit, type WeatherVM } from "../../app/weather";
 import { WeatherIcon } from "../../components/weather-icon/WeatherIcon";
 import { Icon } from "../../components/_ui/Icon";
-import { CommuteRow } from "../../components/commute-row/CommuteRow";
 import { ForecastRow } from "../../components/forecast-row/ForecastRow";
 import { HourlyForecast } from "../../components/hourly-forecast/HourlyForecast";
 import { garmentIcon } from "../../components/outfit-chip/garments";
@@ -21,8 +19,6 @@ export type HomeScreenProps = {
   weather?: WeatherVM;
   /** Garment labels for the 昨日穿搭 row (「不加外套」already omitted). */
   yesterdayChips?: string[];
-  /** Garment labels for the 今日建議穿搭 row. */
-  suggestedChips?: string[];
   advice?: string;
   /**
    * Cross-location state — set only when today's city differs from where
@@ -79,27 +75,37 @@ function PinIcon({ size = 12 }: { size?: number }) {
   );
 }
 
-/** 實際氣溫 delta color: rising → warm, falling → cold, flat → neutral. */
-function deltaColor(d: string): string {
-  if (d.includes("↑")) return "var(--yw-sys-color-delta-warm)";
-  if (d.includes("↓")) return "var(--yw-sys-color-delta-cold)";
-  return "var(--yw-sys-color-delta-neutral)";
+/** 「較昨日下降 2°」 from a commute delta like ↓2° / ↑1° / ±0°. */
+function deltaPhrase(delta: string): string {
+  const n = delta.replace(/[^\d]/g, "");
+  if (delta.includes("↓")) return `較昨日下降 ${n}°`;
+  if (delta.includes("↑")) return `較昨日上升 ${n}°`;
+  return "與昨日持平";
+}
+
+/** Hero summary (Figma 665:2194): 出門 / 下班 feels-like + change vs yesterday, and
+ *  a rain reminder when rain is possible. */
+function commuteSentence(commute: WeatherVM["commute"], rainPossible: boolean): string {
+  const [leave, ret] = commute;
+  const parts = [
+    leave ? `出門時間體感溫度 ${leave.temp}，${deltaPhrase(leave.delta)}` : "",
+    ret ? `下班時間體感溫度為 ${ret.temp}，${deltaPhrase(ret.delta)}` : "",
+  ].filter(Boolean);
+  return parts.join("；") + "。" + (rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "");
 }
 
 const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 
 /**
- * HomeScreen — the 174:2 Dashboard (v4d). Paper ground with #f5f5f5 cards: a
- * hero (現在體感 + condition + comparison headline, 實際氣溫/濕度 + 較昨日 pill),
- * then commute → outfit → 今天各時段溫度 → week forecast → widget promo. No tab
- * bar: the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭
- * is a sticky CTA at the bottom. Weight tiers: 21°C Bold, headline SemiBold,
- * numbers Medium, everything else Regular. Presentational: pass props for real data.
+ * HomeScreen — Figma 608:1477 (v5). Paper ground with #f5f5f5 cards, read top to
+ * bottom: hero (現在體感 · 溫度 · 比較句 · 天氣 · 實際氣溫/濕度/降雨 · 通勤摘要) →
+ * 昨日穿搭 + 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
+ * the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭 is a
+ * sticky CTA at the bottom. Presentational: pass props for real data.
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
   yesterdayChips = ["長袖上衣", "薄外套"],
-  suggestedChips = outfitChips(DEFAULT_SUGGESTION),
   advice = DEFAULT_SUGGESTION.advice,
   crossLocation,
   ctaLabel = "記錄今天穿搭",
@@ -115,7 +121,6 @@ export function HomeScreen({
   const metric = (label: string) =>
     weather.metrics.find((m) => m.label === label)?.value ?? "";
   const airTemp = metric("氣溫");
-  const airDelta = metric("較昨天");
   const rain = metric("降雨");
   const humidity = metric("濕度");
   const rainPossible = Number.parseInt(rain, 10) > 0;
@@ -124,7 +129,6 @@ export function HomeScreen({
       <div className="yw-home__top">
         <TopBar
           location={weather.location}
-          date={weather.date}
           onLocationClick={onLocationPress}
           onSettingsClick={onSettingsPress}
         />
@@ -146,39 +150,35 @@ export function HomeScreen({
             <Icon src={refreshUrl} size={18} />
           </span>
         </div>
-        {/* Hero: 現在體感 + condition/headline, then the metrics rows (Figma 173:2893) */}
+        {/* Hero (Figma 608:1479): 現在體感 → 溫度 → 比較句 → 天氣, then 實際氣溫 / 濕度 /
+            降雨, then the commute summary in one sentence. */}
         <section className="yw-home__hero">
-          <div className="yw-home__hero-top">
-            <div className="yw-home__now">
+          <div className="yw-home__now">
+            <div className="yw-home__now-main">
               <span className="yw-home__now-label">現在體感</span>
               <span className="yw-home__now-temp">{weather.nowTemp}</span>
             </div>
-            <div className="yw-home__hero-info">
-              <span className="yw-home__now-cond">
-                <WeatherIcon condition={weather.condition} size={20} />{" "}
-                {weather.conditionLabel}
-              </span>
-              <h1 className="yw-home__headline">{weather.headline}</h1>
-            </div>
+            <h1 className="yw-home__headline">{weather.headline}</h1>
+            <span className="yw-home__now-cond">
+              <WeatherIcon condition={weather.condition} size={20} />
+              {weather.conditionLabel}
+            </span>
           </div>
 
-          <hr className="yw-home__hero-divider" />
-          <div className="yw-home__hero-metrics">
-            <div className="yw-home__hm-row">
-              <span className="yw-home__hm-label">實際氣溫</span>
-              <span className="yw-home__hm-value">{airTemp}</span>
-              <span
-                className="yw-home__hm-pill"
-                style={{ background: deltaColor(airDelta) }}
-              >
-                較昨日 {airDelta}
-              </span>
-            </div>
-            <div className="yw-home__hm-row">
-              <span className="yw-home__hm-label">濕度</span>
-              <span className="yw-home__hm-value">{humidity}</span>
-            </div>
+          <div className="yw-home__metrics">
+            {[
+              ["實際氣溫", airTemp],
+              ["濕度", humidity],
+              ["降雨", rain],
+            ].map(([label, value]) => (
+              <div key={label} className="yw-home__metric">
+                <span className="yw-home__metric-label">{label}</span>
+                <span className="yw-home__metric-value">{value}</span>
+              </div>
+            ))}
           </div>
+
+          <p className="yw-home__summary">{commuteSentence(weather.commute, rainPossible)}</p>
 
           {/* 當地昨日補充列 — secondary, not part of the delta calc (跨地點時才顯示) */}
           {crossLocation?.localYesterday ? (
@@ -188,27 +188,6 @@ export function HomeScreen({
               {crossLocation.localYesterday.feels}
             </p>
           ) : null}
-        </section>
-
-        <section className="yw-home__card yw-home__block">
-          <SecLabel>通勤時段溫度</SecLabel>
-          <div className="yw-home__commute">
-            {weather.commute.map((c, i) => (
-              <Fragment key={c.slot}>
-                {i > 0 ? <span className="yw-home__vrule" /> : null}
-                <CommuteRow {...c} />
-              </Fragment>
-            ))}
-            <span className="yw-home__vrule" />
-            {/* 降雨 reuses the commute column visual (value + optional note) */}
-            <div className="yw-commute-row">
-              <span className="yw-commute-row__slot">降雨</span>
-              <span className="yw-commute-row__temp">{rain}</span>
-              {rainPossible ? (
-                <span className="yw-commute-row__delta">攜帶雨具</span>
-              ) : null}
-            </div>
-          </div>
         </section>
 
         <section className="yw-home__card yw-home__block">
@@ -237,54 +216,34 @@ export function HomeScreen({
             )}
           </div>
           <SecLabel>今日建議穿搭</SecLabel>
-          <div className="yw-home__chips">
-            {suggestedChips.map((label) => (
-              <OutfitChip
-                key={label}
-                compact
-                label={label}
-                iconSrc={garmentIcon[label]}
-              />
-            ))}
-          </div>
-          <p className="yw-home__suggestion">
-            {advice.startsWith("建議：") ? (
-              <>
-                <strong>建議：</strong>
-                {advice.slice("建議：".length)}
-              </>
-            ) : (
-              advice
-            )}
-          </p>
+          <p className="yw-home__suggestion">{advice.replace(/^建議：/, "")}</p>
         </section>
 
-        {/* 今天各時段溫度 — older cached snapshots have no hourly data, so hide
-            when empty. */}
-        {weather.hourly?.length ? (
-          <section className="yw-home__card yw-home__block">
-            <SecLabel>今天各時段溫度</SecLabel>
-            <HourlyForecast items={weather.hourly} />
+        {/* 各時段體感溫度 — older cached snapshots have no hourly data (or no actual
+            temperature per hour), so hide until the next refresh. */}
+        {weather.hourly?.length && weather.hourly.every((h) => typeof h.actual === "number") ? (
+          <section className="yw-home__card">
+            <HourlyForecast items={weather.hourly} header={<SecLabel>各時段體感溫度</SecLabel>} />
           </section>
         ) : null}
 
-        <section className="yw-home__block">
-          <h2 className="yw-home__h2">未來一週天氣</h2>
-          <div className="yw-home__card yw-home__forecast">
-            {weather.forecast.map((d) => (
-              <ForecastRow
-                key={d.day}
-                day={d.day}
-                condition={d.condition}
-                low={d.low}
-                high={d.high}
-                weekMin={weekMin}
-                weekMax={weekMax}
-                pop={"pop" in d ? d.pop : undefined}
-                current={"current" in d ? d.current : undefined}
-              />
-            ))}
+        <section className="yw-home__card yw-home__forecast">
+          <div className="yw-home__forecast-head">
+            <SecLabel>未來一週天氣</SecLabel>
           </div>
+          {weather.forecast.map((d) => (
+            <ForecastRow
+              key={d.day}
+              day={d.day}
+              condition={d.condition}
+              low={d.low}
+              high={d.high}
+              weekMin={weekMin}
+              weekMax={weekMax}
+              pop={"pop" in d ? d.pop : undefined}
+              current={"current" in d ? d.current : undefined}
+            />
+          ))}
         </section>
 
         <WidgetPromoCard

@@ -83,21 +83,26 @@ actor WeatherService {
             conditionCode: current?.weatherCode,
             rainNow: rainNow,
             forecast: forecast(response.daily),
-            hourly: today(hourly),
+            hourly: window(hourly, nowIdx: nowIdx),
             nowHour: nowIdx >= Self.dayHours ? nowIdx - Self.dayHours : nil
         )
     }
 
-    /// hourly[24..<48] is today (past_days=1).
-    private func today(_ hourly: HourlyWeather) -> [HourPoint]? {
-        let range = Self.dayHours..<(Self.dayHours * 2)
-        guard range.upperBound <= hourly.apparentTemperature.count else { return nil }
-        return range.map { i in
+    /// 各時段體感溫度: 3 hours before now → now → 24 hours ahead
+    /// (past_days=1, so hourly[24..<48] is today and [48...] tomorrow).
+    private func window(_ hourly: HourlyWeather, nowIdx: Int) -> [HourPoint]? {
+        let lo = max(0, nowIdx - 3), hi = min(hourly.time.count - 1, nowIdx + 24)
+        guard lo <= hi, hi < hourly.apparentTemperature.count, hi < hourly.temperature2m.count else { return nil }
+        let today = hourly.time[min(max(nowIdx, 0), hourly.time.count - 1)].prefix(10)
+        return (lo...hi).map { i in
             HourPoint(
-                hour: i - Self.dayHours,
+                hour: Int(hourly.time[i].dropFirst(11).prefix(2)) ?? 0,
                 apparent: hourly.apparentTemperature[i],
                 conditionCode: hourly.weatherCode?[i] ?? 0,
-                pop: hourly.precipitationProbability[i] ?? 0
+                pop: hourly.precipitationProbability[i] ?? 0,
+                actual: hourly.temperature2m[i],
+                offset: i - nowIdx,
+                day: hourly.time[i].prefix(10) == today ? 0 : 1
             )
         }
     }

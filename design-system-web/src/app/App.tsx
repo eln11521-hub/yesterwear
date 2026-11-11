@@ -118,7 +118,6 @@ export function App() {
             <HomeScreen
               weather={weather}
               yesterdayChips={yesterdayChips}
-              suggestedChips={outfitChips(suggestion)}
               advice={suggestion.advice}
               ctaLabel={today ? "更新今日穿搭" : "記錄今天穿搭"}
               onRecord={() => setOpen(true)}
