@@ -579,9 +579,11 @@ struct SectionBadge: View {
 /// "now" to the center on appear.
 /// 各時段體感溫度 — ported from design-system-web/src/components/hourly-forecast/
 /// HourlyForecast.tsx (Figma 608:1520): next-commute line, hour columns (time ·
-/// icon · 體感 · 實際) over a feels-like (solid) vs actual (dashed) chart with the
-/// gap shaded, then the legend. Columns + chart scroll edge to edge across the
-/// card (the body bleeds over its 16pt padding); the ° ticks float over the chart.
+/// icon), then feels-like (solid) vs actual (dashed) lines with the gap shaded and
+/// each value written at its point, then the legend. The higher value sits above
+/// its point and the lower below, so the labels swap when the lines cross; equal
+/// values show one 「=23°」. The y-scale hugs the data. Columns + chart scroll edge
+/// to edge across the card (the body bleeds over its 16pt padding).
 struct HourlyChart: View {
     struct Item: Identifiable {
         var id: Int { offset }
@@ -597,37 +599,33 @@ struct HourlyChart: View {
 
     let items: [Item]
 
-    private static let col: CGFloat = 48, step: CGFloat = 52, chartH: CGFloat = 112, colH: CGFloat = 92, gap: CGFloat = 8,
-                       axisW: CGFloat = 28, bleed: CGFloat = 16
+    private static let col: CGFloat = 48, step: CGFloat = 52, plotH: CGFloat = 96,
+                       labelPad: CGFloat = 24, colH: CGFloat = 48, gap: CGFloat = 8, bleed: CGFloat = 16
 
-    private var nowIdx: Int { items.firstIndex { $0.offset == 0 } ?? 0 }
     private var bounds: (lo: Int, hi: Int) {
         let all = items.flatMap { [$0.feels, $0.actual] }
-        let lo = Int((Double(all.min() ?? 0) / 4).rounded(.down)) * 4
-        let hi = Int((Double(all.max() ?? 0) / 4).rounded(.up)) * 4
-        return (lo, max(hi, lo + 4))
+        let lo = (all.min() ?? 0) - 1
+        return (lo, max((all.max() ?? 0) + 1, lo + 4))
     }
-    private var ticks: [Int] { Array(stride(from: bounds.lo, through: bounds.hi, by: 4)) }
     private func x(_ i: Int) -> CGFloat { CGFloat(i) * Self.step + Self.col / 2 }
-    private func y(_ v: Int) -> CGFloat { CGFloat(bounds.hi - v) / CGFloat(bounds.hi - bounds.lo) * Self.chartH }
+    private func y(_ v: Int) -> CGFloat {
+        let b = bounds
+        return Self.labelPad + CGFloat(b.hi - v) / CGFloat(b.hi - b.lo) * Self.plotH
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // The next commute after now — today's 下班 in the afternoon, tomorrow's
             // 出門 once that has passed.
             if let next = items.first(where: { $0.offset > 0 && $0.slot != nil }) { summary(next) }
-            ZStack(alignment: .topLeading) {
-                ScrollView(.horizontal) {
-                    VStack(alignment: .leading, spacing: Self.gap) {
-                        HStack(spacing: 4) { ForEach(items) { column($0) } }
-                        chart
-                    }
-                    .padding(.leading, Self.bleed + Self.axisW)
-                    .padding(.trailing, Self.bleed)
+            ScrollView(.horizontal) {
+                VStack(alignment: .leading, spacing: Self.gap) {
+                    HStack(spacing: 4) { ForEach(items) { column($0) } }
+                    chart
                 }
-                .scrollIndicators(.hidden)
-                axis
+                .padding(.horizontal, Self.bleed)
             }
+            .scrollIndicators(.hidden)
             .padding(.horizontal, -Self.bleed)
             legend
         }
@@ -664,50 +662,25 @@ struct HourlyChart: View {
         }
     }
 
-    /// ° ticks over the chart's left edge, on the card colour so the chart slides
-    /// under them while the columns above scroll right to the card edge.
-    private var axis: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(ticks, id: \.self) { t in
-                Text("\(t)°").font(T.ui(10)).foregroundStyle(S.textLabel)
-                    .frame(height: 12)
-                    .offset(x: Self.bleed, y: y(t) + 4 - 6)
-            }
-        }
-        // 4pt of extra cover above and below so the top/bottom gridlines' strokes
-        // don't peek out next to the ticks.
-        .frame(width: Self.bleed + Self.axisW, height: Self.chartH + 16, alignment: .topLeading)
-        // An explicit Rectangle: a bare ShapeStyle background takes the container's
-        // rounded shape here, which let the gridlines show at its ends.
-        .background(Rectangle().fill(S.surfaceRaised))
-        .offset(y: Self.colH + Self.gap - 4)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    /// Figma 668:1252: time 8 SemiBold, 體感 14 Medium, 實際 10. 現在 in ink, past muted.
+    /// Figma 668:1252 (values moved onto the chart): time 8 SemiBold + icon.
     private func column(_ h: Item) -> some View {
         let past = h.offset < 0, now = h.offset == 0
-        return VStack(spacing: 6) {
+        return VStack(spacing: 4) {
             Text(now ? "現在" : String(format: "%02d:00", h.hour))
                 .font(T.ui(8, .semibold))
                 .foregroundStyle(now ? S.textPrimary : S.textLabel)
                 .lineLimit(1).fixedSize()
                 .frame(height: 10)
             WeatherGlyph(condition: h.condition, size: 18).opacity(past ? 0.45 : 1)
-            Text("\(h.feels)°").font(T.ui(14, .medium)).foregroundStyle(past ? S.textHint : S.textPrimary)
-                .frame(height: 18)
-            Text("實際 \(h.actual)°").font(T.ui(10))
-                .foregroundStyle(past ? S.textHint : (now ? S.textPrimary : S.textLabel))
-                .lineLimit(1).fixedSize()
-                .frame(height: 12)
         }
         .frame(width: Self.col, height: Self.colH)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(now ? "現在" : String(format: "%02d:00", h.hour))，體感 \(h.feels)°，實際 \(h.actual)°")
     }
 
     private var chart: some View {
         let w = CGFloat(items.count) * Self.step - 4
+        let h = Self.plotH + Self.labelPad * 2
         let feels = items.map(\.feels), actual = items.map(\.actual)
         func line(_ vals: [Int]) -> Path {
             Path { p in for (i, v) in vals.enumerated() { let pt = CGPoint(x: x(i), y: y(v)); i == 0 ? p.move(to: pt) : p.addLine(to: pt) } }
@@ -717,25 +690,38 @@ struct HourlyChart: View {
             for i in feels.indices.reversed() { p.addLine(to: CGPoint(x: x(i), y: y(feels[i]))) }
             p.closeSubpath()
         }
-        let n = nowIdx
         return ZStack(alignment: .topLeading) {
-            ForEach(ticks, id: \.self) { t in
-                Path { p in p.move(to: .init(x: 0, y: y(t))); p.addLine(to: .init(x: w, y: y(t))) }.stroke(S.line, lineWidth: 1)
-            }
             band.fill(S.deltaCold.opacity(0.2))
-            Path { p in p.move(to: .init(x: x(n), y: 0)); p.addLine(to: .init(x: x(n), y: Self.chartH)) }
-                .stroke(S.textMutedWarm.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [2, 3]))
             line(actual).stroke(S.textMutedWarm, style: StrokeStyle(lineWidth: 2, lineJoin: .round, dash: [5, 4]))
             line(feels).stroke(S.textPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-            if items.indices.contains(n) {
-                Circle().fill(S.surfaceWhite).overlay(Circle().stroke(S.textMutedWarm, lineWidth: 2))
-                    .frame(width: 8, height: 8).position(x: x(n), y: y(actual[n]))
-                Circle().fill(S.textPrimary).overlay(Circle().stroke(S.surfaceWhite, lineWidth: 2))
-                    .frame(width: 8, height: 8).position(x: x(n), y: y(feels[n]))
+            ForEach(items.indices, id: \.self) { i in points(i) }
+        }
+        .frame(width: w, height: h, alignment: .topLeading)
+        .accessibilityHidden(true)
+    }
+
+    /// Dots + values for one hour: higher value above, lower below; equal → 「=23°」.
+    @ViewBuilder private func points(_ i: Int) -> some View {
+        let it = items[i], past = it.offset < 0, cx = x(i)
+        let feelsColor = past ? S.textHint : S.textPrimary
+        let actualColor = past ? S.textHint : S.textLabel
+        Group {
+            if it.feels == it.actual {
+                Circle().fill(S.textPrimary).frame(width: 6, height: 6).position(x: cx, y: y(it.feels))
+                Text("=\(it.feels)°").font(T.ui(12, .medium)).foregroundStyle(feelsColor)
+                    .fixedSize().position(x: cx, y: y(it.feels) - 12)
+            } else {
+                let feelsUp = it.feels > it.actual
+                Circle().fill(S.surfaceRaised).overlay(Circle().stroke(S.textMutedWarm, lineWidth: 1.5))
+                    .frame(width: 6, height: 6).position(x: cx, y: y(it.actual))
+                Circle().fill(S.textPrimary).frame(width: 6, height: 6).position(x: cx, y: y(it.feels))
+                Text("\(it.feels)°").font(T.ui(12, .medium)).foregroundStyle(feelsColor)
+                    .fixedSize().position(x: cx, y: y(it.feels) + (feelsUp ? -12 : 13))
+                Text("\(it.actual)°").font(T.ui(10)).foregroundStyle(actualColor)
+                    .fixedSize().position(x: cx, y: y(it.actual) + (feelsUp ? 12 : -12))
             }
         }
-        .frame(width: w, height: Self.chartH + 8, alignment: .topLeading)
-        .accessibilityLabel(items.indices.contains(n) ? "現在體感 \(feels[n])°，實際 \(actual[n])°" : "體感與實際溫度")
+        .opacity(past ? 0.9 : 1)
     }
 }
 

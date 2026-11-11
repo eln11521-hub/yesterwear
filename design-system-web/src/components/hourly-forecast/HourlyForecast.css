@@ -2,7 +2,7 @@
    chart point sits under its column; columns + chart scroll together edge to
    edge, the ° ticks stay put over the chart. */
 .yw-hourly {
-  --yw-hourly-col-h: 92px;
+  --yw-hourly-col-h: 48px;
   --yw-hourly-gap: 8px;
   display: flex;
   flex-direction: column;
@@ -52,10 +52,8 @@
 }
 
 /* Columns + chart scroll edge to edge: the body bleeds over the card's 16px
-   padding; the track starts after the 28px tick axis. */
+   padding. */
 .yw-hourly__body {
-  --yw-hourly-axis: 28px;
-  position: relative;
   margin-inline: -16px;
 }
 .yw-hourly__scroll {
@@ -67,24 +65,7 @@
 }
 .yw-hourly__track {
   inline-size: max-content;
-  padding-inline: calc(16px + var(--yw-hourly-axis)) 16px;
-}
-.yw-hourly__axis {
-  position: absolute;
-  inset-inline-start: 0;
-  inset-block-start: calc(var(--yw-hourly-col-h) + var(--yw-hourly-gap));
-  inline-size: calc(16px + var(--yw-hourly-axis));
-  block-size: 120px;
-  background: var(--yw-sys-color-surface-raised);
-  font-size: 10px;
-  color: var(--yw-sys-color-text-label);
-  pointer-events: none;
-}
-.yw-hourly__tick {
-  position: absolute;
-  inset-inline-start: 16px;
-  line-height: 12px;
-  transform: translateY(-6px);
+  padding-inline: 16px;
 }
 
 .yw-hourly__cols {
@@ -101,7 +82,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   padding-block: 8px;
   border-radius: var(--yw-sys-radius-md);
 }
@@ -113,27 +94,10 @@
   color: var(--yw-sys-color-text-label);
   white-space: nowrap;
 }
-.yw-hourly__col[data-now] .yw-hourly__time,
-.yw-hourly__col[data-now] .yw-hourly__actual {
+.yw-hourly__col[data-now] .yw-hourly__time {
   color: var(--yw-sys-color-text-primary);
-}
-.yw-hourly__temp {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 18px;
-  color: var(--yw-sys-color-text-primary);
-}
-.yw-hourly__actual {
-  font-size: 10px;
-  line-height: 12px;
-  color: var(--yw-sys-color-text-label);
-  white-space: nowrap;
 }
 /* past hours: muted (Figma State=Past) */
-.yw-hourly__col[data-past] .yw-hourly__temp,
-.yw-hourly__col[data-past] .yw-hourly__actual {
-  color: var(--yw-sys-color-text-hint);
-}
 .yw-hourly__col[data-past] .yw-weather-icon {
   opacity: 0.45;
 }
@@ -142,17 +106,8 @@
   display: block;
   overflow: visible;
 }
-.yw-hourly__grid {
-  stroke: var(--yw-sys-color-line);
-  stroke-width: 1;
-}
 .yw-hourly__band {
   fill: color-mix(in srgb, var(--yw-sys-color-delta-cold) 20%, transparent);
-}
-.yw-hourly__nowline {
-  stroke: color-mix(in srgb, var(--yw-sys-color-text-muted-warm) 50%, transparent);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
 }
 .yw-hourly__line {
   fill: none;
@@ -169,13 +124,32 @@
   stroke-linecap: butt;
 }
 .yw-hourly__dot {
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
 .yw-hourly__dot[data-kind="feels"] {
   fill: var(--yw-sys-color-text-primary);
-  stroke: var(--yw-sys-color-surface-white);
 }
 .yw-hourly__dot[data-kind="actual"] {
-  fill: var(--yw-sys-color-surface-white);
+  fill: var(--yw-sys-color-surface-raised);
   stroke: var(--yw-sys-color-text-muted-warm);
+}
+/* values at the points: 體感 12 Medium ink, 實際 10 label colour */
+.yw-hourly__val {
+  font-family: var(--yw-sys-font-ui);
+  text-anchor: middle;
+}
+.yw-hourly__val[data-kind="feels"] {
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--yw-sys-color-text-primary);
+}
+.yw-hourly__val[data-kind="actual"] {
+  font-size: 10px;
+  fill: var(--yw-sys-color-text-label);
+}
+g[data-past] .yw-hourly__val {
+  fill: var(--yw-sys-color-text-hint);
+}
+g[data-past] .yw-hourly__dot {
+  opacity: 0.45;
 }
