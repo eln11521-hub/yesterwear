@@ -130,3 +130,40 @@
 .yw-hourly__xaxis span:first-child {
   transform: none;
 }
+
+/* 出門 / 下班 markers: tag above the plot, dashed rule, ring on today's line */
+.yw-hourly__marks {
+  position: relative;
+  block-size: 16px;
+  margin-inline-end: 28px;
+  margin-block-end: -8px;
+}
+.yw-hourly__marks span {
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--yw-sys-color-surface-white);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  color: var(--yw-sys-color-text-primary);
+  white-space: nowrap;
+}
+.yw-hourly__commute {
+  stroke: var(--yw-sys-color-text-muted-warm);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.yw-hourly__cdot {
+  position: absolute;
+  inline-size: 8px;
+  block-size: 8px;
+  margin: -4px 0 0 -4px;
+  box-sizing: border-box;
+  border: 2px solid var(--yw-sys-color-text-primary);
+  border-radius: 50%;
+  background: var(--yw-sys-color-surface-raised);
+  pointer-events: none;
+}

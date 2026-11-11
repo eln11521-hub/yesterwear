@@ -21,13 +21,18 @@ const H = 112;
 /**
  * HourlyForecast — 各時段體感溫度 as one overview chart (Figma 608:1520): today's
  * feels-like (solid — ink up to now, lighter for the forecast) against
- * yesterday's (dashed) across 00–24, with a dot at now. It's for the shape of
+ * yesterday's (dashed) across 00–24, with a dot at now and the user's 出門 /
+ * 下班 hours marked (a dashed rule, a ring on today's line, a tag above). It's for the shape of
  * the day, not exact readings: the legend shows both values at now, and
  * dragging across the chart reads any hour. Above it, one line about the next
  * commute against the same hour the day before.
  */
 export function HourlyForecast({ today, yesterday, items = [], header }: HourlyForecastProps) {
   const nowItem = items.find((h) => h.now);
+  // 出門 / 下班 hours from the user's settings (the window tags them).
+  const commutes = [
+    ...new Map(items.filter((h) => h.slot).map((h) => [h.slot!, h.hour] as const)).entries(),
+  ].map(([label, hour]) => ({ label, hour }));
   const nowHour = nowItem?.hour ?? new Date().getHours();
   const [hover, setHover] = useState<number | null>(null);
   const at = hover ?? nowHour;
@@ -80,6 +85,23 @@ export function HourlyForecast({ today, yesterday, items = [], header }: HourlyF
         </span>
       </div>
 
+      {commutes.length ? (
+        <div className="yw-hourly__marks" aria-hidden>
+          {commutes.map((c) => (
+            <span
+              key={c.label}
+              style={{
+                left: `${(c.hour / 23) * 100}%`,
+                // keep tags near either end inside the plot
+                transform: `translateX(${c.hour < 2 ? 0 : c.hour > 21 ? -100 : -50}%)`,
+              }}
+            >
+              {c.label} {pad(c.hour)}:00
+            </span>
+          ))}
+        </div>
+      ) : null}
+
       <div className="yw-hourly__plot">
         <svg
           className="yw-hourly__chart"
@@ -95,6 +117,9 @@ export function HourlyForecast({ today, yesterday, items = [], header }: HourlyF
           {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
             <line key={h} className="yw-hourly__grid" x1={x(h)} x2={x(h)} y1={0} y2={H} />
           ))}
+          {commutes.map((c) => (
+            <line key={c.label} className="yw-hourly__commute" x1={x(c.hour)} x2={x(c.hour)} y1={0} y2={H} />
+          ))}
           <path className="yw-hourly__line" data-kind="yesterday" d={path(yesterday)} />
           <path className="yw-hourly__line" data-kind="forecast" d={path(today, nowHour)} />
           <path className="yw-hourly__line" data-kind="today" d={path(today, 0, nowHour)} />
@@ -103,6 +128,14 @@ export function HourlyForecast({ today, yesterday, items = [], header }: HourlyF
           ) : null}
         </svg>
         {/* dots in HTML so they stay round while the SVG stretches */}
+        {commutes.map((c) => (
+          <span
+            key={c.label}
+            className="yw-hourly__cdot"
+            style={{ left: `${(c.hour / 23) * 100}%`, top: y(today[c.hour]) }}
+            aria-hidden
+          />
+        ))}
         <span
           className="yw-hourly__dot"
           style={{ left: `${(at / 23) * 100}%`, top: y(today[at]) }}
