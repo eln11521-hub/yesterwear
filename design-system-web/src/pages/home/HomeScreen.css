@@ -167,19 +167,7 @@
   background: var(--yw-sys-color-text-primary);
 }
 
-/* 昨日穿搭 then 今日穿搭, stacked (12 apart like the rest of the card) */
-.yw-home__days {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.yw-home__day {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* One day's outfit on one line; +N folds the rest (expandable for 昨日). */
+/* 昨日穿搭 on one line; +N folds the rest and expands the row. */
 .yw-home__chipline {
   display: flex;
   flex-wrap: nowrap;
@@ -187,18 +175,6 @@
   gap: 8px;
   min-inline-size: 0;
   overflow: hidden;
-}
-/* 今日: the whole row opens the record sheet */
-.yw-home__chipline[data-action] {
-  cursor: pointer;
-}
-.yw-home__chipline[data-action] .yw-outfit-chip {
-  pointer-events: none;
-}
-.yw-home__chipline[data-action]:focus-visible {
-  outline: var(--yw-sys-icon-stroke) solid var(--yw-sys-color-delta-warm);
-  outline-offset: 2px;
-  border-radius: 999px;
 }
 .yw-home__chipline[data-expanded] {
   flex-wrap: wrap;

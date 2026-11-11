@@ -183,12 +183,10 @@ struct OutfitChip: View {
     }
 }
 
-/// One day's outfit on one line (web ChipLine): up to 3 chips — fewer when they
-/// don't fit — and the rest folded into「+N」. With `onOpen` (今日穿搭) the row
-/// opens the record sheet; without it (昨日穿搭) +N expands it in place.
+/// 昨日穿搭 on one line (web ChipLine): up to 3 chips — fewer when they don't
+/// fit — and the rest folded into「+N」, which expands the row in place.
 struct ChipLine: View {
     let chips: [OutfitChipItem]
-    var onOpen: (() -> Void)? = nil
     @State private var expanded = false
 
     private static let maxShown = 3
@@ -199,10 +197,6 @@ struct ChipLine: View {
                 ForEach(chips, id: \.self) { chip($0) }
                 more("收合") { expanded = false }
             }
-        } else if let onOpen {
-            Button(action: onOpen) { line }
-                .buttonStyle(.plain)
-                .accessibilityLabel("今日穿搭：\(chips.map(\.label).joined(separator: "、"))，點一下修改")
         } else {
             line
         }
@@ -215,7 +209,7 @@ struct ChipLine: View {
                 HStack(spacing: 8) {
                     ForEach(chips.prefix(k), id: \.self) { chip($0) }
                     if chips.count > k {
-                        more("+\(chips.count - k)") { if onOpen == nil { expanded = true } else { onOpen?() } }
+                        more("+\(chips.count - k)") { expanded = true }
                     }
                 }
             }

@@ -21,9 +21,9 @@ export type HomeScreenProps = {
   /** Garment labels for the 昨日穿搭 row, ranked by warmth (app/outfit
    *  rankedChips) — the row shows the first few and folds the rest into「+N」. */
   yesterdayChips?: string[];
-  /** Garment labels of today's record, shown beside 昨日穿搭. Empty/omitted =
-   *  not recorded yet: the column reads 尚未記錄 and the CTA stays solid ink. */
-  todayChips?: string[];
+  /** Today already recorded: the CTA turns into the outlined 更新今日穿搭 pill.
+   *  (Today's picks stay in the record sheet, not on Home.) */
+  recorded?: boolean;
   advice?: string;
   /**
    * Cross-location state — set only when today's city differs from where
@@ -104,14 +104,14 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 /**
  * HomeScreen — Figma 608:1477 (v5). Paper ground with #f5f5f5 cards, read top to
  * bottom: hero (現在體感 · 溫度 · 比較句 · 天氣 · 實際氣溫/濕度/降雨 · 通勤摘要) →
- * 昨日穿搭 / 今日穿搭 / 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
+ * 昨日穿搭 + 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
  * the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭 is a
  * sticky CTA at the bottom. Presentational: pass props for real data.
  */
 export function HomeScreen({
   weather = MOCK_WEATHER,
   yesterdayChips = ["薄外套", "長袖上衣"],
-  todayChips = [],
+  recorded = false,
   advice = DEFAULT_SUGGESTION.advice,
   crossLocation,
   ctaLabel,
@@ -130,7 +130,6 @@ export function HomeScreen({
   const rain = metric("降雨");
   const humidity = metric("濕度");
   const rainPossible = Number.parseInt(rain, 10) > 0;
-  const recorded = todayChips.length > 0;
   return (
     <div className="yw-home">
       <div className="yw-home__top">
@@ -197,36 +196,22 @@ export function HomeScreen({
           ) : null}
         </section>
 
-        {/* 昨日穿搭 above 今日穿搭, so the two days compare line by line; today's
-            record becomes 昨日穿搭 tomorrow. */}
         <section className="yw-home__card yw-home__block">
-          <div className="yw-home__days">
-            <div className="yw-home__day">
-              <SecLabel>
-                {crossLocation ? (
-                  <span className="yw-home__sec-city">
-                    昨日穿搭 · <PinIcon size={11} />
-                    {crossLocation.yesterdayCity}
-                  </span>
-                ) : (
-                  "昨日穿搭"
-                )}
-              </SecLabel>
-              {yesterdayChips.length ? (
-                <ChipLine labels={yesterdayChips} />
-              ) : (
-                <span className="yw-home__empty">尚無昨日紀錄</span>
-              )}
-            </div>
-            <div className="yw-home__day">
-              <SecLabel>今日穿搭</SecLabel>
-              {recorded ? (
-                <ChipLine labels={todayChips} onOpen={onRecord} />
-              ) : (
-                <span className="yw-home__empty">尚未記錄</span>
-              )}
-            </div>
-          </div>
+          <SecLabel>
+            {crossLocation ? (
+              <span className="yw-home__sec-city">
+                昨日穿搭 · <PinIcon size={11} />
+                {crossLocation.yesterdayCity}
+              </span>
+            ) : (
+              "昨日穿搭"
+            )}
+          </SecLabel>
+          {yesterdayChips.length ? (
+            <ChipLine labels={yesterdayChips} />
+          ) : (
+            <span className="yw-home__empty">尚無昨日紀錄</span>
+          )}
           <SecLabel>今日建議穿搭</SecLabel>
           <p className="yw-home__suggestion">{advice.replace(/^建議：/, "")}</p>
         </section>
@@ -292,12 +277,11 @@ export function HomeScreen({
 const ROW_MAX = 3;
 
 /**
- * One day's outfit on a single line: up to ROW_MAX chips (fewer when they don't
- * fit the width), the rest folded into「+N」. With `onOpen` (今日穿搭) the whole
- * row opens the record sheet; without it (昨日穿搭, read-only) +N expands the
- * row in place and 收合 folds it back.
+ * 昨日穿搭 on a single line: up to ROW_MAX chips (fewer when they don't fit the
+ * width), the rest folded into「+N」, which expands the row in place (收合 folds
+ * it back).
  */
-function ChipLine({ labels, onOpen }: { labels: string[]; onOpen?: () => void }) {
+function ChipLine({ labels }: { labels: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(Math.min(ROW_MAX, labels.length));
   const [expanded, setExpanded] = useState(false);
@@ -325,29 +309,6 @@ function ChipLine({ labels, onOpen }: { labels: string[]; onOpen?: () => void })
   ));
   const moreLabel = `+${more}`;
 
-  if (onOpen) {
-    return (
-      // A div, not a <button>: OutfitChip renders a <button> itself.
-      <div
-        ref={ref}
-        role="button"
-        tabIndex={0}
-        className="yw-home__chipline"
-        data-action
-        onClick={onOpen}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onOpen();
-          }
-        }}
-        aria-label={`今日穿搭：${labels.join("、")}，點一下修改`}
-      >
-        {chips}
-        {more > 0 ? <span className="yw-home__more">{moreLabel}</span> : null}
-      </div>
-    );
-  }
   return (
     <div ref={ref} className="yw-home__chipline" data-expanded={expanded || undefined}>
       {chips}

@@ -36,15 +36,14 @@ export const CrossLocation: Story = {
   },
 };
 
-/** Today recorded: 今日穿搭 fills in beside 昨日穿搭 and the CTA turns outlined. */
+/** Today recorded: the CTA turns into the outlined 更新今日穿搭 pill. */
 export const Recorded: Story = {
-  args: { todayChips: ["薄外套", "短袖上衣", "長褲"] },
+  args: { recorded: true },
 };
 
-/** Many picks: each row keeps one line, the rest fold into「+N」(昨日 +N expands). */
+/** Many picks: 昨日穿搭 keeps one line, the rest fold into「+N」(tap to expand). */
 export const ManyPicks: Story = {
   args: {
     yesterdayChips: ["羽絨外套", "高領毛衣", "保暖褲", "鋪棉背心", "發熱衣", "圍巾", "手套"],
-    todayChips: ["厚外套夾克", "長袖上衣", "牛仔褲", "毛帽", "圍巾"],
   },
 };

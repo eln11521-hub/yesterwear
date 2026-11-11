@@ -118,7 +118,7 @@ export function App() {
             <HomeScreen
               weather={weather}
               yesterdayChips={yesterdayChips}
-              todayChips={rankedChips(today)}
+              recorded={Boolean(today)}
               advice={suggestion.advice}
               onRecord={() => setOpen(true)}
               onRefresh={refresh}
