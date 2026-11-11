@@ -607,6 +607,14 @@ struct HourlyChart: View {
     private static let plotH: CGFloat = 112, yLabelW: CGFloat = 28
 
     private var at: Int { min(max(hover ?? nowHour, 0), 23) }
+    /// 出門 / 下班 hours from the user's settings (the window tags them).
+    private var commutes: [(label: String, hour: Int)] {
+        var seen = Set<String>()
+        return items.compactMap { it in
+            guard let s = it.slot, (0..<24).contains(it.hour), seen.insert(s).inserted else { return nil }
+            return (s, it.hour)
+        }
+    }
     private var bounds: (lo: Int, hi: Int) {
         let all = today + yesterday
         let lo = all.min() ?? 0
@@ -618,6 +626,7 @@ struct HourlyChart: View {
             if let line = summary { Text(line).font(T.ui(12)).foregroundStyle(S.textBody) }
             legend
             VStack(spacing: 4) {
+                if !commutes.isEmpty { marks.padding(.trailing, Self.yLabelW).padding(.bottom, -4) }
                 HStack(alignment: .top, spacing: 8) {
                     GeometryReader { geo in plot(geo.size) }
                         .frame(height: Self.plotH)
@@ -688,12 +697,22 @@ struct HourlyChart: View {
                 Path { p in p.move(to: .init(x: x(h), y: 0)); p.addLine(to: .init(x: x(h), y: size.height)) }
                     .stroke(S.line, lineWidth: 1)
             }
+            ForEach(commutes, id: \.label) { c in
+                Path { p in p.move(to: .init(x: x(c.hour), y: 0)); p.addLine(to: .init(x: x(c.hour), y: size.height)) }
+                    .stroke(S.textMutedWarm, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+            }
             line(yesterday, 0, 23).stroke(S.textHint, style: StrokeStyle(lineWidth: 2, dash: [4, 4]))
             line(today, now, 23).stroke(S.textMutedWarm, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
             line(today, 0, now).stroke(S.textPrimary, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
             if let hover {
                 Path { p in p.move(to: .init(x: x(hover), y: 0)); p.addLine(to: .init(x: x(hover), y: size.height)) }
                     .stroke(S.textMutedWarm, lineWidth: 1)
+            }
+            ForEach(commutes, id: \.label) { c in
+                Circle().fill(S.surfaceRaised)
+                    .overlay(Circle().strokeBorder(S.textPrimary, lineWidth: 2))
+                    .frame(width: 8, height: 8)
+                    .position(x: x(c.hour), y: y(today[c.hour]))
             }
             Circle().fill(S.textPrimary)
                 .overlay(Circle().stroke(S.surfaceRaised, lineWidth: 2))
@@ -709,6 +728,29 @@ struct HourlyChart: View {
         )
         .accessibilityElement()
         .accessibilityLabel("今天與昨天的體感溫度，現在今天 \(today[now])°、昨天 \(yesterday[now])°")
+    }
+
+    /// 出門 / 下班 tags above the plot, over their hour (kept inside at either end).
+    private var marks: some View {
+        GeometryReader { geo in
+            ForEach(commutes, id: \.label) { c in
+                Text("\(c.label) \(String(format: "%02d:00", c.hour))")
+                    .font(T.ui(10, .medium))
+                    .foregroundStyle(S.textPrimary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 1)
+                    .background(S.surfaceWhite, in: Capsule())
+                    .fixedSize()
+                    .alignmentGuide(.leading) { d in
+                        let x = CGFloat(c.hour) / 23 * geo.size.width
+                        let anchor = c.hour < 2 ? 0 : (c.hour > 21 ? d.width : d.width / 2)
+                        return anchor - x
+                    }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(height: 16)
+        .accessibilityHidden(true)
     }
 
     private var xAxis: some View {
