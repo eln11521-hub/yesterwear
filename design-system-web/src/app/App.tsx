@@ -162,6 +162,7 @@ export function App() {
                   <RecordOutfitSheet
                     initial={today ?? suggestion}
                     initialThumb={today?.thumbnailRef ?? undefined}
+                    saved={Boolean(today)}
                     onSave={(r) => {
                       saveToday(r);
                       setOpen(false);

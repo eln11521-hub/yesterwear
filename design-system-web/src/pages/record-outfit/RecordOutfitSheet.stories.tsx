@@ -68,3 +68,21 @@ export const PhotoLowConfidence: Story = {
     initialThumb: sampleThumb,
   },
 };
+
+/** Reopened after saving (更新今日穿搭) with a photo: the panel shows the saved
+ *  photo and tags (Figma 665:2745). */
+export const SavedWithPhoto: Story = {
+  args: {
+    initial: { tops: ["帽T衛衣"], outers: ["連帽外套"] },
+    initialThumb: sampleThumb,
+    saved: true,
+  },
+};
+
+/** Reopened after saving without a photo: the panel just shows the saved tags. */
+export const SavedNoPhoto: Story = {
+  args: {
+    initial: { tops: ["長袖上衣"], outers: ["薄外套"], bottoms: ["牛仔褲"] },
+    saved: true,
+  },
+};

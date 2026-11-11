@@ -40,7 +40,8 @@ struct RootTabView: View {
         let thumb = today?.thumbnailURL.flatMap { UIImage(contentsOfFile: $0.path) }
         return RecordOutfitSheet(
             initial: today?.picks ?? suggestion.picks,
-            initialThumb: thumb
+            initialThumb: thumb,
+            saved: today != nil
         ) { picks, photo, keptExisting in
             outfit.saveToday(picks,
                              thumbnailJPEG: photo?.thumbnailJPEG(), keepThumbnail: keptExisting)
