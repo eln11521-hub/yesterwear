@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 import UIKit
 
@@ -18,10 +19,22 @@ struct RecordOutfitSheet: View {
     @State private var hint: String?
     @State private var outerUnsure = false
     @State private var thumbIsNew = false
-    @State private var picking = false
+    /// 拍照來源 action sheet (Figma 232:5) → camera or a single library photo.
+    @State private var choosingSource = false
+    @State private var shooting = false
+    @State private var browsing = false
+    @State private var libraryItem: PhotosPickerItem?
 
     private typealias T = YWTokens.Typography
     private typealias S = YWTokens.Sys
+
+    private static var hasCamera: Bool {
+        #if targetEnvironment(simulator)
+        false
+        #else
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+        #endif
+    }
 
     init(initial: OutfitPicks, initialThumb: UIImage? = nil,
          onSave: @escaping (_ picks: OutfitPicks, _ photo: UIImage?, _ keptExisting: Bool) -> Void) {
@@ -60,7 +73,7 @@ struct RecordOutfitSheet: View {
 
             VStack(spacing: 12) {
                 YWSecondaryButton(label: thumb == nil ? "拍照記錄" : "重新拍照", icon: "icon-camera") {
-                    picking = true
+                    choosingSource = true
                 }
                 YWPrimaryButton(label: "儲存今日紀錄", icon: "icon-check") {
                     onSave(picks, thumbIsNew ? thumb : nil, thumb != nil && !thumbIsNew)
@@ -71,14 +84,76 @@ struct RecordOutfitSheet: View {
             .padding(.bottom, 8)   // the sheet adds the home-indicator inset below
             .overlay(alignment: .top) { Rectangle().fill(S.line).frame(height: 1) }
         }
-        .sheet(isPresented: $picking) {
-            PhotoPicker { image in
-                picking = false
-                guard let image else { return }
-                accept(photo: image)
+        .overlay { if choosingSource { sourceSheet } }
+        .animation(.easeOut(duration: 0.2), value: choosingSource)
+        .fullScreenCover(isPresented: $shooting) {
+            CameraPicker { image in
+                shooting = false
+                if let image { accept(photo: image) }
             }
             .ignoresSafeArea()
         }
+        .photosPicker(isPresented: $browsing, selection: $libraryItem, matching: .images)
+        .onChange(of: libraryItem) { _, item in
+            guard let item else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data) {
+                    accept(photo: image)
+                }
+                libraryItem = nil
+            }
+        }
+    }
+
+    // MARK: 拍照來源 (Figma 232:5)
+
+    /// Bottom action sheet: 拍照 / 從相簿選擇單張 on one white card, 取消 below.
+    private var sourceSheet: some View {
+        ZStack(alignment: .bottom) {
+            // Reach over the sheet's handle strip and home-indicator inset too
+            // (the sheet clips to its own shape).
+            Color.black.opacity(0.3)
+                .padding(.top, -24)
+                .padding(.bottom, -48)
+                .onTapGesture { choosingSource = false }
+            VStack(spacing: 8) {
+                VStack(spacing: 0) {
+                    if Self.hasCamera {
+                        sourceRow("拍照", icon: "icon-camera") { choosingSource = false; shooting = true }
+                        Rectangle().fill(S.line).frame(height: 1)
+                    }
+                    sourceRow("從相簿選擇單張", systemIcon: "photo") { choosingSource = false; browsing = true }
+                }
+                .background(S.surfaceWhite, in: RoundedRectangle(cornerRadius: S.radiusMd))
+                Button { choosingSource = false } label: {
+                    Text("取消")
+                        .font(T.ui(15, .semibold))
+                        .foregroundStyle(S.textPrimary)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .background(S.surfaceWhite, in: RoundedRectangle(cornerRadius: S.radiusMd))
+            }
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
+            .transition(.move(edge: .bottom))
+        }
+        .transition(.opacity)
+    }
+
+    private func sourceRow(_ label: String, icon: String? = nil, systemIcon: String? = nil, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                if let icon { AssetIcon(name: icon, size: 18) }
+                if let systemIcon { Image(systemName: systemIcon).font(.system(size: 16)) }
+                Text(label).font(T.ui(15))
+            }
+            .foregroundStyle(S.textPrimary)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Pieces
@@ -188,13 +263,14 @@ struct RecordOutfitSheet: View {
     }
 }
 
-/// Camera when the device has one, photo library otherwise (the simulator).
-struct PhotoPicker: UIViewControllerRepresentable {
+/// The system camera. The simulator reports a camera but has no feed (the
+/// shutter stays disabled), so it only offers the photo library there.
+struct CameraPicker: UIViewControllerRepresentable {
     var onPick: (UIImage?) -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = UIImagePickerController.isSourceTypeAvailable(.camera) ? .camera : .photoLibrary
+        picker.sourceType = .camera
         picker.delegate = context.coordinator
         return picker
     }
