@@ -156,11 +156,9 @@ struct HomeView: View {
         let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
         let advice = suggestion.advice.hasPrefix("建議：") ? String(suggestion.advice.dropFirst(3)) : suggestion.advice
         return VStack(alignment: .leading, spacing: 12) {
-            // 昨日穿搭 | 今日穿搭 side by side; today's column becomes 昨日 tomorrow.
-            HStack(alignment: .top, spacing: 16) {
-                dayColumn("昨日穿搭", outfit.yesterday, empty: "尚無昨日紀錄")
-                dayColumn("今日穿搭", outfit.today, empty: "尚未記錄")
-            }
+            // 昨日穿搭 above 今日穿搭; today's record becomes 昨日 tomorrow.
+            dayColumn("昨日穿搭", outfit.yesterday, empty: "尚無昨日紀錄")
+            dayColumn("今日穿搭", outfit.today, empty: "尚未記錄")
             SectionLabel("今日建議穿搭")
             Text(advice)
                 .font(T.ui(12))

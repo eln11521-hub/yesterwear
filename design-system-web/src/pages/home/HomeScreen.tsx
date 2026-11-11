@@ -103,7 +103,7 @@ const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 /**
  * HomeScreen — Figma 608:1477 (v5). Paper ground with #f5f5f5 cards, read top to
  * bottom: hero (現在體感 · 溫度 · 比較句 · 天氣 · 實際氣溫/濕度/降雨 · 通勤摘要) →
- * 昨日穿搭 | 今日穿搭 + 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
+ * 昨日穿搭 / 今日穿搭 / 今日建議穿搭 → 各時段體感溫度 → 未來一週天氣 → widget promo. No tab bar:
  * the header gear opens Settings, pull-to-refresh reloads, and 記錄今天穿搭 is a
  * sticky CTA at the bottom. Presentational: pass props for real data.
  */
@@ -200,8 +200,8 @@ export function HomeScreen({
           ) : null}
         </section>
 
-        {/* 昨日穿搭 | 今日穿搭 side by side, so the two days compare at a glance;
-            today's column becomes 昨日穿搭 tomorrow. */}
+        {/* 昨日穿搭 above 今日穿搭, so the two days compare line by line; today's
+            record becomes 昨日穿搭 tomorrow. */}
         <section className="yw-home__card yw-home__block">
           <div className="yw-home__days">
             <div className="yw-home__day">
