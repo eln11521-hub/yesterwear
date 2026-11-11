@@ -2,7 +2,7 @@
    chart point sits under its column; columns + chart scroll together edge to
    edge, the ° ticks stay put over the chart. */
 .yw-hourly {
-  --yw-hourly-col-h: 48px;
+  --yw-hourly-col-h: 92px;
   --yw-hourly-gap: 8px;
   display: flex;
   flex-direction: column;
@@ -36,19 +36,15 @@
 }
 .yw-hourly__key {
   display: inline-block;
-  inline-size: 16px;
-  block-size: 0;
-  border-block-start: 2px solid var(--yw-sys-color-text-primary);
-}
-.yw-hourly__key[data-kind="actual"] {
-  border-block-start: 2px dashed var(--yw-sys-color-text-muted-warm);
-}
-.yw-hourly__key[data-kind="gap"] {
-  inline-size: 12px;
-  block-size: 8px;
-  border: none;
+  inline-size: 8px;
+  block-size: 12px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--yw-sys-color-delta-cold) 20%, transparent);
+}
+.yw-hourly__key[data-kind="cold"] {
+  background: var(--yw-sys-color-delta-cold);
+}
+.yw-hourly__key[data-kind="warm"] {
+  background: var(--yw-sys-color-delta-warm);
 }
 
 /* Columns + chart scroll edge to edge: the body bleeds over the card's 16px
@@ -82,7 +78,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding-block: 8px;
   border-radius: var(--yw-sys-radius-md);
 }
@@ -97,59 +93,84 @@
 .yw-hourly__col[data-now] .yw-hourly__time {
   color: var(--yw-sys-color-text-primary);
 }
+.yw-hourly__temp {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-hourly__actual {
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--yw-sys-color-text-label);
+  white-space: nowrap;
+}
+.yw-hourly__col[data-now] .yw-hourly__actual {
+  color: var(--yw-sys-color-text-primary);
+}
 /* past hours: muted (Figma State=Past) */
+.yw-hourly__col[data-past] .yw-hourly__temp,
+.yw-hourly__col[data-past] .yw-hourly__actual {
+  color: var(--yw-sys-color-text-hint);
+}
 .yw-hourly__col[data-past] .yw-weather-icon {
   opacity: 0.45;
 }
 
-.yw-hourly__chart {
-  display: block;
-  overflow: visible;
+/* Gap row: one bar per hour off a shared baseline (= same as 實際). */
+.yw-hourly__gaps {
+  position: relative;
+  display: flex;
+  gap: 4px;
 }
-.yw-hourly__band {
-  fill: color-mix(in srgb, var(--yw-sys-color-delta-cold) 20%, transparent);
+.yw-hourly__gaps::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: var(--yw-hourly-base);
+  block-size: 1px;
+  background: var(--yw-sys-color-line);
 }
-.yw-hourly__line {
-  fill: none;
-  stroke-width: 2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
+.yw-hourly__gapcol {
+  position: relative;
+  flex: none;
+  inline-size: 48px;
 }
-.yw-hourly__line[data-kind="feels"] {
-  stroke: var(--yw-sys-color-text-primary);
+.yw-hourly__gapcol[data-past] {
+  opacity: 0.45;
 }
-.yw-hourly__line[data-kind="actual"] {
-  stroke: var(--yw-sys-color-text-muted-warm);
-  stroke-dasharray: 5 4;
-  stroke-linecap: butt;
+.yw-hourly__bar {
+  position: absolute;
+  inset-inline-start: 15px;
+  inline-size: 18px;
+  border-radius: 4px;
 }
-.yw-hourly__dot {
-  stroke-width: 1.5;
+.yw-hourly__gapcol[data-kind="cold"] .yw-hourly__bar {
+  background: var(--yw-sys-color-delta-cold);
 }
-.yw-hourly__dot[data-kind="feels"] {
-  fill: var(--yw-sys-color-text-primary);
+.yw-hourly__gapcol[data-kind="warm"] .yw-hourly__bar {
+  background: var(--yw-sys-color-delta-warm);
 }
-.yw-hourly__dot[data-kind="actual"] {
-  fill: var(--yw-sys-color-surface-raised);
-  stroke: var(--yw-sys-color-text-muted-warm);
+.yw-hourly__gapcol[data-kind="same"] .yw-hourly__bar {
+  inset-block-start: calc(var(--yw-hourly-base) - 1px);
+  block-size: 3px;
+  border-radius: 2px;
+  background: var(--yw-sys-color-delta-neutral);
 }
-/* values at the points: 體感 12 Medium ink, 實際 10 label colour */
-.yw-hourly__val {
-  font-family: var(--yw-sys-font-ui);
-  text-anchor: middle;
-}
-.yw-hourly__val[data-kind="feels"] {
+.yw-hourly__gapval {
+  position: absolute;
+  inset-inline: 0;
+  text-align: center;
   font-size: 12px;
   font-weight: 500;
-  fill: var(--yw-sys-color-text-primary);
+  line-height: 16px;
 }
-.yw-hourly__val[data-kind="actual"] {
-  font-size: 10px;
-  fill: var(--yw-sys-color-text-label);
+.yw-hourly__gapcol[data-kind="cold"] .yw-hourly__gapval {
+  color: var(--yw-sys-color-delta-cold);
 }
-g[data-past] .yw-hourly__val {
-  fill: var(--yw-sys-color-text-hint);
+.yw-hourly__gapcol[data-kind="warm"] .yw-hourly__gapval {
+  color: var(--yw-sys-color-badge-required-text);
 }
-g[data-past] .yw-hourly__dot {
-  opacity: 0.45;
+.yw-hourly__gapcol[data-kind="same"] .yw-hourly__gapval {
+  color: var(--yw-sys-color-text-label);
 }
