@@ -20,6 +20,8 @@ export type WeatherVM = {
   commute: { slot: string; time: string; temp: string; delta: string }[];
   /** 各時段體感溫度: the 3 hours before now, now, and the next 24 hours. */
   hourly: HourlyPoint[];
+  /** Today vs yesterday, 00–23 feels-like in the display unit (各時段 overview). */
+  dayCompare?: { today: number[]; yesterday: number[] };
   forecast: {
     day: string;
     condition: Condition;
@@ -58,6 +60,17 @@ export type HourlyPoint = {
   /** Commute marker for this hour. */
   slot?: "出門" | "下班";
 };
+
+/** Mock 00–23 feels-like: today runs a little colder than yesterday until the
+ *  afternoon, then catches up. */
+function mockDayCompare() {
+  const curve = (h: number, base: number) =>
+    Math.round(base + 6 * Math.sin(((h - 9) / 24) * 2 * Math.PI));
+  return {
+    today: Array.from({ length: 24 }, (_, h) => curve(h, 12) - (h < 15 ? 2 : 0)),
+    yesterday: Array.from({ length: 24 }, (_, h) => curve(h, 13)),
+  };
+}
 
 /** Mock window: 06:00 → 09:00 (now) → 09:00 tomorrow; feels-like peaks at 15:00
  *  and runs a few degrees below the actual temperature. */
@@ -110,6 +123,7 @@ export const MOCK_WEATHER: WeatherVM = {
     { slot: "下班", time: "18:00", temp: "14°", delta: "↓4°" },
   ],
   hourly: mockHourly(),
+  dayCompare: mockDayCompare(),
   forecast: [
     { day: "今天", condition: "partly", low: 11, high: 18, current: 16 },
     { day: "週五", condition: "sun", low: 13, high: 20 },

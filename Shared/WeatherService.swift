@@ -84,7 +84,9 @@ actor WeatherService {
             rainNow: rainNow,
             forecast: forecast(response.daily),
             hourly: window(hourly, nowIdx: nowIdx),
-            nowHour: nowIdx >= Self.dayHours ? nowIdx - Self.dayHours : nil
+            nowHour: nowIdx >= Self.dayHours ? nowIdx - Self.dayHours : nil,
+            todayFeels: day(hourly.apparentTemperature, from: Self.dayHours),
+            yesterdayFeels: day(hourly.apparentTemperature, from: 0)
         )
     }
 
@@ -105,6 +107,11 @@ actor WeatherService {
                 day: hourly.time[i].prefix(10) == today ? 0 : 1
             )
         }
+    }
+
+    /// 24 hourly values from `from` (0 = yesterday, 24 = today), or nil if short.
+    private func day(_ values: [Double], from: Int) -> [Double]? {
+        values.count >= from + 24 ? Array(values[from..<(from + 24)]) : nil
     }
 
     /// daily[0] = yesterday (past_days=1), so today onward starts at index 1.

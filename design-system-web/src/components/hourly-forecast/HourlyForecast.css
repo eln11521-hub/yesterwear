@@ -1,9 +1,7 @@
-/* 各時段體感溫度 (Figma 608:1520). Columns are 48 wide on a 52 step so each
-   chart point sits under its column; columns + chart scroll together edge to
-   edge, the ° ticks stay put over the chart. */
+/* 各時段體感溫度 overview (Figma 608:1520): today vs yesterday feels-like, 00–24,
+   stretched to the card width. Sizes on the 4pt grid. */
 .yw-hourly {
-  --yw-hourly-col-h: 92px;
-  --yw-hourly-gap: 8px;
+  --yw-hourly-plot-h: 112px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -15,7 +13,7 @@
   align-items: center;
 }
 
-/* next-commute line: 12 Regular body colour, no emphasis (Figma 669:1343) */
+/* next-commute line: 12 Regular body colour (Figma 669:1343) */
 .yw-hourly__summary {
   margin: 0;
   font-size: 12px;
@@ -23,6 +21,7 @@
   color: var(--yw-sys-color-text-body);
 }
 
+/* legend doubles as the read-out: values at now, or at the dragged hour */
 .yw-hourly__legend {
   display: flex;
   gap: 16px;
@@ -34,143 +33,100 @@
   align-items: center;
   gap: 6px;
 }
+.yw-hourly__num {
+  font-weight: 500;
+  color: var(--yw-sys-color-text-primary);
+}
 .yw-hourly__key {
   display: inline-block;
+  inline-size: 16px;
+  block-size: 0;
+  border-block-start: 2px solid var(--yw-sys-color-text-primary);
+}
+.yw-hourly__key[data-kind="yesterday"] {
+  border-block-start: 2px dashed var(--yw-sys-color-text-hint);
+}
+
+/* plot: room on the right for the hi / lo labels */
+.yw-hourly__plot {
+  position: relative;
+  block-size: var(--yw-hourly-plot-h);
+  margin-inline-end: 28px;
+}
+.yw-hourly__chart {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+.yw-hourly__grid {
+  stroke: var(--yw-sys-color-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.yw-hourly__line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.yw-hourly__line[data-kind="today"] {
+  stroke: var(--yw-sys-color-text-primary);
+}
+.yw-hourly__line[data-kind="forecast"] {
+  stroke: var(--yw-sys-color-text-muted-warm);
+}
+.yw-hourly__line[data-kind="yesterday"] {
+  stroke: var(--yw-sys-color-text-hint);
+  stroke-dasharray: 4 4;
+  stroke-linecap: butt;
+}
+.yw-hourly__cursor {
+  stroke: var(--yw-sys-color-text-muted-warm);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.yw-hourly__dot {
+  position: absolute;
   inline-size: 8px;
-  block-size: 12px;
-  border-radius: 2px;
+  block-size: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--yw-sys-color-text-primary);
+  box-shadow: 0 0 0 2px var(--yw-sys-color-surface-raised);
+  pointer-events: none;
 }
-.yw-hourly__key[data-kind="cold"] {
-  background: var(--yw-sys-color-delta-cold);
-}
-.yw-hourly__key[data-kind="warm"] {
-  background: var(--yw-sys-color-delta-warm);
-}
-
-/* Columns + chart scroll edge to edge: the body bleeds over the card's 16px
-   padding. */
-.yw-hourly__body {
-  margin-inline: -16px;
-}
-.yw-hourly__scroll {
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.yw-hourly__scroll::-webkit-scrollbar {
-  display: none;
-}
-.yw-hourly__track {
-  inline-size: max-content;
-  padding-inline: 16px;
-}
-
-.yw-hourly__cols {
-  display: flex;
-  gap: 4px;
-  inline-size: max-content;
-  margin-block-end: var(--yw-hourly-gap);
-}
-.yw-hourly__col {
-  flex: none;
-  box-sizing: border-box;
-  inline-size: 48px;
-  block-size: var(--yw-hourly-col-h);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding-block: 8px;
-  border-radius: var(--yw-sys-radius-md);
-}
-/* time 8 SemiBold (Figma 668:1252) */
-.yw-hourly__time {
-  font-size: 8px;
-  font-weight: 600;
-  line-height: 10px;
-  color: var(--yw-sys-color-text-label);
-  white-space: nowrap;
-}
-.yw-hourly__col[data-now] .yw-hourly__time {
-  color: var(--yw-sys-color-text-primary);
-}
-.yw-hourly__temp {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 18px;
-  color: var(--yw-sys-color-text-primary);
-}
-.yw-hourly__actual {
+.yw-hourly__yhi,
+.yw-hourly__ylo {
+  position: absolute;
+  inset-inline-start: calc(100% + 8px);
   font-size: 10px;
   line-height: 12px;
   color: var(--yw-sys-color-text-label);
-  white-space: nowrap;
 }
-.yw-hourly__col[data-now] .yw-hourly__actual {
-  color: var(--yw-sys-color-text-primary);
+.yw-hourly__yhi {
+  inset-block-start: 2px;
 }
-/* past hours: muted (Figma State=Past) */
-.yw-hourly__col[data-past] .yw-hourly__temp,
-.yw-hourly__col[data-past] .yw-hourly__actual {
-  color: var(--yw-sys-color-text-hint);
-}
-.yw-hourly__col[data-past] .yw-weather-icon {
-  opacity: 0.45;
+.yw-hourly__ylo {
+  inset-block-end: 2px;
 }
 
-/* Gap row: one bar per hour off a shared baseline (= same as 實際). */
-.yw-hourly__gaps {
+.yw-hourly__xaxis {
   position: relative;
-  display: flex;
-  gap: 4px;
-}
-.yw-hourly__gaps::before {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: var(--yw-hourly-base);
-  block-size: 1px;
-  background: var(--yw-sys-color-line);
-}
-.yw-hourly__gapcol {
-  position: relative;
-  flex: none;
-  inline-size: 48px;
-}
-.yw-hourly__gapcol[data-past] {
-  opacity: 0.45;
-}
-.yw-hourly__bar {
-  position: absolute;
-  inset-inline-start: 15px;
-  inline-size: 18px;
-  border-radius: 4px;
-}
-.yw-hourly__gapcol[data-kind="cold"] .yw-hourly__bar {
-  background: var(--yw-sys-color-delta-cold);
-}
-.yw-hourly__gapcol[data-kind="warm"] .yw-hourly__bar {
-  background: var(--yw-sys-color-delta-warm);
-}
-.yw-hourly__gapcol[data-kind="same"] .yw-hourly__bar {
-  inset-block-start: calc(var(--yw-hourly-base) - 1px);
-  block-size: 3px;
-  border-radius: 2px;
-  background: var(--yw-sys-color-delta-neutral);
-}
-.yw-hourly__gapval {
-  position: absolute;
-  inset-inline: 0;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-}
-.yw-hourly__gapcol[data-kind="cold"] .yw-hourly__gapval {
-  color: var(--yw-sys-color-delta-cold);
-}
-.yw-hourly__gapcol[data-kind="warm"] .yw-hourly__gapval {
-  color: var(--yw-sys-color-badge-required-text);
-}
-.yw-hourly__gapcol[data-kind="same"] .yw-hourly__gapval {
+  block-size: 12px;
+  margin-inline-end: 28px;
+  margin-block-start: -4px;
+  font-size: 10px;
+  line-height: 12px;
   color: var(--yw-sys-color-text-label);
+}
+.yw-hourly__xaxis span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+.yw-hourly__xaxis span:first-child {
+  transform: none;
 }

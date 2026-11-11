@@ -93,6 +93,9 @@ struct WeatherSnapshot: Codable, Equatable {
     var hourly: [HourPoint]? = nil
     /// Current hour of day in the city's timezone.
     var nowHour: Int? = nil
+    /// 今天 vs 昨天 feels-like, 00–23 each (各時段 overview chart).
+    var todayFeels: [Double]? = nil
+    var yesterdayFeels: [Double]? = nil
 
     var condition: WeatherCondition { .from(code: conditionCode ?? 0) }
 

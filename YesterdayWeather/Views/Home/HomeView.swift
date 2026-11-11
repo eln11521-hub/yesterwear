@@ -37,9 +37,9 @@ struct HomeView: View {
                     if let snap = weather.snapshot {
                         hero(snap)
                         outfitCard(snap)
-                        // Older caches have no 3h-back/24h-ahead window — hide until refresh.
-                        if let hours = snap.hourly, !hours.isEmpty, hours.allSatisfy({ $0.offset != nil && $0.actual != nil }) {
-                            hourlyCard(hours)
+                        // Older caches have no 00–23 comparison — hide until refresh.
+                        if let today = snap.todayFeels, let yesterday = snap.yesterdayFeels {
+                            hourlyCard(snap.hourly ?? [], today: today, yesterday: yesterday, nowHour: snap.nowHour)
                         }
                         if let days = snap.forecast, !days.isEmpty {
                             forecast(days, currentApparent: snap.currentApparent)
@@ -175,7 +175,7 @@ struct HomeView: View {
 
     // MARK: Hourly
 
-    private func hourlyCard(_ hours: [HourPoint]) -> some View {
+    private func hourlyCard(_ hours: [HourPoint], today: [Double], yesterday: [Double], nowHour: Int?) -> some View {
         let leave = settings.settings.leaveHour, back = settings.settings.returnHour
         let items = hours.map { h in
             HourlyChart.Item(
@@ -190,7 +190,12 @@ struct HomeView: View {
         }
         return VStack(alignment: .leading, spacing: 12) {
             SectionLabel("各時段體感溫度")
-            HourlyChart(items: items)
+            HourlyChart(
+                today: today.map(deg),
+                yesterday: yesterday.map(deg),
+                nowHour: nowHour ?? Calendar.current.component(.hour, from: .now),
+                items: items
+            )
         }
         .ywCard(padding: EdgeInsets(top: 12, leading: 16, bottom: 16, trailing: 16))
     }
