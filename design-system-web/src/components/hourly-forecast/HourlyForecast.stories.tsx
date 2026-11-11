@@ -44,8 +44,8 @@ export const Rainy: Story = {
   },
 };
 
-/** Close and crossing lines (a typical Taipei day): a 0° gap shows one 「=23°」
- *  label, and where 體感 rises above 實際 the two labels swap sides. */
+/** A typical Taipei day: gaps of 0–1°, and 體感 rising above 實際 in the
+ *  afternoon — cold bars hang down, warm bars rise, equal hours read 「0°」. */
 export const CloseAndCrossing: Story = {
   args: {
     items: MOCK_WEATHER.hourly.map((h, i) => {
