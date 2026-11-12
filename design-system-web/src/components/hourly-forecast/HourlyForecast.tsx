@@ -127,9 +127,13 @@ export function HourlyForecast({
       ) : (
         <>
           <div className="yw-hourly__legend">
+            {/* which hour the values are for: 現在 04:00, or the dragged hour */}
+            <span className="yw-hourly__at" aria-live="polite">
+              {hover == null ? `現在 ${pad(at)}:00` : `${pad(at)}:00`}
+            </span>
             <span>
               <i className="yw-hourly__key" data-kind="today" />
-              {hover == null ? "今天" : `今天 ${pad(at)}:00`}
+              今天
               <b className="yw-hourly__num">{today[at]}°</b>
             </span>
             <span>
