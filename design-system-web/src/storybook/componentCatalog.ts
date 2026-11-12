@@ -134,9 +134,20 @@ const componentCatalogSeed = [
     compositionRole: "data-display",
     provenance: "implementation-derived",
     purpose:
-      "Today's hours as a horizontally scrolling strip: time, weather icon, feels-like temperature, rain % when wet; the current hour is dotted and labeled 現在, commute hours tagged 出門 / 下班.",
-    useWhen: ["Showing 今天各時段溫度 under the Home CTA."],
+      "各時段體感溫度 with two tabs: 今天各時段 (a horizontal strip of hours — time, icon, feels-like, actual; 現在 and 出門 / 下班 highlighted) and 相比昨天 (today vs yesterday feels-like overview chart).",
+    useWhen: ["Showing 各時段體感溫度 on Home."],
     keywords: ["hourly", "today", "weather", "temperature", "timeline"],
+  },
+  {
+    id: "segmented-control",
+    name: "Segmented Control",
+    category: "Selection",
+    compositionRole: "control",
+    provenance: "extracted",
+    purpose:
+      "2–3 equal segments on a rounded track with a white active pill (Figma 497:137).",
+    useWhen: ["Settings 定位方式 / 溫度單位.", "Switching the Home 各時段體感溫度 tabs."],
+    keywords: ["segmented", "tabs", "toggle", "switch", "selection"],
   },
   {
     id: "floating-nav",

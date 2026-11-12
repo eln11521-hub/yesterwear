@@ -142,34 +142,6 @@
   color: var(--yw-sys-color-text-label);
 }
 
-/* segmented control */
-.yw-settings__segmented {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--yw-sys-color-surface-raised);
-  border-radius: var(--yw-sys-radius-md);
-}
-.yw-settings__seg {
-  flex: 1;
-  padding: 9px 8px;
-  border: none;
-  border-radius: var(--yw-sys-radius-sm);
-  background: transparent;
-  color: var(--yw-sys-color-text-muted);
-  font-family: var(--yw-sys-font-ui);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--yw-sys-motion-state-duration)
-    var(--yw-sys-motion-ease-out);
-}
-.yw-settings__seg[data-active="true"] {
-  background: var(--yw-sys-color-surface-white);
-  color: var(--yw-sys-color-text-primary);
-  box-shadow: 0 1px 3px rgb(17 17 17 / 8%);
-}
-
 /* city search */
 .yw-settings__search {
   display: flex;

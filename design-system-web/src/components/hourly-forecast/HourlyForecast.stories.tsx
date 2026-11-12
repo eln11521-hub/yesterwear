@@ -36,14 +36,18 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/** Today (solid — ink up to now, lighter ahead) against yesterday (dashed),
- *  00–24. Drag across the chart to read an hour in the legend. */
+/** 今天各時段: the hours strip (現在 and 出門 / 下班 on white chips). */
 export const Default: Story = {};
+
+/** 相比昨天: today (solid — ink up to now, lighter ahead) against yesterday
+ *  (dashed), 00–24. Drag across the chart to read an hour in the legend. */
+export const CompareTab: Story = { args: { initialTab: "compare" } };
 
 /** Today much warmer than yesterday all day. */
 export const WarmerDay: Story = {
   args: {
     today: MOCK_WEATHER.dayCompare!.yesterday.map((v) => v + 5),
     yesterday: MOCK_WEATHER.dayCompare!.yesterday,
+    initialTab: "compare",
   },
 };

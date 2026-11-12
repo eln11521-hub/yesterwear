@@ -2,6 +2,7 @@ import { type ReactNode, useState } from "react";
 
 import type { LocationMode, TempUnit } from "../../app/useSettingsStore";
 import { geocodeCity, type GeoLocation } from "../../app/weatherApi";
+import { SegmentedControl } from "../../components/segmented-control/SegmentedControl";
 import "./SettingsScreen.css";
 
 export type SettingsScreenProps = {
@@ -202,24 +203,15 @@ export function SettingsScreen({
         {/* 地點設定 */}
         <section className="yw-settings__group">
           <SecLabel>地點設定</SecLabel>
-          <div className="yw-settings__segmented" role="tablist">
-            <button
-              type="button"
-              className="yw-settings__seg"
-              data-active={locationMode === "gps"}
-              onClick={() => onModeChange?.("gps")}
-            >
-              GPS 自動定位
-            </button>
-            <button
-              type="button"
-              className="yw-settings__seg"
-              data-active={locationMode === "manual"}
-              onClick={() => onModeChange?.("manual")}
-            >
-              手動輸入城市
-            </button>
-          </div>
+          <SegmentedControl
+            label="定位方式"
+            options={[
+              { value: "gps", label: "GPS 自動定位" },
+              { value: "manual", label: "手動輸入城市" },
+            ]}
+            value={locationMode}
+            onChange={(v) => onModeChange?.(v)}
+          />
 
           {locationMode === "gps" ? (
             <div className="yw-settings__card">
@@ -306,24 +298,15 @@ export function SettingsScreen({
         {/* 溫度單位 */}
         <section className="yw-settings__group">
           <SecLabel>溫度單位</SecLabel>
-          <div className="yw-settings__segmented">
-            <button
-              type="button"
-              className="yw-settings__seg"
-              data-active={unit === "C"}
-              onClick={() => onUnitChange?.("C")}
-            >
-              攝氏 °C
-            </button>
-            <button
-              type="button"
-              className="yw-settings__seg"
-              data-active={unit === "F"}
-              onClick={() => onUnitChange?.("F")}
-            >
-              華氏 °F
-            </button>
-          </div>
+          <SegmentedControl
+            label="溫度單位"
+            options={[
+              { value: "C", label: "攝氏 °C" },
+              { value: "F", label: "華氏 °F" },
+            ]}
+            value={unit}
+            onChange={(v) => onUnitChange?.(v)}
+          />
           <p className="yw-settings__note">
             跟隨系統地區(美國 °F,其餘 °C)。全域生效,溫差同步換算,色彩門檻不變。
           </p>
