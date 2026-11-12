@@ -33,6 +33,10 @@
   align-items: center;
   gap: 6px;
 }
+.yw-hourly__at {
+  font-weight: 500;
+  color: var(--yw-sys-color-text-primary);
+}
 .yw-hourly__num {
   font-weight: 500;
   color: var(--yw-sys-color-text-primary);

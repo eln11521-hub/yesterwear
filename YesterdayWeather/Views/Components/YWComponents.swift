@@ -707,9 +707,14 @@ struct HourlyChart: View {
     /// The legend doubles as the read-out: values at now, or at the dragged hour.
     private var legend: some View {
         HStack(spacing: 16) {
+            // Which hour the values are for: 現在 04:00, or the dragged hour.
+            Text((hover == nil ? "現在 " : "") + String(format: "%02d:00", at))
+                .font(T.ui(12, .medium))
+                .foregroundStyle(S.textPrimary)
+                .monospacedDigit()
             HStack(spacing: 6) {
                 Capsule().fill(S.textPrimary).frame(width: 16, height: 2)
-                Text(hover == nil ? "今天" : "今天 \(String(format: "%02d:00", at))")
+                Text("今天")
                 Text("\(today[at])°").font(T.ui(12, .medium)).foregroundStyle(S.textPrimary)
             }
             HStack(spacing: 6) {
