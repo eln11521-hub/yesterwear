@@ -88,7 +88,7 @@ struct SettingsView: View {
         return group("地點設定", note: manual
                      ? "固定城市模式下，旅行時資料不會跟著你移動。"
                      : "自動定位：旅行跨城市時，昨日仍以你昨天所在地的體感為基準。") {
-            Segmented(options: ["GPS 自動定位", "手動輸入城市"], selected: manual ? 1 : 0) {
+            YWSegmented(options: ["GPS 自動定位", "手動輸入城市"], selected: manual ? 1 : 0) {
                 store.settings.useManualLocation = $0 == 1
             }
             card {
@@ -160,7 +160,7 @@ struct SettingsView: View {
 
     private var unitGroup: some View {
         group("溫度單位", note: "跟隨系統地區（美國 °F，其餘 °C）。全域生效，溫差同步換算，色彩門檻不變。") {
-            Segmented(options: ["攝氏 °C", "華氏 °F"], selected: store.settings.unit == .f ? 1 : 0) {
+            YWSegmented(options: ["攝氏 °C", "華氏 °F"], selected: store.settings.unit == .f ? 1 : 0) {
                 store.settings.unit = $0 == 1 ? .f : .c
             }
         }
@@ -337,41 +337,6 @@ struct SettingsView: View {
 }
 
 // MARK: - Controls
-
-/// Two-option segmented control (web .yw-settings__segmented).
-private struct Segmented: View {
-    let options: [String]
-    let selected: Int
-    var onSelect: (Int) -> Void
-
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(options.indices, id: \.self) { i in
-                let active = i == selected
-                Button { onSelect(i) } label: {
-                    Text(options[i])
-                        .font(YWTokens.Typography.ui(13, .medium))
-                        .foregroundStyle(active ? YWTokens.Sys.textPrimary : YWTokens.Sys.textMuted)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 9)
-                        .padding(.horizontal, 8)
-                        .background {
-                            if active {
-                                RoundedRectangle(cornerRadius: YWTokens.Sys.radiusSm)
-                                    .fill(YWTokens.Sys.surfaceWhite)
-                                    .shadow(color: YWTokens.Sys.textPrimary.opacity(0.08), radius: 1.5, y: 1)
-                            }
-                        }
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .animation(.easeOut(duration: YWTokens.Sys.motionStateDuration), value: active)
-            }
-        }
-        .padding(4)
-        .background(YWTokens.Sys.surfaceRaised, in: RoundedRectangle(cornerRadius: YWTokens.Sys.radiusMd))
-    }
-}
 
 /// 44×26 ink toggle (web .yw-settings__toggle).
 struct YWToggleStyle: ToggleStyle {

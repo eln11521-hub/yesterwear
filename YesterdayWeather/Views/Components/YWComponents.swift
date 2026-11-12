@@ -578,7 +578,8 @@ struct SectionBadge: View {
 /// ink dot, 「現在」 and a white chip; commute hours a 出門 / 下班 tag. Scrolls
 /// "now" to the center on appear.
 /// 各時段體感溫度 — ported from design-system-web/src/components/hourly-forecast/
-/// HourlyForecast.tsx (Figma 608:1520): one overview chart of today's feels-like
+/// HourlyForecast.tsx (Figma 608:1520). Two tabs under one commute line: 今天各時段
+/// (a horizontal strip of hours) and 相比昨天 — an overview chart of today's feels-like
 /// (solid — ink up to now, lighter ahead) against yesterday's (dashed) across
 /// 00–24, a dot at now. It shows the shape of the day, not exact readings: the
 /// legend gives both values at now, and dragging across the chart reads any hour.
@@ -603,6 +604,8 @@ struct HourlyChart: View {
     var items: [Item] = []
 
     @State private var hover: Int?
+    /// 0 = 今天各時段 (hours strip), 1 = 相比昨天 (overview chart).
+    @State private var tab = 0
 
     private static let plotH: CGFloat = 112, yLabelW: CGFloat = 28
 
@@ -624,25 +627,68 @@ struct HourlyChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let line = summary { Text(line).font(T.ui(12)).foregroundStyle(S.textBody) }
-            legend
-            VStack(spacing: 4) {
-                if !commutes.isEmpty { marks.padding(.trailing, Self.yLabelW).padding(.bottom, -4) }
-                HStack(alignment: .top, spacing: 8) {
-                    GeometryReader { geo in plot(geo.size) }
-                        .frame(height: Self.plotH)
-                    VStack(alignment: .leading) {
-                        Text("\(bounds.hi)°")
-                        Spacer()
-                        Text("\(bounds.lo)°")
+            YWSegmented(options: ["今天各時段", "相比昨天"], selected: tab, inset: true) { tab = $0 }
+            if tab == 0 {
+                strip
+            } else {
+                legend
+                VStack(spacing: 4) {
+                    if !commutes.isEmpty { marks.padding(.trailing, Self.yLabelW).padding(.bottom, -4) }
+                    HStack(alignment: .top, spacing: 8) {
+                        GeometryReader { geo in plot(geo.size) }
+                            .frame(height: Self.plotH)
+                        VStack(alignment: .leading) {
+                            Text("\(bounds.hi)°")
+                            Spacer()
+                            Text("\(bounds.lo)°")
+                        }
+                        .font(T.ui(10))
+                        .foregroundStyle(S.textLabel)
+                        .frame(width: Self.yLabelW - 8, height: Self.plotH, alignment: .leading)
                     }
-                    .font(T.ui(10))
-                    .foregroundStyle(S.textLabel)
-                    .frame(width: Self.yLabelW - 8, height: Self.plotH, alignment: .leading)
+                    xAxis.padding(.trailing, Self.yLabelW)
                 }
-                xAxis.padding(.trailing, Self.yLabelW)
             }
         }
     }
+
+    // MARK: 今天各時段
+
+    /// Hours 3h back → 24h ahead, scrolling edge to edge across the card (bleeds
+    /// over its 16pt padding). 現在 and the 出門 / 下班 hours sit on white chips.
+    private var strip: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 4) { ForEach(items) { column($0) } }
+                .padding(.horizontal, 16)
+        }
+        .scrollIndicators(.hidden)
+        .padding(.horizontal, -16)
+    }
+
+    /// Figma 668:1252: time 8 SemiBold, 體感 14 Medium, 實際 10; past hours muted.
+    private func column(_ h: Item) -> some View {
+        let past = h.offset < 0, now = h.offset == 0
+        let tag = now ? "現在" : (!past ? h.slot : nil)
+        return VStack(spacing: 6) {
+            Text(tag ?? String(format: "%02d:00", h.hour))
+                .font(T.ui(8, .semibold))
+                .foregroundStyle(tag != nil ? S.textPrimary : S.textLabel)
+                .lineLimit(1).fixedSize()
+                .frame(height: 10)
+            WeatherGlyph(condition: h.condition, size: 18).opacity(past ? 0.45 : 1)
+            Text("\(h.feels)°").font(T.ui(14, .medium)).foregroundStyle(past ? S.textHint : S.textPrimary)
+                .frame(height: 18)
+            Text("實際 \(h.actual)°").font(T.ui(10)).foregroundStyle(past ? S.textHint : S.textLabel)
+                .lineLimit(1).fixedSize()
+                .frame(height: 12)
+        }
+        .frame(width: 48, height: 92)
+        .background(tag != nil ? S.surfaceWhite : .clear, in: RoundedRectangle(cornerRadius: S.radiusMd))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(tag ?? String(format: "%02d:00", h.hour))，體感 \(h.feels)°，實際 \(h.actual)°")
+    }
+
+    // MARK: 相比昨天
 
     /// Next commute: today's against yesterday; once those have passed, tomorrow's
     /// against today — the same hour the day before either way.
@@ -765,6 +811,47 @@ struct HourlyChart: View {
         }
         .frame(height: 12)
         .accessibilityHidden(true)
+    }
+}
+
+// MARK: Segmented control
+
+/// 2–3 equal segments on a rounded track, the active one a white pill (web
+/// SegmentedControl, Figma 497:137). `inset` tints the track for use on a raised card.
+struct YWSegmented: View {
+    let options: [String]
+    let selected: Int
+    var inset = false
+    var onSelect: (Int) -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(options.indices, id: \.self) { i in
+                let active = i == selected
+                Button { onSelect(i) } label: {
+                    Text(options[i])
+                        .font(T.ui(13, .medium))
+                        .foregroundStyle(active ? S.textPrimary : S.textMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 9)
+                        .padding(.horizontal, 8)
+                        .background {
+                            if active {
+                                RoundedRectangle(cornerRadius: S.radiusSm)
+                                    .fill(S.surfaceWhite)
+                                    .shadow(color: S.textPrimary.opacity(0.08), radius: 1.5, y: 1)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(active ? .isSelected : [])
+                .animation(.easeOut(duration: S.motionStateDuration), value: active)
+            }
+        }
+        .padding(4)
+        .background(inset ? S.textPrimary.opacity(0.05) : S.surfaceRaised,
+                    in: RoundedRectangle(cornerRadius: S.radiusMd))
     }
 }
 

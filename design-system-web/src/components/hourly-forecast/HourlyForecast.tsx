@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 
 import type { HourlyPoint } from "../../app/weather";
+import { SegmentedControl } from "../segmented-control/SegmentedControl";
+import { WeatherIcon } from "../weather-icon/WeatherIcon";
 import "./HourlyForecast.css";
 
 export type HourlyForecastProps = {
@@ -12,14 +14,21 @@ export type HourlyForecastProps = {
   items?: HourlyPoint[];
   /** Section title (the card's Section Header). */
   header?: ReactNode;
+  /** Which tab opens first. */
+  initialTab?: Tab;
 };
+
+type Tab = "today" | "compare";
 
 /** Plot size in viewBox units; the SVG stretches to the card width. */
 const W = 300;
 const H = 112;
 
 /**
- * HourlyForecast — 各時段體感溫度 as one overview chart (Figma 608:1520): today's
+ * HourlyForecast — 各時段體感溫度 (Figma 608:1520), two tabs under one commute line:
+ *  - 今天各時段: a horizontal strip of hours (3h back → 24h ahead) — time, icon,
+ *    feels-like, actual; 現在 and the 出門 / 下班 hours sit on white chips.
+ *  - 相比昨天: an overview chart of today's
  * feels-like (solid — ink up to now, lighter for the forecast) against
  * yesterday's (dashed) across 00–24, with a dot at now and the user's 出門 /
  * 下班 hours marked (a dashed rule, a ring on today's line, a tag above). It's for the shape of
@@ -27,7 +36,14 @@ const H = 112;
  * dragging across the chart reads any hour. Above it, one line about the next
  * commute against the same hour the day before.
  */
-export function HourlyForecast({ today, yesterday, items = [], header }: HourlyForecastProps) {
+export function HourlyForecast({
+  today,
+  yesterday,
+  items = [],
+  header,
+  initialTab = "today",
+}: HourlyForecastProps) {
+  const [tab, setTab] = useState<Tab>(initialTab);
   const nowItem = items.find((h) => h.now);
   // 出門 / 下班 hours from the user's settings (the window tags them).
   const commutes = [
@@ -73,83 +89,135 @@ export function HourlyForecast({ today, yesterday, items = [], header }: HourlyF
       {header ? <div className="yw-hourly__head">{header}</div> : null}
       {summary ? <p className="yw-hourly__summary">{summary}</p> : null}
 
-      <div className="yw-hourly__legend">
-        <span>
-          <i className="yw-hourly__key" data-kind="today" />
-          {hover == null ? "今天" : `今天 ${pad(at)}:00`}
-          <b className="yw-hourly__num">{today[at]}°</b>
-        </span>
-        <span>
-          <i className="yw-hourly__key" data-kind="yesterday" />
-          昨天<b className="yw-hourly__num">{yesterday[at]}°</b>
-        </span>
-      </div>
+      <SegmentedControl
+        tone="inset"
+        label="各時段體感溫度"
+        options={[
+          { value: "today", label: "今天各時段" },
+          { value: "compare", label: "相比昨天" },
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
 
-      {commutes.length ? (
-        <div className="yw-hourly__marks" aria-hidden>
-          {commutes.map((c) => (
-            <span
-              key={c.label}
-              style={{
-                left: `${(c.hour / 23) * 100}%`,
-                // keep tags near either end inside the plot
-                transform: `translateX(${c.hour < 2 ? 0 : c.hour > 21 ? -100 : -50}%)`,
-              }}
-            >
-              {c.label} {pad(c.hour)}:00
-            </span>
-          ))}
+      {tab === "today" ? (
+        <div className="yw-hourly__body">
+          <div className="yw-hourly__scroll">
+            <div className="yw-hourly__cols" role="list">
+              {items.map((h) => (
+                <div
+                  key={`${h.day}-${h.hour}`}
+                  className="yw-hourly__col"
+                  data-now={h.now || undefined}
+                  data-slot={h.slot && !h.past ? true : undefined}
+                  data-past={h.past || undefined}
+                  role="listitem"
+                >
+                  <span className="yw-hourly__time">
+                    {h.now ? "現在" : h.slot && !h.past ? h.slot : `${pad(h.hour)}:00`}
+                  </span>
+                  <WeatherIcon condition={h.condition} size={18} />
+                  <span className="yw-hourly__temp">{h.temp}°</span>
+                  <span className="yw-hourly__actual">實際 {h.actual}°</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <>
+          <div className="yw-hourly__legend">
+            <span>
+              <i className="yw-hourly__key" data-kind="today" />
+              {hover == null ? "今天" : `今天 ${pad(at)}:00`}
+              <b className="yw-hourly__num">{today[at]}°</b>
+            </span>
+            <span>
+              <i className="yw-hourly__key" data-kind="yesterday" />
+              昨天<b className="yw-hourly__num">{yesterday[at]}°</b>
+            </span>
+          </div>
 
-      <div className="yw-hourly__plot">
-        <svg
-          className="yw-hourly__chart"
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
-          role="img"
-          aria-label={`今天與昨天的體感溫度，現在今天 ${today[nowHour]}°、昨天 ${yesterday[nowHour]}°`}
-          onPointerDown={scrub}
-          onPointerMove={(e) => (e.buttons || e.pointerType === "mouse") && scrub(e)}
-          onPointerLeave={() => setHover(null)}
-          onPointerUp={(e) => e.pointerType !== "mouse" && setHover(null)}
-        >
-          {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
-            <line key={h} className="yw-hourly__grid" x1={x(h)} x2={x(h)} y1={0} y2={H} />
-          ))}
-          {commutes.map((c) => (
-            <line key={c.label} className="yw-hourly__commute" x1={x(c.hour)} x2={x(c.hour)} y1={0} y2={H} />
-          ))}
-          <path className="yw-hourly__line" data-kind="yesterday" d={path(yesterday)} />
-          <path className="yw-hourly__line" data-kind="forecast" d={path(today, nowHour)} />
-          <path className="yw-hourly__line" data-kind="today" d={path(today, 0, nowHour)} />
-          {hover != null ? (
-            <line className="yw-hourly__cursor" x1={x(hover)} x2={x(hover)} y1={0} y2={H} />
+          {commutes.length ? (
+            <div className="yw-hourly__marks" aria-hidden>
+              {commutes.map((c) => (
+                <span
+                  key={c.label}
+                  style={{
+                    left: `${(c.hour / 23) * 100}%`,
+                    // keep tags near either end inside the plot
+                    transform: `translateX(${c.hour < 2 ? 0 : c.hour > 21 ? -100 : -50}%)`,
+                  }}
+                >
+                  {c.label} {pad(c.hour)}:00
+                </span>
+              ))}
+            </div>
           ) : null}
-        </svg>
-        {/* dots in HTML so they stay round while the SVG stretches */}
-        {commutes.map((c) => (
-          <span
-            key={c.label}
-            className="yw-hourly__cdot"
-            style={{ left: `${(c.hour / 23) * 100}%`, top: y(today[c.hour]) }}
-            aria-hidden
-          />
-        ))}
-        <span
-          className="yw-hourly__dot"
-          style={{ left: `${(at / 23) * 100}%`, top: y(today[at]) }}
-          aria-hidden
-        />
-        <span className="yw-hourly__yhi" aria-hidden>{hi}°</span>
-        <span className="yw-hourly__ylo" aria-hidden>{lo}°</span>
-      </div>
 
-      <div className="yw-hourly__xaxis" aria-hidden>
-        {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
-          <span key={h} style={{ left: `${(h / 23) * 100}%` }}>{h}</span>
-        ))}
-      </div>
+          <div className="yw-hourly__plot">
+            <svg
+              className="yw-hourly__chart"
+              viewBox={`0 0 ${W} ${H}`}
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={`今天與昨天的體感溫度，現在今天 ${today[nowHour]}°、昨天 ${yesterday[nowHour]}°`}
+              onPointerDown={scrub}
+              onPointerMove={(e) => (e.buttons || e.pointerType === "mouse") && scrub(e)}
+              onPointerLeave={() => setHover(null)}
+              onPointerUp={(e) => e.pointerType !== "mouse" && setHover(null)}
+            >
+              {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
+                <line key={h} className="yw-hourly__grid" x1={x(h)} x2={x(h)} y1={0} y2={H} />
+              ))}
+              {commutes.map((c) => (
+                <line
+                  key={c.label}
+                  className="yw-hourly__commute"
+                  x1={x(c.hour)}
+                  x2={x(c.hour)}
+                  y1={0}
+                  y2={H}
+                />
+              ))}
+              <path className="yw-hourly__line" data-kind="yesterday" d={path(yesterday)} />
+              <path className="yw-hourly__line" data-kind="forecast" d={path(today, nowHour)} />
+              <path className="yw-hourly__line" data-kind="today" d={path(today, 0, nowHour)} />
+              {hover != null ? (
+                <line className="yw-hourly__cursor" x1={x(hover)} x2={x(hover)} y1={0} y2={H} />
+              ) : null}
+            </svg>
+            {/* dots in HTML so they stay round while the SVG stretches */}
+            {commutes.map((c) => (
+              <span
+                key={c.label}
+                className="yw-hourly__cdot"
+                style={{ left: `${(c.hour / 23) * 100}%`, top: y(today[c.hour]) }}
+                aria-hidden
+              />
+            ))}
+            <span
+              className="yw-hourly__dot"
+              style={{ left: `${(at / 23) * 100}%`, top: y(today[at]) }}
+              aria-hidden
+            />
+            <span className="yw-hourly__yhi" aria-hidden>
+              {hi}°
+            </span>
+            <span className="yw-hourly__ylo" aria-hidden>
+              {lo}°
+            </span>
+          </div>
+
+          <div className="yw-hourly__xaxis" aria-hidden>
+            {[0, 3, 6, 9, 12, 15, 18, 21].map((h) => (
+              <span key={h} style={{ left: `${(h / 23) * 100}%` }}>
+                {h}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

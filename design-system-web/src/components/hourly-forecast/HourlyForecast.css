@@ -167,3 +167,69 @@
   background: var(--yw-sys-color-surface-raised);
   pointer-events: none;
 }
+
+/* 今天各時段: hours scroll edge to edge (the body bleeds over the card's 16px
+   padding). Columns 48 wide on a 52 step, 92 tall (Figma 668:1252). */
+.yw-hourly__body {
+  margin-inline: -16px;
+}
+.yw-hourly__scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.yw-hourly__scroll::-webkit-scrollbar {
+  display: none;
+}
+.yw-hourly__cols {
+  display: flex;
+  gap: 4px;
+  inline-size: max-content;
+  padding-inline: 16px;
+}
+.yw-hourly__col {
+  flex: none;
+  box-sizing: border-box;
+  inline-size: 48px;
+  block-size: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-block: 8px;
+  border-radius: var(--yw-sys-radius-md);
+}
+/* 現在 and the 出門 / 下班 hours stand out on white chips */
+.yw-hourly__col[data-now],
+.yw-hourly__col[data-slot] {
+  background: var(--yw-sys-color-surface-white);
+}
+.yw-hourly__time {
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 10px;
+  color: var(--yw-sys-color-text-label);
+  white-space: nowrap;
+}
+.yw-hourly__col[data-now] .yw-hourly__time,
+.yw-hourly__col[data-slot] .yw-hourly__time {
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-hourly__temp {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--yw-sys-color-text-primary);
+}
+.yw-hourly__actual {
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--yw-sys-color-text-label);
+  white-space: nowrap;
+}
+.yw-hourly__col[data-past] .yw-hourly__temp,
+.yw-hourly__col[data-past] .yw-hourly__actual {
+  color: var(--yw-sys-color-text-hint);
+}
+.yw-hourly__col[data-past] .yw-weather-icon {
+  opacity: 0.45;
+}
