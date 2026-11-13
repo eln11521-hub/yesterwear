@@ -24,7 +24,8 @@
 /* legend doubles as the read-out: values at now, or at the dragged hour */
 .yw-hourly__legend {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   font-size: 12px;
   color: var(--yw-sys-color-text-muted-warm);
 }

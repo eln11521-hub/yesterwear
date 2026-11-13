@@ -65,8 +65,12 @@ struct SlotCompare: Codable, Equatable {
     var yesterdayTemp: Double
     var todayApparent: Double
     var precipProbability: Int
+    /// Yesterday's feels-like at this hour. Optional so caches from older builds
+    /// decode (they fall back to yesterday's actual temperature).
+    var yesterdayApparent: Double? = nil
 
-    var delta: Double { todayApparent - yesterdayTemp }
+    /// 溫差 = 今日體感 − 昨日同一小時體感 (feels-like on both sides).
+    var delta: Double { todayApparent - (yesterdayApparent ?? yesterdayTemp) }
 
     var rainHint: Bool { precipProbability > 50 }
 }

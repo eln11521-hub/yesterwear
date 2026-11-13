@@ -706,7 +706,7 @@ struct HourlyChart: View {
 
     /// The legend doubles as the read-out: values at now, or at the dragged hour.
     private var legend: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             // Which hour the values are for: 現在 04:00, or the dragged hour.
             Text((hover == nil ? "現在 " : "") + String(format: "%02d:00", at))
                 .font(T.ui(12, .medium))
@@ -714,19 +714,21 @@ struct HourlyChart: View {
                 .monospacedDigit()
             HStack(spacing: 6) {
                 Capsule().fill(S.textPrimary).frame(width: 16, height: 2)
-                Text("今天")
+                Text("今天體感")
                 Text("\(today[at])°").font(T.ui(12, .medium)).foregroundStyle(S.textPrimary)
             }
             HStack(spacing: 6) {
                 Path { p in p.move(to: .init(x: 0, y: 1)); p.addLine(to: .init(x: 16, y: 1)) }
                     .stroke(S.textHint, style: StrokeStyle(lineWidth: 2, dash: [4, 4]))
                     .frame(width: 16, height: 2)
-                Text("昨天")
+                Text("昨天體感")
                 Text("\(yesterday[at])°").font(T.ui(12, .medium)).foregroundStyle(S.textPrimary)
             }
         }
         .font(T.ui(12))
         .foregroundStyle(S.textMutedWarm)
+        .lineLimit(1)
+        .minimumScaleFactor(0.85)   // stays on one line on narrow phones
     }
 
     private func plot(_ size: CGSize) -> some View {

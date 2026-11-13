@@ -133,12 +133,12 @@ export function HourlyForecast({
             </span>
             <span>
               <i className="yw-hourly__key" data-kind="today" />
-              今天
+              今天體感
               <b className="yw-hourly__num">{today[at]}°</b>
             </span>
             <span>
               <i className="yw-hourly__key" data-kind="yesterday" />
-              昨天<b className="yw-hourly__num">{yesterday[at]}°</b>
+              昨天體感<b className="yw-hourly__num">{yesterday[at]}°</b>
             </span>
           </div>
 
