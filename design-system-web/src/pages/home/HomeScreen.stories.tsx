@@ -36,7 +36,7 @@ export const CrossLocation: Story = {
   },
 };
 
-/** Today recorded: the CTA turns into the outlined 更新今日穿搭 pill. */
+/** Today recorded: the CTA turns into the outlined 查看今日穿搭 pill. */
 export const Recorded: Story = {
   args: { recorded: true },
 };

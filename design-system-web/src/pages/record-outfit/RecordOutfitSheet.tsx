@@ -207,7 +207,7 @@ export function RecordOutfitSheet({
           onClick={() => fileRef.current?.click()}
         />
         <PrimaryButton
-          label="儲存今日紀錄"
+          label={saved ? "更新今日穿搭" : "儲存今日紀錄"}
           icon={<Icon src={checkUrl} size={18} />}
           onClick={handleSave}
         />

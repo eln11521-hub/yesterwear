@@ -51,7 +51,7 @@ export const Disabled: Story = {
   args: { label: "拍照記錄", icon: <CameraIcon />, disabled: true },
 };
 
-/** Home sticky CTA once today is recorded (更新今日穿搭). */
+/** Home sticky CTA once today is recorded (查看今日穿搭). */
 export const Pill: Story = {
-  args: { label: "更新今日穿搭", shape: "pill" },
+  args: { label: "查看今日穿搭", shape: "pill" },
 };

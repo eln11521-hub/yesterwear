@@ -529,7 +529,7 @@ struct YWSecondaryButton: View {
     let label: String
     var icon: String? = nil
     /// Fully rounded, 14pt Bold on a white fill — the Home CTA once today is
-    /// recorded (更新今日穿搭); same size as the YWPrimaryButton pill.
+    /// recorded (查看今日穿搭); same size as the YWPrimaryButton pill.
     var pill: Bool = false
     let action: () -> Void
 
