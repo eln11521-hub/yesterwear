@@ -45,7 +45,7 @@ struct HomeScreenCompareView: View {
     /// between devices so nothing is squeezed against the edges.
     private func content(_ snap: WeatherSnapshot) -> some View {
         let d = WidgetFormat.delta(snap, entry.unit)
-        let deltaColor = TempDeltaState.from(deltaCelsius: snap.overallDelta).primary
+        let deltaColor = WidgetFormat.state(snap).primary
         return VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 8) {
                 Text(WidgetFormat.locationLine(snap))
@@ -114,7 +114,7 @@ struct HomeScreenCompareView: View {
     /// (Figma 424:10): hero (體感 + delta) on top, 昨日 + commute below the divider.
     private func small(_ snap: WeatherSnapshot) -> some View {
         let d = WidgetFormat.delta(snap, entry.unit)
-        let deltaColor = TempDeltaState.from(deltaCelsius: snap.overallDelta).primary
+        let deltaColor = WidgetFormat.state(snap).primary
         return VStack(alignment: .leading, spacing: 0) {
             Text(WidgetFormat.locationLine(snap))
                 .font(T.mono(9.5))

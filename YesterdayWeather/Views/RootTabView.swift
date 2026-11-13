@@ -34,7 +34,7 @@ struct RootTabView: View {
     /// (web App: initial = today ?? suggestion).
     private var recordSheet: some View {
         let suggestion = OutfitSuggestion.make(
-            delta: weather.snapshot?.overallDelta ?? 0, rain: weather.snapshot?.showRain ?? false,
+            delta: weather.snapshot?.nowDelta ?? 0, rain: weather.snapshot?.showRain ?? false,
             yesterday: outfit.yesterday)
         let today = outfit.today
         let thumb = today?.thumbnailURL.flatMap { UIImage(contentsOfFile: $0.path) }

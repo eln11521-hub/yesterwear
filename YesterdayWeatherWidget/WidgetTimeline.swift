@@ -72,10 +72,22 @@ struct WeatherTimelineProvider: TimelineProvider {
 
 /// Shared widget formatting (web deltaDisplay / deltaStateColor).
 enum WidgetFormat {
+    /// 比昨天 pill: today's feels-like vs yesterday's feels-like at this hour, as
+    /// the difference of the two rounded values (the big number is the shown one).
     static func delta(_ snap: WeatherSnapshot, _ unit: TempUnit) -> (arrow: String, abs: Int) {
-        let d = snap.overallDelta
-        let mag = unit == .f ? d * 9 / 5 : d
-        return (d < 0 ? "↓" : d > 0 ? "↑" : "±", abs(Int(mag.rounded())))
+        let d: Int
+        if let y = snap.yesterdayApparentNow {
+            d = DeltaFormat.temp(snap.currentApparent, unit) - DeltaFormat.temp(y, unit)
+        } else {
+            let raw = snap.overallDelta
+            d = Int((unit == .f ? raw * 9 / 5 : raw).rounded())
+        }
+        return (d < 0 ? "↓" : d > 0 ? "↑" : "±", abs(d))
+    }
+
+    /// Delta state (tint / pill colour) from the same feels-vs-feels comparison.
+    static func state(_ snap: WeatherSnapshot) -> TempDeltaState {
+        .from(deltaCelsius: snap.nowDelta)
     }
 
     /// 「EDMONTON · 今天」, plus how old the data is once it's over an hour stale.

@@ -110,7 +110,12 @@ export async function fetchWeather(
       ? hourly.apparent_temperature[idx] - hourly.apparent_temperature[idx - 24]
       : 0;
 
-  const overallDelta = apparentDeltaAt(nowIdx);
+  // 比昨天 now: the *current* feels-like (the number the hero and widgets show)
+  // against yesterday's feels-like at this hour.
+  const overallDelta =
+    nowIdx >= 24
+      ? current.apparent_temperature - hourly.apparent_temperature[nowIdx - 24]
+      : apparentDeltaAt(nowIdx);
   const today = current.time.slice(0, 10);
 
   const commuteAt = (slot: string, timeStr: string) => {
