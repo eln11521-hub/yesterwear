@@ -64,8 +64,11 @@ actor WeatherService {
         // 溫差 = 今日體感 − 昨日同一小時體感, read at the current hour (feels-like on
         // both sides, matching the 相比昨天 chart; was 昨日實際 per PRD 3.3).
         let nowIdx = currentHourIndex(response) ?? (Self.dayHours + leave.hourOffset)
+        // Today's side is the *current* feels-like — the number the hero and the
+        // widgets show — against yesterday's feels-like at this hour.
         let overallDelta = nowIdx >= Self.dayHours && nowIdx < hourly.apparentTemperature.count
-            ? hourly.apparentTemperature[nowIdx] - hourly.apparentTemperature[nowIdx - Self.dayHours]
+            ? (current?.apparentTemperature ?? hourly.apparentTemperature[nowIdx])
+                - hourly.apparentTemperature[nowIdx - Self.dayHours]
             : leave.delta
         let rainNow = nowIdx < hourly.precipitationProbability.count
             ? (hourly.precipitationProbability[nowIdx] ?? 0) : 0

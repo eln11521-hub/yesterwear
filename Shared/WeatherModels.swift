@@ -103,7 +103,18 @@ struct WeatherSnapshot: Codable, Equatable {
 
     var condition: WeatherCondition { .from(code: conditionCode ?? 0) }
 
-    var state: TempDeltaState { .from(deltaCelsius: overallDelta) }
+    /// Yesterday's feels-like at the current hour, when the snapshot carries it.
+    var yesterdayApparentNow: Double? {
+        guard let y = yesterdayFeels, let h = nowHour, y.indices.contains(h) else { return nil }
+        return y[h]
+    }
+
+    /// 比昨天 right now, feels-like vs feels-like (°C): the current feels-like against
+    /// yesterday's at this hour. Snapshots cached before that data existed fall
+    /// back to the stored delta.
+    var nowDelta: Double { yesterdayApparentNow.map { currentApparent - $0 } ?? overallDelta }
+
+    var state: TempDeltaState { .from(deltaCelsius: nowDelta) }
 
     var showRain: Bool { leave.rainHint || `return`.rainHint }
 

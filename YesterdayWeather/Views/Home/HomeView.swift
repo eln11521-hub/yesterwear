@@ -101,7 +101,7 @@ struct HomeView: View {
                         .lineLimit(1)
                         .fixedSize()
                 }
-                Text(DeltaFormat.headline(snap.overallDelta))
+                Text(DeltaFormat.headline(snap.nowDelta))
                     .font(T.ui(16, .medium))
                     .foregroundStyle(S.textPrimary)
                 HStack(spacing: 4) {
@@ -153,7 +153,7 @@ struct HomeView: View {
     // MARK: Outfit
 
     private func outfitCard(_ snap: WeatherSnapshot) -> some View {
-        let suggestion = OutfitSuggestion.make(delta: snap.overallDelta, rain: snap.showRain, yesterday: outfit.yesterday)
+        let suggestion = OutfitSuggestion.make(delta: snap.nowDelta, rain: snap.showRain, yesterday: outfit.yesterday)
         let advice = suggestion.advice.hasPrefix("建議：") ? String(suggestion.advice.dropFirst(3)) : suggestion.advice
         return VStack(alignment: .leading, spacing: 12) {
             SectionLabel("昨日穿搭")
