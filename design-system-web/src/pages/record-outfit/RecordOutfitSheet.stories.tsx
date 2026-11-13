@@ -69,7 +69,7 @@ export const PhotoLowConfidence: Story = {
   },
 };
 
-/** Reopened after saving (更新今日穿搭) with a photo: the panel shows the saved
+/** Reopened after saving (查看今日穿搭) with a photo: the CTA reads 更新今日穿搭 and the panel shows the saved
  *  photo and tags (Figma 665:2745). */
 export const SavedWithPhoto: Story = {
   args: {

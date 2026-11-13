@@ -79,7 +79,7 @@ struct RecordOutfitSheet: View {
                 YWSecondaryButton(label: thumb == nil ? "拍照記錄" : "重新拍照", icon: "icon-camera") {
                     choosingSource = true
                 }
-                YWPrimaryButton(label: "儲存今日紀錄", icon: "icon-check") {
+                YWPrimaryButton(label: saved ? "更新今日穿搭" : "儲存今日紀錄", icon: "icon-check") {
                     onSave(picks, thumbIsNew ? thumb : nil, thumb != nil && !thumbIsNew)
                 }
             }

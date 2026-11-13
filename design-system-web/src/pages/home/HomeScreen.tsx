@@ -21,7 +21,7 @@ export type HomeScreenProps = {
   /** Garment labels for the 昨日穿搭 row, ranked by warmth (app/outfit
    *  rankedChips) — the row shows the first few and folds the rest into「+N」. */
   yesterdayChips?: string[];
-  /** Today already recorded: the CTA turns into the outlined 更新今日穿搭 pill.
+  /** Today already recorded: the CTA turns into the outlined 查看今日穿搭 pill.
    *  (Today's picks stay in the record sheet, not on Home.) */
   recorded?: boolean;
   advice?: string;
@@ -255,12 +255,12 @@ export function HomeScreen({
       </div>
 
       {/* Sticky CTA — solid ink (the page's only one) until today is recorded,
-          then an outlined white pill: 更新今日穿搭. */}
+          then an outlined white pill: 查看今日穿搭 (the sheet's own CTA reads 更新今日穿搭). */}
       <div className="yw-home__cta">
         {recorded ? (
           <SecondaryButton
             shape="pill"
-            label={ctaLabel ?? "更新今日穿搭"}
+            label={ctaLabel ?? "查看今日穿搭"}
             icon={<Icon src={tagUrl} size={18} />}
             onClick={onRecord}
           />

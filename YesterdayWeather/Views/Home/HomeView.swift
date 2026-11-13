@@ -74,7 +74,7 @@ struct HomeView: View {
                 if outfit.today == nil {
                     YWPrimaryButton(label: "記錄今天穿搭", icon: "icon-tag", pill: true, action: onRecord)
                 } else {
-                    YWSecondaryButton(label: "更新今日穿搭", icon: "icon-tag", pill: true, action: onRecord)
+                    YWSecondaryButton(label: "查看今日穿搭", icon: "icon-tag", pill: true, action: onRecord)
                 }
             }
             .padding(.horizontal, 16)
