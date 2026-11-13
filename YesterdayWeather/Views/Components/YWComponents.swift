@@ -821,6 +821,69 @@ struct HourlyChart: View {
     }
 }
 
+// MARK: Snackbar
+
+/// Brief confirmation after an action (web Snackbar): an ink pill with a check
+/// and a 14pt Medium label — e.g. 儲存成功！ after saving today's outfit.
+/// Shown by `ywSnackbar(_:message:)`, which fades it in, holds it ~2 s and
+/// takes it away; it never takes a tap.
+struct YWSnackbar: View {
+    let message: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            AssetIcon(name: "icon-check", size: 16)
+            Text(message).font(T.ui(14, .medium))
+        }
+        .foregroundStyle(S.textOnDark)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 20)
+        .background(S.textPrimary, in: Capsule())
+        .shadow(color: S.textPrimary.opacity(0.16), radius: 12, y: 8)
+        .allowsHitTesting(false)
+        .accessibilityAddTraits(.updatesFrequently)
+    }
+}
+
+private struct YWSnackbarModifier: ViewModifier {
+    /// Bump to show (each change replays the snackbar).
+    let trigger: Int
+    let message: String
+    var bottomInset: CGFloat
+
+    @State private var visible = false
+    @State private var hideTask: Task<Void, Never>?
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .bottom) {
+                if visible {
+                    YWSnackbar(message: message)
+                        .padding(.bottom, bottomInset)
+                        .transition(.opacity.combined(with: .offset(y: 8)))
+                }
+            }
+            .animation(.easeOut(duration: 0.25), value: visible)
+            .onChange(of: trigger) { _, _ in
+                hideTask?.cancel()
+                visible = true
+                UIAccessibility.post(notification: .announcement, argument: message)
+                hideTask = Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
+                    if !Task.isCancelled { visible = false }
+                }
+            }
+    }
+}
+
+extension View {
+    /// Shows a `YWSnackbar` each time `trigger` changes; `bottomInset` lifts it
+    /// clear of a bottom CTA.
+    func ywSnackbar(_ trigger: Int, message: String, bottomInset: CGFloat = 76) -> some View {
+        modifier(YWSnackbarModifier(trigger: trigger, message: message, bottomInset: bottomInset))
+    }
+}
+
 // MARK: Segmented control
 
 /// 2–3 equal segments on a rounded track, the active one a white pill (web

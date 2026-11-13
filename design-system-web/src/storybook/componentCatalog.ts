@@ -1,6 +1,7 @@
 export type ComponentStorybookCategory =
   | "Brand"
   | "Data Display"
+  | "Feedback"
   | "Actions"
   | "Selection"
   | "Navigation"
@@ -137,6 +138,17 @@ const componentCatalogSeed = [
       "各時段體感溫度 with two tabs: 今天各時段 (a horizontal strip of hours — time, icon, feels-like, actual; 現在 and 出門 / 下班 highlighted) and 相比昨天 (today vs yesterday feels-like overview chart).",
     useWhen: ["Showing 各時段體感溫度 on Home."],
     keywords: ["hourly", "today", "weather", "temperature", "timeline"],
+  },
+  {
+    id: "snackbar",
+    name: "Snackbar",
+    category: "Feedback",
+    compositionRole: "feedback",
+    provenance: "implementation-derived",
+    purpose:
+      "Brief confirmation after an action: an ink pill with a check that rises in, holds ~2 s and fades out on its own.",
+    useWhen: ["Confirming the outfit save (儲存成功！) after 儲存今日紀錄 / 更新今日穿搭."],
+    keywords: ["snackbar", "toast", "feedback", "confirmation", "saved"],
   },
   {
     id: "segmented-control",

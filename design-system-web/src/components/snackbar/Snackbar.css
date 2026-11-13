@@ -1,0 +1,51 @@
+/* Snackbar: ink pill, white 14 Medium label + check, rises in → holds → fades.
+   Sizes on the 4pt grid. Place it in a positioned container (bottom-centred). */
+.yw-snackbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--yw-sys-color-text-primary);
+  color: var(--yw-sys-color-text-on-dark);
+  font-family: var(--yw-sys-font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgb(17 17 17 / 16%);
+  pointer-events: none;
+  animation: yw-snackbar 2400ms var(--yw-sys-motion-ease-out) both;
+}
+
+@keyframes yw-snackbar {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  10%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yw-snackbar {
+    animation-name: yw-snackbar-fade;
+  }
+  @keyframes yw-snackbar-fade {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    10%,
+    85% {
+      opacity: 1;
+    }
+  }
+}

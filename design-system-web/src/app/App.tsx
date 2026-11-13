@@ -10,6 +10,7 @@ import { SettingsScreen } from "../pages/settings/SettingsScreen";
 import "./App.css";
 import { keyChips, outfitComboText, rankedChips } from "./outfit";
 import { useOutfitStore } from "./useOutfitStore";
+import { Snackbar } from "../components/snackbar/Snackbar";
 import { useSettingsStore } from "./useSettingsStore";
 import { useWeather } from "./useWeather";
 import { agoText, suggestOutfit } from "./weather";
@@ -48,6 +49,8 @@ export function App() {
     useOutfitStore();
   const [open, setOpen] = useState(false);
   const [locOpen, setLocOpen] = useState(false);
+  /** 儲存成功！ snackbar — a counter so each save replays it (0 = hidden). */
+  const [savedToast, setSavedToast] = useState(0);
 
   /** 使用目前位置: resolve the device location and show its weather (GPS mode). */
   function locateMe(): Promise<boolean> {
@@ -150,6 +153,12 @@ export function App() {
               </>
             ) : null}
 
+            {savedToast ? (
+              <div className="yw-app__toast">
+                <Snackbar key={savedToast} message="儲存成功！" onDone={() => setSavedToast(0)} />
+              </div>
+            ) : null}
+
             {open ? (
               <>
                 <button
@@ -166,6 +175,7 @@ export function App() {
                     onSave={(r) => {
                       saveToday(r);
                       setOpen(false);
+                      setSavedToast((n) => n + 1);
                     }}
                   />
                 </div>
