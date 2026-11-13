@@ -134,19 +134,19 @@ struct HomeView: View {
         .frame(maxWidth: .infinity)
     }
 
-    /// 「較昨日下降 2°」 from a delta like ↓2° / ↑1° / ±0°.
-    private func deltaPhrase(_ deltaC: Double) -> String {
-        let text = DeltaFormat.text(deltaC, unit)
-        let n = text.filter(\.isNumber)
-        if text.contains("↓") { return "較昨日下降 \(n)°" }
-        if text.contains("↑") { return "較昨日上升 \(n)°" }
+    /// 「較昨日下降 2°」 — the difference of the two shown (rounded) feels-like
+    /// values, so it matches the 各時段 line and chart (27° vs 26° reads 1°).
+    private func deltaPhrase(_ slot: SlotCompare) -> String {
+        let d = deg(slot.todayApparent) - deg(slot.yesterdayApparent ?? slot.yesterdayTemp)
+        if d < 0 { return "較昨日下降 \(-d)°" }
+        if d > 0 { return "較昨日上升 \(d)°" }
         return "與昨日持平"
     }
 
     /// Figma 665:2194 / web commuteSentence.
     private func commuteSentence(_ snap: WeatherSnapshot, rainPossible: Bool) -> String {
-        "出門時間體感溫度 \(deg(snap.leave.todayApparent))°，\(deltaPhrase(snap.leave.delta))；"
-            + "下班時間體感溫度為 \(deg(snap.return.todayApparent))°，\(deltaPhrase(snap.return.delta))。"
+        "出門時間體感溫度 \(deg(snap.leave.todayApparent))°，\(deltaPhrase(snap.leave))；"
+            + "下班時間體感溫度為 \(deg(snap.return.todayApparent))°，\(deltaPhrase(snap.return))。"
             + (rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "")
     }
 

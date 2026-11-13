@@ -61,10 +61,11 @@ actor WeatherService {
         let ret = try slot(response: response, hour: settings.returnHour, label: settings.returnTimeLabel)
 
         let current = response.current
-        // PRD 3.3: 溫差 = 今日體感 − 昨日同一小時實際溫度, read at the current hour.
+        // 溫差 = 今日體感 − 昨日同一小時體感, read at the current hour (feels-like on
+        // both sides, matching the 相比昨天 chart; was 昨日實際 per PRD 3.3).
         let nowIdx = currentHourIndex(response) ?? (Self.dayHours + leave.hourOffset)
         let overallDelta = nowIdx >= Self.dayHours && nowIdx < hourly.apparentTemperature.count
-            ? hourly.apparentTemperature[nowIdx] - hourly.temperature2m[nowIdx - Self.dayHours]
+            ? hourly.apparentTemperature[nowIdx] - hourly.apparentTemperature[nowIdx - Self.dayHours]
             : leave.delta
         let rainNow = nowIdx < hourly.precipitationProbability.count
             ? (hourly.precipitationProbability[nowIdx] ?? 0) : 0
@@ -134,7 +135,7 @@ actor WeatherService {
         return response.hourly.time.firstIndex { $0.prefix(13) == now }
     }
 
-    /// PRD: 溫差 = 今日體感 − 昨日實際溫度（對應通勤時段）
+    /// 溫差 = 今日體感 − 昨日同一小時體感（對應通勤時段）
     private func slot(response: OpenMeteoResponse, hour: Int, label: String) throws
         -> (compare: SlotCompare, delta: Double, hourOffset: Int) {
         let hourly = response.hourly
@@ -148,7 +149,8 @@ actor WeatherService {
             todayTemp: hourly.temperature2m[tAbs],
             yesterdayTemp: hourly.temperature2m[yAbs],
             todayApparent: hourly.apparentTemperature[tAbs],
-            precipProbability: hourly.precipitationProbability[tAbs] ?? 0
+            precipProbability: hourly.precipitationProbability[tAbs] ?? 0,
+            yesterdayApparent: hourly.apparentTemperature[yAbs]
         )
         return (compare, compare.delta, hour)
     }

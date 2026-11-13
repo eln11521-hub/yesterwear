@@ -103,10 +103,11 @@ export async function fetchWeather(
   if (nowIdx < 0) nowIdx = hourly.time.findIndex((t) => t >= nowHour);
   if (nowIdx < 0) nowIdx = 24; // fallback to first "today" hour
 
-  // PRD 3.3: 溫差 = 今日體感溫度 − 昨日實際溫度
+  // 溫差 = 今日體感 − 昨日同一小時體感 (feels-like on both sides, so the headline,
+  // the commute line and the 相比昨天 chart all agree; was 昨日實際 per PRD 3.3).
   const apparentDeltaAt = (idx: number) =>
     idx >= 24
-      ? hourly.apparent_temperature[idx] - hourly.temperature_2m[idx - 24]
+      ? hourly.apparent_temperature[idx] - hourly.apparent_temperature[idx - 24]
       : 0;
 
   const overallDelta = apparentDeltaAt(nowIdx);
@@ -117,8 +118,12 @@ export async function fetchWeather(
     const idx = findHour(`${today}T${hh}:00`);
     // 體感溫度 (apparent) — the decision-relevant reading, consistent with the delta.
     const temp = idx >= 0 ? toDisp(hourly.apparent_temperature[idx]) : 0;
-    const delta = idx >= 0 ? apparentDeltaAt(idx) : 0;
-    return { slot, time: timeStr, temp: `${temp}°`, delta: fmtDelta(delta) };
+    // Difference of the two shown (rounded) feels-like values, so it matches the
+    // 各時段 line and chart (27° vs 26° reads ↑1°).
+    const before = idx >= 24 ? toDisp(hourly.apparent_temperature[idx - 24]) : temp;
+    const d = temp - before;
+    const delta = d < 0 ? `↓${-d}°` : d > 0 ? `↑${d}°` : "±0°";
+    return { slot, time: timeStr, temp: `${temp}°`, delta };
   };
 
   const rainNow =
