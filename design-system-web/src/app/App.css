@@ -12,6 +12,17 @@
   max-inline-size: 100%;
 }
 
+/* 儲存成功！ snackbar, centred just above the sticky CTA */
+.yw-app__toast {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 76px;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .yw-app__scrim {
   position: absolute;
   inset: 0;

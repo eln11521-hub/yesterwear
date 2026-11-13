@@ -10,6 +10,8 @@ struct RootTabView: View {
     @State private var showingSettings = false
     @State private var recording = false
     @State private var switchingPlace = false
+    /// Bumped on every save → 儲存成功！ snackbar.
+    @State private var savedToast = 0
 
     var body: some View {
         ZStack {
@@ -28,6 +30,8 @@ struct RootTabView: View {
         // In-app sheets (edge to edge).
         .ywSheet(isPresented: $recording) { recordSheet }
         .ywSheet(isPresented: $switchingPlace, fraction: 0.7) { LocationSheet() }
+        // 儲存成功！ just above the sticky CTA — on top of the closing sheet.
+        .ywSnackbar(savedToast, message: "儲存成功！")
     }
 
     /// Seeds with today's record when updating, otherwise today's suggestion
@@ -46,6 +50,7 @@ struct RootTabView: View {
             outfit.saveToday(picks,
                              thumbnailJPEG: photo?.thumbnailJPEG(), keepThumbnail: keptExisting)
             recording = false
+            savedToast += 1
             Task { await weather.refresh(settings: settings.settings, yesterdayOutfit: outfit.yesterday) }
         }
     }
