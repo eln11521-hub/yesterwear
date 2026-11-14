@@ -33,8 +33,8 @@ const H = 112;
  * yesterday's (dashed) across 00–24, with a dot at now and the user's 出門 /
  * 下班 hours marked (a dashed rule, a ring on today's line, a tag above). It's for the shape of
  * the day, not exact readings: the legend shows both values at now, and
- * dragging across the chart reads any hour. Above it, one line about the next
- * commute against the same hour the day before.
+ * dragging across the chart reads any hour. (The next-commute line lives in the
+ * Home hero summary.)
  */
 export function HourlyForecast({
   today,
@@ -64,20 +64,6 @@ export function HourlyForecast({
       .map((v, i) => `${i ? "L" : "M"}${x(from + i)} ${y(v)}`)
       .join(" ");
 
-  // Next commute: today's against yesterday; once today's have passed, tomorrow's
-  // against today (the same hour the day before either way).
-  const next = items.find((h) => !h.past && !h.now && h.slot);
-  const summary = next
-    ? (() => {
-        const before = next.day ? today[next.hour] : yesterday[next.hour];
-        const d = next.temp - before;
-        const when = next.day ? (next.slot === "出門" ? "明早" : "明天") : "今天";
-        const ref = next.day ? "今天" : "昨天";
-        const diff = d === 0 ? `和${ref}差不多` : `比${ref}${d > 0 ? "高" : "低"} ${Math.abs(d)}°`;
-        return `${when} ${pad(next.hour)}:00 ${next.slot}體感 ${next.temp}°，${diff}`;
-      })()
-    : null;
-
   function scrub(e: React.PointerEvent<SVGSVGElement>) {
     const r = e.currentTarget.getBoundingClientRect();
     const h = Math.round(((e.clientX - r.left) / r.width) * 23);
@@ -87,7 +73,6 @@ export function HourlyForecast({
   return (
     <div className="yw-hourly">
       {header ? <div className="yw-hourly__head">{header}</div> : null}
-      {summary ? <p className="yw-hourly__summary">{summary}</p> : null}
 
       <SegmentedControl
         tone="inset"

@@ -99,6 +99,27 @@ function commuteSentence(commute: WeatherVM["commute"], rainPossible: boolean): 
   return parts.join("；") + "。" + (rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "");
 }
 
+/**
+ * Hero summary: the NEXT commute (出門 or 下班, from the settings) and how its
+ * feels-like compares with the same hour the day before — today's against
+ * yesterday, or, once today's have passed, tomorrow's against today. Plus a rain
+ * reminder when rain is possible. Falls back to both commutes when the hourly
+ * data isn't there (older caches).
+ */
+function nextCommuteSentence(weather: WeatherVM, rainPossible: boolean): string {
+  const rainNote = rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "";
+  const next = weather.hourly?.find((h) => !h.past && !h.now && h.slot);
+  const cmp = weather.dayCompare;
+  if (!next || !cmp) return commuteSentence(weather.commute, rainPossible);
+  const before = next.day ? cmp.today[next.hour] : cmp.yesterday[next.hour];
+  const d = next.temp - before;
+  const ref = next.day ? "今天" : "昨日";
+  const diff = d === 0 ? `與${ref}持平` : `較${ref}${d > 0 ? "上升" : "下降"} ${Math.abs(d)}°`;
+  const when = next.day ? (next.slot === "出門" ? "明早" : "明天") : "今天";
+  const hh = String(next.hour).padStart(2, "0");
+  return `${when} ${hh}:00 ${next.slot}時間體感溫度 ${next.temp}°，${diff}。${rainNote}`;
+}
+
 const DEFAULT_SUGGESTION = suggestOutfit(MOCK_WEATHER, null);
 
 /**
@@ -184,7 +205,7 @@ export function HomeScreen({
             ))}
           </div>
 
-          <p className="yw-home__summary">{commuteSentence(weather.commute, rainPossible)}</p>
+          <p className="yw-home__summary">{nextCommuteSentence(weather, rainPossible)}</p>
 
           {/* 當地昨日補充列 — secondary, not part of the delta calc (跨地點時才顯示) */}
           {crossLocation?.localYesterday ? (

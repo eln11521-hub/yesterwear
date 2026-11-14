@@ -583,7 +583,7 @@ struct SectionBadge: View {
 /// (solid — ink up to now, lighter ahead) against yesterday's (dashed) across
 /// 00–24, a dot at now. It shows the shape of the day, not exact readings: the
 /// legend gives both values at now, and dragging across the chart reads any hour.
-/// Above it, one line about the next commute against the same hour the day before.
+/// (The next-commute line lives in the Home hero summary.)
 struct HourlyChart: View {
     struct Item: Identifiable {
         var id: Int { offset }
@@ -626,7 +626,6 @@ struct HourlyChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if let line = summary { Text(line).font(T.ui(12)).foregroundStyle(S.textBody) }
             YWSegmented(options: ["今天各時段", "相比昨天"], selected: tab, inset: true) { tab = $0 }
             if tab == 0 {
                 strip
@@ -689,20 +688,6 @@ struct HourlyChart: View {
     }
 
     // MARK: 相比昨天
-
-    /// Next commute: today's against yesterday; once those have passed, tomorrow's
-    /// against today — the same hour the day before either way.
-    private var summary: String? {
-        guard let next = items.first(where: { $0.offset > 0 && $0.slot != nil }),
-              (0..<24).contains(next.hour) else { return nil }
-        let before = next.day == 0 ? yesterday[next.hour] : today[next.hour]
-        let d = next.feels - before
-        let slot = next.slot ?? "通勤"
-        let when = next.day == 0 ? "今天" : (slot == "出門" ? "明早" : "明天")
-        let ref = next.day == 0 ? "昨天" : "今天"
-        let diff = d == 0 ? "和\(ref)差不多" : "比\(ref)\(d > 0 ? "高" : "低") \(abs(d))°"
-        return "\(when) \(String(format: "%02d:00", next.hour)) \(slot)體感 \(next.feels)°，\(diff)"
-    }
 
     /// The legend doubles as the read-out: values at now, or at the dragged hour.
     private var legend: some View {
