@@ -143,11 +143,32 @@ struct HomeView: View {
         return "與昨日持平"
     }
 
-    /// Figma 665:2194 / web commuteSentence.
+    /// Hero summary (web nextCommuteSentence): the NEXT commute (出門 or 下班) and
+    /// its feels-like against the same hour the day before — today's vs yesterday,
+    /// or, once today's have passed, tomorrow's vs today — plus a rain reminder.
+    /// Falls back to both commutes when the hourly data isn't there.
     private func commuteSentence(_ snap: WeatherSnapshot, rainPossible: Bool) -> String {
+        let rainNote = rainPossible ? "今日有降雨機率，記得攜帶雨具。" : ""
+        let leave = settings.settings.leaveHour, back = settings.settings.returnHour
+        if let today = snap.todayFeels, let yesterday = snap.yesterdayFeels,
+           let next = snap.hourly?.first(where: { ($0.offset ?? 0) > 0 && ($0.hour == leave || $0.hour == back) }),
+           (0..<24).contains(next.hour) {
+            let slot = next.hour == leave ? "出門" : "下班"
+            let tomorrow = (next.day ?? 0) != 0
+            let before = tomorrow ? today[next.hour] : yesterday[next.hour]
+            let d = deg(next.apparent) - deg(before)
+            let ref = tomorrow ? "今天" : "昨日"
+            let diff = d == 0 ? "與\(ref)持平" : "較\(ref)\(d > 0 ? "上升" : "下降") \(abs(d))°"
+            let when = tomorrow ? (slot == "出門" ? "明早" : "明天") : "今天"
+            return "\(when) \(String(format: "%02d:00", next.hour)) \(slot)時間體感溫度 \(deg(next.apparent))°，\(diff)。" + rainNote
+        }
+        return bothCommutes(snap) + rainNote
+    }
+
+    /// Older caches: both commutes (Figma 665:2194).
+    private func bothCommutes(_ snap: WeatherSnapshot) -> String {
         "出門時間體感溫度 \(deg(snap.leave.todayApparent))°，\(deltaPhrase(snap.leave))；"
             + "下班時間體感溫度為 \(deg(snap.return.todayApparent))°，\(deltaPhrase(snap.return))。"
-            + (rainPossible ? "今日有降雨機率，記得攜帶雨具。" : "")
     }
 
     // MARK: Outfit

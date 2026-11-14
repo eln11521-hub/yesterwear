@@ -13,14 +13,6 @@
   align-items: center;
 }
 
-/* next-commute line: 12 Regular body colour (Figma 669:1343) */
-.yw-hourly__summary {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--yw-sys-color-text-body);
-}
-
 /* legend doubles as the read-out: values at now, or at the dragged hour */
 .yw-hourly__legend {
   display: flex;
